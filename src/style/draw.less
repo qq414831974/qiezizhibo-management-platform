@@ -1,0 +1,85 @@
+.steps-div {
+}
+
+.steps-content {
+  border-radius: 6px;
+  text-align: center;
+  width: 100%;
+  height: 140px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.steps-content::-webkit-scrollbar {
+  display: none;
+}
+
+.steps-content-large {
+  border-radius: 6px;
+  text-align: center;
+  width: 100%;
+  height: 270px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.steps-content-large::-webkit-scrollbar {
+  display: none;
+}
+
+.steps-content-large-more {
+  border-radius: 6px;
+  text-align: center;
+  width: 100%;
+  height: 400px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.steps-content-large-more::-webkit-scrollbar {
+  display: none;
+}
+
+.steps-action {
+  height: 40px;
+  width: 100%;
+  position: absolute;
+  bottom: 8px;
+  left: 0;
+}
+
+.ant-drawer-body-pa-s .ant-drawer-body {
+  padding: 12px !important;
+}
+
+.step-item-hover:hover {
+  border-radius: 6px;
+  background-color: @min-black;
+  cursor: pointer;
+}
+
+.step-item-selected {
+  border-radius: 6px;
+  background-color: @min-black;
+  cursor: pointer;
+  .step-item-check {
+    display: flex;
+  }
+}
+
+.step-collapse-no-border {
+  .ant-collapse-item {
+    border-bottom: 0px !important;
+    .ant-collapse-header {
+      .anticon-right {
+        display: none !important;
+      }
+    }
+  }
+}
+
+.step-delete-item {
+  position: absolute;
+  right: 10px;
+  top: 60px;
+}

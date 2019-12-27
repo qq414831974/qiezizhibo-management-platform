@@ -1,0 +1,10 @@
+./config
+LICENSE
+./node_modules
+package-lock.json
+package.json
+./public
+qiezizhibo-management-platform.iml
+./scripts
+./src
+./theme

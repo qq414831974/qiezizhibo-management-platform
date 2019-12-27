@@ -1,0 +1,117 @@
+.qz-live-league-content {
+  padding: 4.5em 6em;
+  background-color: @dark-white;
+  .qz-live-league-content-title {
+    margin: 2em 0;
+    .qz-live-league-content-title__img {
+      width: 4em;
+      height: 4em;
+      border-radius: 45px;
+      margin-right: 1.5em;
+    }
+    .qz-live-league-content-title__name {
+      font-size: 3em;
+      font-weight: bold;
+      letter-spacing: 0.3em;
+    }
+  }
+  .qz-live-league-content-list__div {
+    padding: 1em 0;
+    .qz-live-league-content-list__loading {
+      position: absolute;
+      bottom: -40px;
+      left: 50%;
+    }
+  }
+  .qz-live-league-content-list-item {
+    border-bottom: none;
+    .qz-live-league-content-list-item__item {
+      margin: 0 6em;
+      cursor: pointer;
+    }
+    .qz-live-league-content-list-item__item:hover {
+      background-color: @purple-light;
+      color: @dark-white;
+      border-radius: 10px;
+    }
+  }
+  .qz-live-league-content-left {
+    padding: 2em 0;
+    width: 60%;
+    display: inline-block;
+    border-right: @light-grey solid 1px;
+    .qz-live-league-content-left__title {
+      font-size: 3em;
+      font-weight: bold;
+      letter-spacing: 0.3em;
+    }
+  }
+  .qz-live-league-content-right {
+    padding: 2em 1em;
+    width: 40%;
+    float: right;
+    .qz-live-league-content-right__title {
+      font-size: 3em;
+      font-weight: bold;
+      letter-spacing: 0.3em;
+    }
+    .qz-live-league-content-right__title_2 {
+      font-size: 1.5em;
+      font-weight: bold;
+      letter-spacing: 0.3em;
+    }
+  }
+}
+
+.qz-live-league-search-content {
+  padding: 4em 6em;
+  background-color: @dark-white;
+  position: relative;
+  .qz-live-league-search-content-search-div {
+    padding: 1em 10em;
+    .qz-live-league-search-content-search__input {
+      min-width: 400px;
+      .ant-input {
+        padding-left: 15px;
+        border-radius: 15px;
+      }
+      .ant-input-suffix {
+        right: 15px;
+        .ant-input-search-icon {
+          display: none;
+        }
+      }
+    }
+  }
+  .qz-live-league-search-content-div {
+    .qz-live-league-search-content__title {
+      font-size: 3em;
+      font-weight: bold;
+    }
+    .qz-live-league-search-content__content {
+      padding: 2em;
+    }
+  }
+  .qz-live-league-search-content-list-item {
+    cursor: pointer;
+    padding: 1em;
+    border-radius: 10px;
+    .qz-live-league-search-content-list-item__cover {
+      padding: 2em;
+      border-radius: 10px;
+      //border: @light-grey solid 1px;
+      .qz-live-league-search-content-list-item__cover-img {
+        height: 4em;
+        width: 4em;
+        border-radius: 45px;
+      }
+    }
+    .qz-live-league-search-content-list-item__name {
+      font-size: 2em;
+    }
+  }
+  .qz-live-league-search-content-list-item:hover {
+    background-color: @purple-light;
+    color: @dark-white;
+  }
+}

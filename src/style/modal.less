@@ -1,0 +1,62 @@
+.vertical-center-modal {
+  text-align: center;
+  white-space: nowrap;
+  &:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    width: 0;
+  }
+  .ant-modal {
+    display: inline-block;
+    vertical-align: middle;
+    top: 0;
+    text-align: left;
+  }
+}
+
+.video-iframe {
+  width: 348px;
+  height: 198px;
+  overflow: hidden;
+  //float: right;
+  //position: absolute;
+  //right: 20px;
+  //bottom: 90px;
+  border: 1px solid @black;
+}
+.video-iframe-detail {
+  width: 348px;
+  height: 198px;
+  overflow: hidden;
+  //float: right;
+  //position: absolute;
+  //right: 20px;
+  //bottom: 90px;
+  border: 1px solid @black;
+}
+
+.modal-header-ptb-s{
+  .ant-modal-header{
+    padding-top:6px !important;
+    padding-bottom: 4px !important;
+  }
+}
+.modal-pt-n{
+  .ant-modal-body{
+    padding-top:0px !important;
+  }
+}
+/*
+// Use flex which not working in IE
+.vertical-center-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.vertical-center-modal .ant-modal {
+  top: 0;
+}
+*/

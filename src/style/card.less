@@ -1,0 +1,135 @@
+.react-draggable, .cursor-move {
+  cursor: move;
+  strong {
+    background: #ddd;
+    border: 1px solid #999;
+    border-radius: 3px;
+    display: block;
+    margin-bottom: 10px;
+    padding: 3px 5px;
+    text-align: center;
+  }
+}
+
+.no-cursor {
+  cursor: auto;
+}
+
+.card-tool {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+}
+
+.list-group {
+  .list-group-item {
+    position: relative;
+    display: block;
+    margin-bottom: -1px;
+    padding: 12px 16px;
+    background: transparent;
+    border: 1px solid #ddd;
+    border-color: rgba(120, 130, 140, 0.065);
+    border-width: 1px 0;
+    &:first-child {
+      border-top-width: 0;
+    }
+    &:last-child {
+      border-bottom-width: 0;
+    }
+  }
+}
+
+.card-no-padding {
+  .ant-card-body {
+    padding: 0 !important;
+  }
+}
+.page-background {
+  background-size: contain;
+  position: relative;
+  height: 100%;
+  width: 100%;
+  box-shadow: 0 0 1px #2f2f2f;
+}
+
+.page-foreground {
+  width: 80%;
+  height: 80%;
+  top: 10%;
+  left: 10%;
+  position: absolute;
+  background-size: 100%;
+  overflow: hidden;
+  box-shadow: 0 0 1px #2f2f2f;
+  background: @black;
+  z-index: 1;
+}
+
+.page-detail {
+  width: 77%;
+  height: 78%;
+  background-size: cover;
+  top: 0%;
+  left: 0%;
+  position: absolute;
+  box-shadow: 0 0 1px #2f2f2f;
+  z-index: 200;
+}
+
+.ant-upload-drag {
+  width: 120px;
+  height: 120px;
+  padding: 10px;
+}
+
+.ant-upload-drag-cover {
+  width: 250px;
+  height: 160px;
+  padding: 5px;
+}
+
+.ant-upload-text {
+  margin-top: 8px;
+  color: #666;
+}
+
+.card-pt-m {
+  .ant-card-body {
+    padding-top: 10px !important;
+  }
+}
+
+.video-card {
+  display: inline-block;
+  margin-left: 2% !important;
+  margin-bottom: 6px !important;
+  .video-card-item {
+    width: 48%;
+    min-width: 160px;
+    height: 90px;
+    border-radius: 3px;
+    border: 1px solid @min-black;
+    background: @min-black;
+    .video-card-content {
+      width: 48%;
+      min-width: 152px;
+      height: 82px;
+    }
+    .video-card-content {
+      width: 48%;
+      min-width: 152px;
+      height: 82px;
+    }
+    .video-card-content-img {
+      position: absolute;
+      width: 46%;
+      min-width: 146px;
+      height: 82px;
+    }
+    .video-card-content-img:hover {
+      opacity: 0.6;
+      filter: alpha(opacity=60);
+    }
+  }
+}
