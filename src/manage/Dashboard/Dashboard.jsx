@@ -6,6 +6,7 @@ import {Row, Col, Card, Avatar, Icon} from 'antd';
 import EchartsViews from './EchartsViews';
 import EchartsProjects from './EchartsProjects';
 import avatar from '../../static/avatar.jpg';
+import logo from '../../static/logo.png';
 import {getActivityInfoList, getRecentMatches} from "../../axios/index";
 
 
@@ -185,21 +186,8 @@ class Dashboard extends React.Component {
                     <Col className="gutter-row" md={16}>
                         <div className="gutter-box">
                             <Card bordered={false} style={{height: 214}}>
-                                <div className="pb-m">
-                                    <h3>消息栏</h3>
-                                </div>
-                                <a className="card-tool"><Icon type="sync"/></a>
-                                <ul className="list-group no-border">
-                                    <li className="list-group-item">
-                                        <a href="" className="pull-left w-40 mr-m">
-                                            <img src={avatar} className="img-responsive img-circle" alt="test"/>
-                                        </a>
-                                        <div className="clear">
-                                            <a href="" className="block">用户</a>
-                                            <span className="text-muted">新消息！</span>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <div className="w-full center"><img src={logo} className="round-img"/></div>
+                                <span style={{fontSize:20}} className="w-full center mt-s">欢迎来到全国青少年校园足球赛事后台管理</span>
                             </Card>
                         </div>
                     </Col>

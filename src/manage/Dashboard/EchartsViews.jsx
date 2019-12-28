@@ -20,7 +20,7 @@ class EchartsViews extends React.Component {
         this.setState({
             loading: true,
         });
-        getVisit().then((data) => {
+        getVisit({areatype: 2}).then((data) => {
             if (data) {
                 this.setState({
                     value: this.getValue(data),
