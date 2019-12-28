@@ -73,7 +73,7 @@ class BulletinSetting extends React.Component {
             if (err) {
                 return;
             }
-            setBulletin(values).then((data) => {
+            setBulletin({areatype: 2, ...values}).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
@@ -155,29 +155,6 @@ class BulletinSetting extends React.Component {
                     return <span>网站</span>
                 }
                 return <span>页面</span>
-            }
-        }, {
-            title: '地区',
-            dataIndex: 'areatype',
-            key: 'areatype',
-            width: '10%',
-            align: 'center',
-            render: function (text, record, index) {
-                let area = "默认";
-                if (record.areatype) {
-                    switch (record.areatype) {
-                        case 0:
-                            area = "默认";
-                            break;
-                        case 1:
-                            area = "全国";
-                            break;
-                        case 2:
-                            area = "全国青少年";
-                            break;
-                    }
-                }
-                return <span>{area}</span>
             }
         }, {
             title: '省份',

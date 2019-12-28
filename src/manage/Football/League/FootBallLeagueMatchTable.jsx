@@ -38,6 +38,11 @@ class FootBallLeagueMatchTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
+        if (params.filter) {
+            params.filter = {areatype: 2, ...params.filter}
+        } else {
+            params.filter = {areatype: 2}
+        }
         getAllLeagueMatchSeries(params).then((data) => {
             if (data && data.list) {
                 const pagination = {...this.state.pagination};
@@ -342,28 +347,11 @@ class FootBallLeagueMatchTable extends React.Component {
                 return <p>{(record.isparent ? "系列赛" : "联赛")}</p>
             }
         }, {
-            title: '地区类型',
+            title: <Tooltip title="排序从9-0开始代表在首页的排序顺序，9第一位，8第二位以此类推"><span>排序</span></Tooltip>,
             align: 'center',
-            dataIndex: 'phonenumber',
+            dataIndex: 'remark',
             width: '10%',
-            render: function (text, record, index) {
-                let type = "-";
-                if (record.areatype) {
-                    if (record.areatype == 1) {
-                        type = "全国"
-                    } else if (record.areatype == 2) {
-                        type = "全国青少年"
-                    }
-                }
-                return <p>{type}</p>
-            }
         },
-            {
-                title: <Tooltip title="备注从9-0开始代表在首页的排序顺序，9第一位，8第二位以此类推"><span>备注</span></Tooltip>,
-                align: 'center',
-                dataIndex: 'remark',
-                width: '10%',
-            },
             {
                 title: <span>轮播id</span>,
                 align: 'center',

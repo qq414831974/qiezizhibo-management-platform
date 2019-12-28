@@ -213,11 +213,11 @@ class BulletinModifyDialog extends React.Component {
                             </RadioGroup>
                         )}
                     </FormItem>
-                    <FormItem {...formItemLayout} label="地区" className="bs-form-item">
+                    <FormItem {...formItemLayout} hidden={true} label="地区" className="bs-form-item">
                         {getFieldDecorator('areatype', {
-                            initialValue: record.areatype,
+                            initialValue: 2,
                         })(
-                            <RadioGroup>
+                            <RadioGroup hidden={true}>
                                 <Radio value={0}>默认</Radio>
                                 <Radio value={1}>全国</Radio>
                                 <Radio value={2}>全国青少年</Radio>

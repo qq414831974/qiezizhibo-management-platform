@@ -17,7 +17,7 @@ const store = createStore(reducer, applyMiddleware(...middleware));
 console.log(store.getState());
 const render = Component => {   // 增加react-hot-loader保持状态刷新操作，如果不需要可去掉并把下面注释的打开
     ReactDOM.render(
-        <DocumentTitle title="茄子直播">
+        <DocumentTitle title="全国青少年校园足球赛事后台管理">
             <AppContainer>
                 <Provider store={store}>
                     <Component store={store}/>

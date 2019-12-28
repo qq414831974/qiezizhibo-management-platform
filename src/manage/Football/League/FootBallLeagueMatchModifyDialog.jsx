@@ -181,10 +181,12 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
     getAreasOption = () => {
         let dom = [];
         this.state.areas.forEach((item) => {
-            dom.push(<Option value={item.province} data={item.province} key={`area-${item.id}`}>{item.province}</Option>);
+            dom.push(<Option value={item.province} data={item.province}
+                             key={`area-${item.id}`}>{item.province}</Option>);
         })
         return dom;
     }
+
     render() {
         const {visible, form, record} = this.props;
         const {getFieldDecorator} = form;
@@ -251,12 +253,12 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                 </RadioGroup>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="地区类型" className="bs-form-item">
+                        <FormItem {...formItemLayout} hidden={true} label="地区类型" className="bs-form-item">
                             {getFieldDecorator('areatype', {
                                 rules: [{required: true, message: '请选择类型'}],
-                                initialValue: record.areatype
+                                initialValue: 2
                             })(
-                                <RadioGroup>
+                                <RadioGroup hidden={true}>
                                     <Radio value={0}>默认</Radio>
                                     <Radio value={1}>全国</Radio>
                                     <Radio value={2}>全国青少年</Radio>
@@ -317,11 +319,11 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                             {getFieldDecorator('regulations.population', {
                                 initialValue: record.regulations ? record.regulations.population : null,
                                 getValueFromEvent(e) {
-                                    if(e == null){
+                                    if (e == null) {
                                         return null
                                     }
-                                    if(typeof(e) === 'string'){
-                                        return e.replace(/[^\d]/g,'')
+                                    if (typeof (e) === 'string') {
+                                        return e.replace(/[^\d]/g, '')
                                     }
                                     return e
                                 },
@@ -368,11 +370,11 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                 </span>
                             </Col>
                             <Col span={12}>
-                                <FormItem>
+                                <FormItem hidden={true}>
                                     {getFieldDecorator('city', {
                                         initialValue: record.city,
                                     })(
-                                        <Input placeholder='请输入城市'/>
+                                        <Input hidden={true} placeholder='请输入城市'/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -413,11 +415,11 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                 <Input placeholder='请输入联系电话'/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="备注" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="排序" className="bs-form-item">
                             {getFieldDecorator('remark', {
                                 initialValue: record.remark,
                             })(
-                                <Input.TextArea placeholder='备注'/>
+                                <Input.TextArea placeholder='排序'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="描述" className="bs-form-item">

@@ -75,7 +75,7 @@ class App extends Component {
     render() {
         const {auth, responsive} = this.props;
         return (
-            <DocumentTitle title="茄子TV后台管理系统">
+            <DocumentTitle title="全国青少年校园足球赛事后台管理">
                 <Layout>
                     <SiderCustom collapsed={this.state.collapsed} ontoggle={this.toggle}/>
                     {(responsive.data.isMobile && !this.state.collapsed)
@@ -91,7 +91,7 @@ class App extends Component {
                                 <Routes auth={auth}/>
                             </Content>
                             <Footer style={{textAlign: 'center'}}>
-                                Qiezizhibo-Admin ©2018
+                                全国青少年校园足球赛事后台管理 ©2020
                             </Footer>
                         </Layout>
                     }

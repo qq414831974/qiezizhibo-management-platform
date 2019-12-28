@@ -49,13 +49,13 @@ class BannerUpload extends React.Component {
         const img = this.props.data ? this.props.data.img : null;
         const url = this.props.data ? this.props.data.url : null;
         const province = this.props.data ? this.props.data.province : null;
-        const areatype = this.props.data ? this.props.data.areatype : null;
         setConfig({
+            id: this.props.data ? this.props.data.id : null,
             description: this.props.index,
             value: this.state.imgUrl ? this.state.imgUrl : img,
             remark: this.state.url ? this.state.url : url,
             province: this.state.province ? (this.state.province == "无" ? null : this.state.province) : province,
-            areatype: this.state.areatype != null ? this.state.areatype : areatype,
+            areatype: 2,
             code: "banner"
         }).then((data) => {
             if (data && data.code == 200) {
@@ -70,15 +70,11 @@ class BannerUpload extends React.Component {
             }
         });
     }
-    onRadioChange = (e) => {
-        this.setState({areatype: e.target.value})
-    }
 
     render() {
         const img = this.props.data ? this.props.data.img : null;
         const url = this.props.data ? this.props.data.url : null;
         const province = this.props.data ? this.props.data.province : null;
-        const areatype = this.props.data ? this.props.data.areatype : null;
         // if (this.props.data == null) {
         //     return <div/>
         // }
@@ -116,14 +112,6 @@ class BannerUpload extends React.Component {
                             defaultValue={province}>
                         {this.props.areas ? this.getAreasOption() : null}
                     </Select>
-                </div>
-                <div className="w-full mt-s">
-                    <RadioGroup onChange={this.onRadioChange}
-                                defaultValue={areatype}>
-                        <Radio value={0}>默认</Radio>
-                        <Radio value={1}>全国</Radio>
-                        <Radio value={2}>全国青少年</Radio>
-                    </RadioGroup>
                 </div>
                 <div className="w-full center mt-s">
                     <Button type="primary" onClick={this.onSaveClick}>保存</Button>

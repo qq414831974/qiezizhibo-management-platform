@@ -38,17 +38,12 @@ export default class CRouter extends Component {
         return (
             <Switch>
                 <Route exact path="/index" component={Dashboard}/>
-                <Route exact path="/user" component={UserManagement}/>
-                <Route exact path="/role" component={RoleManagement}/>
-                <Route exact path="/area" component={AreasManagement}/>
                 <Route exact path="/football/footballPlayer" component={FootBallPlayerManagement}/>
                 <Route exact path="/football/footballTeam" component={FootBallTeamManagement}/>
                 <Route exact path="/football/footballMatch" component={FootBallMatchManagement}/>
                 <Route exact path="/football/footballLeagueMatch" component={FootBallLeagueMatchManagement}/>
                 <Route exact path="/live" component={LiveManagement}/>
                 <Route exact path="/setting/banner" component={BannerSetting}/>
-                <Route exact path="/setting/scoreboard" component={ScoreBoardSetting}/>
-                <Route exact path="/setting/wechat" component={WechatSetting}/>
                 <Route exact path="/setting/bulletin" component={BulletinSetting}/>
                 <Route path="/football/comment/:id" component={CommentManagement}/>
                 <Route path="/live/:id" component={LiveDetailManagement}/>
@@ -57,7 +52,6 @@ export default class CRouter extends Component {
                 <Route path="/football/footballLeagueMatch/:id" component={FootballLeagueMatchDetailManagement}/>
                 <Route path="/football/footballLeagueSeries/:id" component={FootBallLeagueMatchSeriesManagement}/>
                 <Route path="/football/footballPlayer/:id" component={FootballPlayerDetailManagement}/>
-                <Route path="/football/schedule" component={FootballMatchSchedule}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )

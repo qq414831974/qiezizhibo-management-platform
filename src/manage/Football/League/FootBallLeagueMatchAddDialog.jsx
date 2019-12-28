@@ -248,12 +248,12 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 </RadioGroup>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="地区类型" className="bs-form-item">
+                        <FormItem {...formItemLayout} hidden={true} label="地区类型" className="bs-form-item">
                             {getFieldDecorator('areatype', {
                                 rules: [{required: true, message: '请选择类型'}],
-                                initialValue: 0
+                                initialValue: 2
                             })(
-                                <RadioGroup>
+                                <RadioGroup  hidden={true}>
                                     <Radio value={0}>默认</Radio>
                                     <Radio value={1}>全国</Radio>
                                     <Radio value={2}>全国青少年</Radio>
@@ -328,11 +328,11 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 <InputNumber placeholder='请输入'/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="英文名" className="bs-form-item">
+                        <FormItem {...formItemLayout} hidden={true} label="英文名" className="bs-form-item">
                             {getFieldDecorator('englishname', {
                                 // initialValue: record.englishname,
                             })(
-                                <Input placeholder='请输入英文名'/>
+                                <Input hidden={true} placeholder='请输入英文名'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="主办方" className="bs-form-item">
@@ -363,10 +363,10 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 </span>
                             </Col>
                             <Col span={12}>
-                                <FormItem>
+                                <FormItem hidden={true}>
                                     {getFieldDecorator('city', {
                                     })(
-                                        <Input placeholder='请输入城市'/>
+                                        <Input hidden={true} placeholder='请输入城市'/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -404,9 +404,9 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 <Input placeholder='请输入联系电话'/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="备注" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="排序" className="bs-form-item">
                             {getFieldDecorator('remark', {})(
-                                <Input placeholder='备注'/>
+                                <Input placeholder='排序'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="描述" className="bs-form-item">

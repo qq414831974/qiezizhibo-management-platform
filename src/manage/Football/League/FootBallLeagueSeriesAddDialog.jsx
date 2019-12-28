@@ -193,6 +193,18 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                                 </RadioGroup>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} hidden={true} label="地区类型" className="bs-form-item">
+                            {getFieldDecorator('areatype', {
+                                rules: [{required: true, message: '请选择类型'}],
+                                initialValue: 2
+                            })(
+                                <RadioGroup hidden={true}>
+                                    <Radio value={0}>默认</Radio>
+                                    <Radio value={1}>全国</Radio>
+                                    <Radio value={2}>全国青少年</Radio>
+                                </RadioGroup>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="名称" className="bs-form-item">
                             {getFieldDecorator('name', {
                                 rules: [{required: true, message: '请输入名字'}],
