@@ -568,7 +568,7 @@ export const getMatchTime = (matchid) => get({url: 'http://localhost:8080/api/ge
     }).catch(function (error) {
         console.log(error)
     });
-export const getRecentMatches = () => get({url: 'http://localhost:8080/api/getRecentMatches'})
+export const getRecentMatches = (params) => get({url: `http://localhost:8080/api/getRecentMatches?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

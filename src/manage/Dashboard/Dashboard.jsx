@@ -21,7 +21,7 @@ class Dashboard extends React.Component {
 
     fetch = () => {
         //获取直播列表
-        getActivityInfoList({pageSize: 1000, pageNum: 1, filter: {},},{name: "qsn-"}).then((data) => {
+        getActivityInfoList({pageSize: 1000, pageNum: 1, filter: {},}, {name: "qsn-"}).then((data) => {
             if (data && data.items && data.items.length > 0) {
                 this.setState({
                     activityData: data.items,
@@ -29,7 +29,7 @@ class Dashboard extends React.Component {
             }
         });
         //获取近期的比赛
-        getRecentMatches().then((data) => {
+        getRecentMatches({areatype: 2}).then((data) => {
             if (data && data.length > 0) {
                 this.setState({
                     matchData: data,
@@ -78,7 +78,7 @@ class Dashboard extends React.Component {
                 totalMatch = totalMatch + 1;
                 if (hostteam == null || guestteam == null) {
                     matchDom.push(<div className="w-full mb-s cursor-hand cell-hover" key={item.id}
-                         onClick={this.onMatchClick.bind(this, item.id)}>
+                                       onClick={this.onMatchClick.bind(this, item.id)}>
                         <span>{item.name}</span>
                     </div>);
                 } else {
