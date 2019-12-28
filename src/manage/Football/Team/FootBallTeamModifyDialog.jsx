@@ -182,6 +182,13 @@ class FootBallTeamModifyDialog extends React.Component {
                                 <Input hidden={true} />
                             )}
                         </FormItem>
+                        <FormItem style={{margin:0}}>
+                            {getFieldDecorator('areatype', {
+                                initialValue: 2,
+                            })(
+                                <Input hidden={true} />
+                            )}
+                        </FormItem>
                     </Form>
                 </div>
                 :

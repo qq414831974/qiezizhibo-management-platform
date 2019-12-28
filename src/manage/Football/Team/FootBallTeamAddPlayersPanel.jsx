@@ -79,6 +79,11 @@ class FootBallTeamAddPlayersPanel extends React.Component {
         this.setState({
             loading: true,
         });
+        if (params.filter) {
+            params.filter = {areatype: 2, ...params.filter}
+        } else {
+            params.filter = {areatype: 2}
+        }
         getAllPlayersNotInTeam(params, this.props.record.id).then((data) => {
             if (data && data.list) {
                 const pagination = {...this.state.pagination};

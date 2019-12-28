@@ -70,10 +70,11 @@ const typeData = [
     }, {
         title: '聊天室',
         value: 4,
-    }, {
-        title: '集锦',
-        value: 5,
     },
+    // {
+    //     title: '推荐赛事',
+    //     value: 5,
+    // },
 ];
 
 class FootBallMatchAddDialog extends React.Component {
@@ -107,7 +108,8 @@ class FootBallMatchAddDialog extends React.Component {
                 pageSize: 300,
                 pageNum: 1,
                 sortField: "id",
-                sortOrder: "desc"
+                sortOrder: "desc",
+                filter: {areatype: 2}
             }).then((data) => {
                 if (data && data.list) {
                     this.setState({
@@ -122,6 +124,7 @@ class FootBallMatchAddDialog extends React.Component {
         getAllLeagueMatchs({
             pageSize: 300,
             pageNum: 1,
+            areatype: 2,
         }).then((data) => {
             if (data && data.list) {
                 this.setState({
@@ -137,7 +140,7 @@ class FootBallMatchAddDialog extends React.Component {
         this.setState({
             listloading: true,
         });
-        getActivityInfoList(params).then((data) => {
+        getActivityInfoList(params, {name: "qsn-"}).then((data) => {
             if (data && data.items) {
                 const pagination = {...this.state.pagination};
                 pagination.total = data ? data.pager.total : 0;
@@ -176,6 +179,7 @@ class FootBallMatchAddDialog extends React.Component {
         this.setState({
             liveloading: true,
         });
+        data.name = "qsn-" + data.name
         createActivity(data).then((data) => {
             this.setState({
                 liveloading: false,
@@ -460,6 +464,9 @@ class FootBallMatchAddDialog extends React.Component {
             place: item
         })
     }
+    replaceName = (name) => {
+        return name.replace("qsn-", "")
+    }
 
     render() {
         const {visible, form, record} = this.props;
@@ -537,7 +544,7 @@ class FootBallMatchAddDialog extends React.Component {
                     renderItem={item => (
                         <List.Item>
                             <div className="cursor-hand" onClick={onLivelistClick.bind(this, form, item)}>
-                                <p style={{fontSize: 14}}>{item.name}</p>
+                                <p style={{fontSize: 14}}>{this.replaceName(item.name)}</p>
                                 <p className="mb-n"
                                    style={{fontSize: 10}}>{parseTimeStringWithOutYear(item.startedAt)}~{parseTimeStringWithOutYear(item.endedAt)}</p>
                             </div>
@@ -793,7 +800,7 @@ class FootBallMatchAddDialog extends React.Component {
                         </div>
                         <div className="center w-full">
                             {this.state.currentLiveData ?
-                                <p>{this.state.currentLiveData.name}</p>
+                                <p>{this.replaceName(this.state.currentLiveData.name)}</p>
                                 :
                                 <div/>
                             }
@@ -826,38 +833,38 @@ class FootBallMatchAddDialog extends React.Component {
                         {/*)}*/}
                         {/*</FormItem>*/}
                         {/*</div>*/}
-                        <div className="center w-full">
-                            <p className="mb-n mt-m" style={{fontSize: 20}}>云犀直播小程序地址</p>
-                        </div>
-                        <div className="center w-full">
-                            <FormItem className="bs-form-item">
-                                {getFieldDecorator('remark', {})(
-                                    <Input style={{minWidth: 300, textAlign: "center"}} placeholder='云犀直播小程序地址'/>
-                                )}
-                            </FormItem>
-                        </div>
-                        <div className="center w-full">
-                            <div>
-                                <p className="mt-m mb-n inline-block" style={{fontSize: 22}}>拉流模式</p>
-                                <Tooltip title="请选择直播间后输入推流码进行推流">
-                                    <Icon className="inline-block" type="question-circle"/>
-                                </Tooltip>
-                            </div>
-                        </div>
-                        <div className="center w-full">
-                            <Input style={{maxWidth: 300, textAlign: "center"}} onChange={this.onPullInputChange}
-                                   value={this.state.pullInput}/>
-                            <Button type="primary" shape="round"
-                                    onClick={this.handlePullClick}><Icon
-                                type={this.state.pullloading ? "loading" : "api"}/>开拉</Button>
-                        </div>
+                        {/*<div className="center w-full">*/}
+                        {/*    <p className="mb-n mt-m" style={{fontSize: 20}}>云犀直播小程序地址</p>*/}
+                        {/*</div>*/}
+                        {/*<div className="center w-full">*/}
+                        {/*    <FormItem className="bs-form-item">*/}
+                        {/*        {getFieldDecorator('remark', {})(*/}
+                        {/*            <Input style={{minWidth: 300, textAlign: "center"}} placeholder='云犀直播小程序地址'/>*/}
+                        {/*        )}*/}
+                        {/*    </FormItem>*/}
+                        {/*</div>*/}
+                        {/*<div className="center w-full">*/}
+                        {/*    <div>*/}
+                        {/*        <p className="mt-m mb-n inline-block" style={{fontSize: 22}}>拉流模式</p>*/}
+                        {/*        <Tooltip title="请选择直播间后输入推流码进行推流">*/}
+                        {/*            <Icon className="inline-block" type="question-circle"/>*/}
+                        {/*        </Tooltip>*/}
+                        {/*    </div>*/}
+                        {/*</div>*/}
+                        {/*<div className="center w-full">*/}
+                        {/*    <Input style={{maxWidth: 300, textAlign: "center"}} onChange={this.onPullInputChange}*/}
+                        {/*           value={this.state.pullInput}/>*/}
+                        {/*    <Button type="primary" shape="round"*/}
+                        {/*            onClick={this.handlePullClick}><Icon*/}
+                        {/*        type={this.state.pullloading ? "loading" : "api"}/>开拉</Button>*/}
+                        {/*</div>*/}
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>
                         </div>
                         <div className="center w-full">
                             <FormItem {...formItemLayout} className="bs-form-item">
                                 {getFieldDecorator('type', {
-                                    initialValue: [1, 2, 3, 4, 5],
+                                    initialValue: [1, 2, 3, 4],
                                 })(
                                     <TreeSelect treeData={typeData}
                                                 style={{minWidth: 300, maxWidth: 300, textAlign: "center"}}

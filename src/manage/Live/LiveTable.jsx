@@ -34,7 +34,7 @@ class UserTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
-        getActivityInfoList(params).then((data) => {
+        getActivityInfoList(params, {name: "qsn-"}).then((data) => {
             const pagination = {...this.state.pagination};
             pagination.total = data ? data.pager.total : 0;
             pagination.current = data ? data.pager.page : 0;
@@ -116,7 +116,7 @@ class UserTable extends React.Component {
             const baseData = {};
             baseData.endedAt = values.endedAt;
             baseData.startedAt = values.startedAt;
-            baseData.name = values.name;
+            baseData.name = "qsn-" + values.name;
             modifyActivityInfo(values.id, baseData).then(((data) => {
                 callback1();
                 if (data) {
@@ -129,24 +129,24 @@ class UserTable extends React.Component {
                     message.error('修改失败：' + (data ? data.name + "-" + data.message : data), 3);
                 }
             }));
-            const fakeData = {}
-            fakeData.enabled = values.isFakeEnabled;
-            fakeData.fake = {};
-            fakeData.fake.baseCount = values.fake.baseCount;
-            fakeData.fake.increaseMin = values.fake.increaseMin;
-            fakeData.fake.increaseMax = values.fake.increaseMax;
-            modifyActivityFakeInfo(values.id, fakeData).then(((data) => {
-                callback2();
-                if (data) {
-                    if (data.result) {
-                        message.success('修改人数放大成功', 1);
-                    } else {
-                        message.error('修改人数放大失败：' + (data ? data.name + "-" + data.message : data), 3);
-                    }
-                } else {
-                    message.error('修改人数放大失败：' + (data ? data.name + "-" + data.message : data), 3);
-                }
-            }));
+            // const fakeData = {}
+            // fakeData.enabled = values.isFakeEnabled;
+            // fakeData.fake = {};
+            // fakeData.fake.baseCount = values.fake.baseCount;
+            // fakeData.fake.increaseMin = values.fake.increaseMin;
+            // fakeData.fake.increaseMax = values.fake.increaseMax;
+            // modifyActivityFakeInfo(values.id, fakeData).then(((data) => {
+            //     callback2();
+            //     if (data) {
+            //         if (data.result) {
+            //             message.success('修改人数放大成功', 1);
+            //         } else {
+            //             message.error('修改人数放大失败：' + (data ? data.name + "-" + data.message : data), 3);
+            //         }
+            //     } else {
+            //         message.error('修改人数放大失败：' + (data ? data.name + "-" + data.message : data), 3);
+            //     }
+            // }));
             form.resetFields();
             this.setState({dialogModifyVisible: false});
         });
@@ -159,6 +159,7 @@ class UserTable extends React.Component {
             }
             values["endedAt"] = values["endedAt"].format('YYYY-MM-DD HH:mm:ss').toString();
             values["startedAt"] = values["startedAt"].format('YYYY-MM-DD HH:mm:ss').toString();
+            values["name"] = "qsn-" + values["name"]
             createActivity(values).then(((data) => {
                 if (data) {
                     if (data.id) {
@@ -215,9 +216,13 @@ class UserTable extends React.Component {
         save_link.download = name;
         this.fake_click(save_link);
     }
+    replaceName = (name) => {
+        return name.replace("qsn-", "")
+    }
 
     render() {
         const onRecordClick = this.onRecordClick;
+        const replaceName = this.replaceName;
         const LiveSimple = Form.create()(LiveSimpleForm);
         const LiveAddSimple = Form.create()(LiveAddDialog);
         const {selectedRowKeys} = this.state;
@@ -249,7 +254,6 @@ class UserTable extends React.Component {
             width: '45%',
             render: function (text, record, index) {
                 var type = "enabled";
-                var name = record.name;
                 switch (record.status) {
                     case "enabled" :
                         type = "play-circle";
@@ -265,7 +269,7 @@ class UserTable extends React.Component {
                         break;
                 }
                 return <p className="cursor-hand" onClick={onRecordClick.bind(this, record)}>
-                    <u>{record.name}</u>
+                    <u>{replaceName(record.name)}</u>
                 </p>;
             },
         }, {
@@ -294,24 +298,25 @@ class UserTable extends React.Component {
                 return <p>{record.isPushing ? "是" : "否"}</p>;
             },
             width: '10%',
-        }, {
-            title: '人数放大',
-            align: 'center',
-            render: function (text, record, index) {
-                return <p>{record.isFakeEnabled ? "是" : "否"}</p>;
-            },
-            width: '10%',
-        }, {
-            title: <span>id</span>,
-            align: 'center',
-            width: '5%',
-            render: function (text, record, index) {
-                return <p className="cursor-hand" onClick={() => {
-                    copy(`https://shangzhibo.tv/watch/${record.id}`);
-                    message.success('观看地址已复制到剪贴板');
-                }}>{record.id ? `${record.id}` : "-"}</p>
-            }
         },
+            //     {
+            //     title: '人数放大',
+            //     align: 'center',
+            //     render: function (text, record, index) {
+            //         return <p>{record.isFakeEnabled ? "是" : "否"}</p>;
+            //     },
+            //     width: '10%',
+            // }, {
+            //     title: <span>id</span>,
+            //     align: 'center',
+            //     width: '5%',
+            //     render: function (text, record, index) {
+            //         return <p className="cursor-hand" onClick={() => {
+            //             copy(`https://shangzhibo.tv/watch/${record.id}`);
+            //             message.success('观看地址已复制到剪贴板');
+            //         }}>{record.id ? `${record.id}` : "-"}</p>
+            //     }
+            // },
             // {
             //     title: '',
             //     key: '操作',
@@ -343,9 +348,9 @@ class UserTable extends React.Component {
                                        </Button>
                                    </Tooltip>
                                    <Tooltip title="刷新">
-                                   <Button type="primary" shape="circle" icon="reload" className="pull-right"
-                                           loading={this.state.loading}
-                                           onClick={this.refresh}/>
+                                       <Button type="primary" shape="circle" icon="reload" className="pull-right"
+                                               loading={this.state.loading}
+                                               onClick={this.refresh}/>
                                    </Tooltip>
                                </div>
                            }

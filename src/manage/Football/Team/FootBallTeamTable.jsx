@@ -38,6 +38,11 @@ class FootBallTeamTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
+        if (params.filter) {
+            params.filter = {areatype: 2, ...params.filter}
+        } else {
+            params.filter = {areatype: 2}
+        }
         getAllTeams(params).then((data) => {
             if (data && data.list) {
                 const pagination = {...this.state.pagination};
@@ -417,7 +422,7 @@ class FootBallTeamTable extends React.Component {
                                    <Upload
                                        className="ml-s"
                                        accept=".docx"
-                                       action={uploaddocx_team}
+                                       action={uploaddocx_team+'?areatype=2'}
                                        listType="text"
                                        withCredentials={true}
                                        showUploadList={false}

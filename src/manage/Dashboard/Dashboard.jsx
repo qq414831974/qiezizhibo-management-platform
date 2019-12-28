@@ -21,7 +21,7 @@ class Dashboard extends React.Component {
 
     fetch = () => {
         //获取直播列表
-        getActivityInfoList({pageSize: 1000, pageNum: 1, filter: {},}).then((data) => {
+        getActivityInfoList({pageSize: 1000, pageNum: 1, filter: {},},{name: "qsn-"}).then((data) => {
             if (data && data.items && data.items.length > 0) {
                 this.setState({
                     activityData: data.items,

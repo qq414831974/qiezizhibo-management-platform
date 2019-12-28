@@ -242,7 +242,7 @@ class BulletinModifyDialog extends React.Component {
                                 onCancel={this.onArticleShowHide}>
                                 {content_article}
                             </Modal>
-                            <Button onClick={this.onArticleShowClick}>选择公众号文章</Button>
+                            <Button disabled onClick={this.onArticleShowClick}>选择公众号文章</Button>
                         </div>
                     </FormItem>
                     <FormItem {...formItemLayout} label="省份" className="bs-form-item">

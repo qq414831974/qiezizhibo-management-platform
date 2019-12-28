@@ -163,6 +163,13 @@ class FootBallTeamAddDialog extends React.Component {
                                 <Input.TextArea placeholder='备注'/>
                             )}
                         </FormItem>
+                        <FormItem style={{margin:0}}>
+                            {getFieldDecorator('areatype', {
+                                initialValue: 2,
+                            })(
+                                <Input hidden={true} />
+                            )}
+                        </FormItem>
                     </Form>
                 </div>
                 :

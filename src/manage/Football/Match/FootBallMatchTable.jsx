@@ -594,23 +594,23 @@ class FootBallMatchTable extends React.Component {
                                        <Button type="primary" shape="circle" icon="plus"
                                                onClick={this.showMatchAddDialog}/>
                                    </Tooltip>
-                                   <Upload
-                                       className="ml-s mr-s"
-                                       accept=".docx"
-                                       action={uploaddocx_match}
-                                       listType="text"
-                                       withCredentials={true}
-                                       showUploadList={false}
-                                       onChange={this.handleUploadChange}
-                                       disabled={this.state.uploadloading}
-                                   >
-                                       {
-                                           <Tooltip title="导入">
-                                               <Button type="primary" shape="circle"
-                                                       icon={this.state.uploadloading ? "loading" : "import"}/>
-                                           </Tooltip>
-                                       }
-                                   </Upload>
+                                   {/*<Upload*/}
+                                   {/*    className="ml-s mr-s"*/}
+                                   {/*    accept=".docx"*/}
+                                   {/*    action={uploaddocx_match}*/}
+                                   {/*    listType="text"*/}
+                                   {/*    withCredentials={true}*/}
+                                   {/*    showUploadList={false}*/}
+                                   {/*    onChange={this.handleUploadChange}*/}
+                                   {/*    disabled={this.state.uploadloading}*/}
+                                   {/*>*/}
+                                   {/*    {*/}
+                                   {/*        <Tooltip title="导入">*/}
+                                   {/*            <Button type="primary" shape="circle"*/}
+                                   {/*                    icon={this.state.uploadloading ? "loading" : "import"}/>*/}
+                                   {/*        </Tooltip>*/}
+                                   {/*    }*/}
+                                   {/*</Upload>*/}
                                    <Tooltip title="导出小程序地址">
                                        <Button type="primary" shape="circle" icon="export"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
@@ -618,11 +618,11 @@ class FootBallMatchTable extends React.Component {
                                            {selectedRowKeys.length}
                                        </Button>
                                    </Tooltip>
-                                   <Tooltip title="计划开始及拉流">
-                                       <Button type="primary" shape="circle" icon="clock-circle"
-                                               hidden={this.state.selectedRowKeys.length > 0 ? false : true}
-                                               onClick={this.handleScheduleMulti}>{selectedRowKeys.length}</Button>
-                                   </Tooltip>
+                                   {/*<Tooltip title="计划开始及拉流">*/}
+                                   {/*    <Button type="primary" shape="circle" icon="clock-circle"*/}
+                                   {/*            hidden={this.state.selectedRowKeys.length > 0 ? false : true}*/}
+                                   {/*            onClick={this.handleScheduleMulti}>{selectedRowKeys.length}</Button>*/}
+                                   {/*</Tooltip>*/}
                                    <Tooltip title="删除">
                                        <Button type="danger" shape="circle" icon="delete"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
@@ -633,12 +633,12 @@ class FootBallMatchTable extends React.Component {
                                                loading={this.state.loading}
                                                onClick={this.refresh}/>
                                    </Tooltip>
-                                   <Button type="primary" className="pull-right">
-                                       <Link to={`/football/schedule`}>
-                                           <Icon type="clock-circle"/>
-                                           查看计划
-                                       </Link>
-                                   </Button>
+                                   {/*<Button type="primary" className="pull-right">*/}
+                                   {/*    <Link to={`/football/schedule`}>*/}
+                                   {/*        <Icon type="clock-circle"/>*/}
+                                   {/*        查看计划*/}
+                                   {/*    </Link>*/}
+                                   {/*</Button>*/}
                                </div>
                            }
         />

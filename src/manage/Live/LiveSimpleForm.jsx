@@ -103,7 +103,7 @@ class LiveSimpleForm extends React.Component {
     }
     showVideoPlayDialog = () => {
         const {record} = this.props;
-        if(!record.isPushing){
+        if (!record.isPushing) {
             alert("未在推流，无法播放");
             return;
         }
@@ -115,6 +115,9 @@ class LiveSimpleForm extends React.Component {
                 dialogPlayVisible: true,
             });
         }
+    }
+    replaceName = (name) => {
+        return name.replace("qsn-", "")
     }
 
     render() {
@@ -172,10 +175,10 @@ class LiveSimpleForm extends React.Component {
                             </FormItem>
                             <FormItem {...formItemLayout} label="名称" className="bs-form-item">
                                 {getFieldDecorator('name', {
-                                    initialValue: record.name,
+                                    initialValue: this.replaceName(record.name),
                                     rules: [{required: true, message: '请输入直播名称!'}],
                                 })(
-                                    <Input placeholder={record.name}/>
+                                    <Input placeholder={this.replaceName(record.name)}/>
                                 )}
                             </FormItem>
                             <FormItem {...formItemLayout} label="时间" className="bs-form-item">
@@ -234,29 +237,29 @@ class LiveSimpleForm extends React.Component {
                                     </RadioGroup>
                                 )}
                             </FormItem>
-                            <FormItem {...formItemLayout} label="启用人数放大" className="bs-form-item">
-                                {getFieldDecorator('isFakeEnabled', {
-                                    initialValue: record.isFakeEnabled,
-                                })(
-                                    <RadioGroup onChange={(e) => {
-                                        this.setState({peopleShow: e.target.value})
-                                    }}>
-                                        <Popover content={content} title="人数放大" visible={this.state.peopleShow}>
-                                            <Radio value={true} onClick={this.showPopup}>是</Radio></Popover>
-                                        <Radio value={false}>否</Radio>
-                                    </RadioGroup>
-                                )}
-                            </FormItem>
-                            <FormItem {...formItemLayout} label="基础人数" className="bs-form-item">
-                                {getFieldDecorator('fake.baseCount', {
-                                    initialValue: record.fake.baseCount,
-                                })(
-                                    <InputNumber style={{maxWidth: 80}}/>
-                                )}
-                            </FormItem>
-                            <FormItem {...formItemLayout} label="在线人数" className="bs-form-item">
-                                {this.state.data ? this.state.data.online : 0}
-                            </FormItem>
+                            {/*<FormItem {...formItemLayout} label="启用人数放大" className="bs-form-item">*/}
+                            {/*    {getFieldDecorator('isFakeEnabled', {*/}
+                            {/*        initialValue: record.isFakeEnabled,*/}
+                            {/*    })(*/}
+                            {/*        <RadioGroup onChange={(e) => {*/}
+                            {/*            this.setState({peopleShow: e.target.value})*/}
+                            {/*        }}>*/}
+                            {/*            <Popover content={content} title="人数放大" visible={this.state.peopleShow}>*/}
+                            {/*                <Radio value={true} onClick={this.showPopup}>是</Radio></Popover>*/}
+                            {/*            <Radio value={false}>否</Radio>*/}
+                            {/*        </RadioGroup>*/}
+                            {/*    )}*/}
+                            {/*</FormItem>*/}
+                            {/*<FormItem {...formItemLayout} label="基础人数" className="bs-form-item">*/}
+                            {/*    {getFieldDecorator('fake.baseCount', {*/}
+                            {/*        initialValue: record.fake.baseCount,*/}
+                            {/*    })(*/}
+                            {/*        <InputNumber style={{maxWidth: 80}}/>*/}
+                            {/*    )}*/}
+                            {/*</FormItem>*/}
+                            {/*<FormItem {...formItemLayout} label="在线人数" className="bs-form-item">*/}
+                            {/*    {this.state.data ? this.state.data.online : 0}*/}
+                            {/*</FormItem>*/}
                             {this.props.detail ?
                                 <div className="center">
                                     <Button type="primary" onClick={this.props.handleSave}>保存配置</Button>

@@ -331,11 +331,11 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                 <InputNumber placeholder='请输入'/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="英文名" className="bs-form-item">
+                        <FormItem {...formItemLayout} hidden={true} label="英文名" className="bs-form-item">
                             {getFieldDecorator('englishname', {
                                 initialValue: record.englishname,
                             })(
-                                <Input placeholder='请输入英文名'/>
+                                <Input hidden={true} placeholder='请输入英文名'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="主办方" className="bs-form-item">

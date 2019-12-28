@@ -45,7 +45,7 @@ class FootBallLeagueMatchAddTeamDialog extends React.Component {
         getAllTeams({
             pageSize: 20,
             pageNum: pageNum,
-            filter: {name: searchText},
+            filter: {name: searchText, areatype: 2},
             sortField: "id",
             sortOrder: "desc"
         }).then((data) => {

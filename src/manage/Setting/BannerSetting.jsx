@@ -16,7 +16,7 @@ class BannerSetting extends React.Component {
     }
 
     fetch = () => {
-        getConfig({areatype:null}).then((data) => {
+        getConfig({areatype: 2}).then((data) => {
             if (data) {
                 let banner = {}
                 let count = 0;

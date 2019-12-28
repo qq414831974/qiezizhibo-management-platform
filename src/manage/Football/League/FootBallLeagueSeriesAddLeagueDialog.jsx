@@ -46,6 +46,7 @@ class FootBallLeagueSeriesAddLeagueDialog extends React.Component {
             pageSize: 20,
             pageNum: pageNum,
             name: searchText,
+            areatype: 2
         }).then((data) => {
             if (data && data.list) {
                 this.setState({

@@ -82,8 +82,8 @@ export const getActivityInfo = (id) => get({url: 'http://localhost:8080/api/acti
     }).catch(function (error) {
         console.log(error)
     });
-export const getActivityInfoList = (params) => post({
-    url: 'http://localhost:8080/api/getAllActivity',
+export const getActivityInfoList = (params, params2) => post({
+    url: `http://localhost:8080/api/getAllActivity?${unpack(params2)}`,
     data: params
 })
     .then(function (response) {
