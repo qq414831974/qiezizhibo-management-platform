@@ -9,14 +9,14 @@ import {
     Select,
     Progress,
     Checkbox,
-    Avatar,
+    Avatar, Tooltip, InputNumber, message,
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
 import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {uploadimg} from "../../../axios/index";
+import {getAreasList, uploadimg} from "../../../axios/index";
 import avatar from '../../../static/avatar.jpg';
 import {toChinesNum} from '../../../utils/index';
 import {upload} from "../../../axios";
@@ -28,6 +28,7 @@ moment.locale('zh-cn');
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 const Option = Select.Option;
+const OptGroup = Select.OptGroup;
 
 const formItemLayout = {
     labelCol: {
@@ -44,7 +45,17 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
     state = {}
 
     componentDidMount() {
-
+        this.setState({loading: true});
+        getAreasList().then((data) => {
+            if (data) {
+                this.setState({
+                    loading: false,
+                    areas: data,
+                });
+            } else {
+                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+            }
+        });
     }
 
     handleAvatarChange = (info) => {
@@ -104,23 +115,42 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
         const {form} = this.props;
         const {getFieldDecorator} = form;
         const selectChildren = [];
-        selectChildren.push(<Option key={'open'} value={'open'}>开幕式</Option>);
-        selectChildren.push(<Option key={'close'} value={'close'}>闭幕式</Option>);
+        const openclose = [];
+        const normalRound = [];
+        const groupRound = [];
+        const knockRound = [];
+        const finalRound = [];
+        openclose.push(<Option key={'open'} value={'open'}>开幕式</Option>);
+        openclose.push(<Option key={'close'} value={'close'}>闭幕式</Option>);
         for (let i = 1; i <= 20; i++) {
-            selectChildren.push(<Option key={`z${i}`} value={`z-${i}`}>正常轮次共{i}轮</Option>);
+            normalRound.push(<Option key={`z${i}`} value={`z-${i}`}>正常轮次共{i}轮</Option>);
         }
         for (let i = 1; i <= 20; i++) {
-            selectChildren.push(<Option key={`x${i}`} value={`x-${i}`}>小组赛共{i}轮</Option>);
+            groupRound.push(<Option key={`x${i}`} value={`x-${i}`}>小组赛共{i}轮</Option>);
         }
         for (let i = 1; i <= 20; i++) {
-            selectChildren.push(<Option key={`t${i}`} value={`t-${i}`}>淘汰赛共{i}轮</Option>);
+            knockRound.push(<Option key={`t${i}`} value={`t-${i}`}>淘汰赛共{i}轮</Option>);
         }
+        for (let i = 1; i <= 10; i++) {
+            finalRound.push(<Option key={`t${i}`} value={`j-${i}`}>
+                <Tooltip title={this.getJueSaiRank(i)}
+                         placement="right">决赛共{i * 2}个名次
+                </Tooltip>
+            </Option>);
+        }
+        selectChildren.push(<OptGroup label="开、闭幕">{openclose}</OptGroup>);
+        selectChildren.push(<OptGroup label="正常轮">{normalRound}</OptGroup>);
+        selectChildren.push(<OptGroup label="小组赛">{groupRound}</OptGroup>);
+        selectChildren.push(<OptGroup label="淘汰赛">{knockRound}</OptGroup>);
+        selectChildren.push(<OptGroup label="决赛">{finalRound}</OptGroup>);
+
         return <FormItem {...formItemLayout} key='round' label='轮次'
                          className="bs-form-item">
             {getFieldDecorator('round.rounds', {
                 rules: [{required: true, message: '请选择轮次'}],
             })(
                 <Select
+                    placeholder="请选择轮次"
                     mode="tags"
                     style={{width: '100%'}}
                     tokenSeparators={[',', '，']}
@@ -129,6 +159,27 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                 </Select>
             )}
         </FormItem>
+    }
+    getJueSaiRank = (num) => {
+        let rank = "包含："
+        for (let i = 1; i <= num; i++) {
+            if (i == 1) {
+                rank = rank + "决赛";
+            } else {
+                rank = rank + `${toChinesNum(i * 2 - 1)}、${toChinesNum(i * 2)}名决赛`;
+            }
+            if (i < num) {
+                rank = rank + "，";
+            }
+        }
+        return rank;
+    }
+    getAreasOption = () => {
+        let dom = [];
+        this.state.areas.forEach((item) => {
+            dom.push(<Option value={item.province} data={item.province} key={`area-${item.id}`}>{item.province}</Option>);
+        })
+        return dom;
     }
 
     render() {
@@ -210,6 +261,18 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                                 <Input placeholder='请输入简称'/>
                             )}
                         </FormItem>
+                        {this.state.isSeries ? null : <FormItem {...formItemLayout} label='场地'
+                                                                className="bs-form-item">
+                            {getFieldDecorator('place', {})(
+                                <Select
+                                    placeholder="请选择比赛场地"
+                                    mode="tags"
+                                    style={{width: '100%'}}
+                                    tokenSeparators={[',', '，']}
+                                >
+                                </Select>
+                            )}
+                        </FormItem>}
                         {this.state.isSeries ? null :
                             <FormItem {...formItemLayout} label="组别" className="bs-form-item">
                                 {getFieldDecorator('subgroup.groups', {
@@ -233,6 +296,22 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                             </FormItem>
                         }
                         {this.state.isSeries ? null : this.getRoundDom()}
+                        <FormItem {...formItemLayout} label="几人制" className="bs-form-item">
+                            {getFieldDecorator('regulations.population', {
+                                // initialValue: record.englishname,
+                                getValueFromEvent(e) {
+                                    if (e == null) {
+                                        return null
+                                    }
+                                    if (typeof(e) === 'string') {
+                                        return e.replace(/[^\d]/g, '')
+                                    }
+                                    return e
+                                },
+                            })(
+                                <InputNumber placeholder='请输入'/>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="英文名" className="bs-form-item">
                             {getFieldDecorator('englishname', {
                                 // initialValue: record.englishname,
@@ -250,13 +329,16 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                                 <Input placeholder='请输入赞助商'/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="国家" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="地区" className="bs-form-item">
                             <Col span={11}>
                                 <FormItem>
-                                    {getFieldDecorator('country', {
-                                        initialValue: "中国",
+                                    {getFieldDecorator('province', {
+                                        // initialValue: record.province,
+                                        rules: [{required: true, message: '请选择省份'}],
                                     })(
-                                        <Input placeholder='请输入国家'/>
+                                        <Select disabled={this.state.loading}>
+                                            {this.state.areas ? this.getAreasOption() : null}
+                                        </Select>
                                     )}
                                 </FormItem>
                             </Col>
@@ -267,8 +349,6 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                             <Col span={12}>
                                 <FormItem>
                                     {getFieldDecorator('city', {
-                                        // initialValue: record.city,
-                                        rules: [{required: true, message: '请选择'}],
                                     })(
                                         <Input placeholder='请输入城市'/>
                                     )}
@@ -311,6 +391,11 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                         <FormItem {...formItemLayout} label="备注" className="bs-form-item">
                             {getFieldDecorator('remark', {})(
                                 <Input.TextArea placeholder='备注'/>
+                            )}
+                        </FormItem>
+                        <FormItem {...formItemLayout} label="描述" className="bs-form-item">
+                            {getFieldDecorator('description', {})(
+                                <Input.TextArea placeholder='描述'/>
                             )}
                         </FormItem>
                         <div className="center w-full">

@@ -51,6 +51,7 @@ class BannerUpload extends React.Component {
         const province = this.props.data ? this.props.data.province : null;
         const areatype = this.props.data ? this.props.data.areatype : null;
         setConfig({
+            id: this.props.data ? this.props.data.id : null,
             description: this.props.index,
             value: this.state.imgUrl ? this.state.imgUrl : img,
             remark: this.state.url ? this.state.url : url,
