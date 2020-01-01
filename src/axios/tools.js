@@ -15,7 +15,7 @@ axios.defaults.withCredentials = true
  */
 export const get = ({url, headers}) => {
     const token = getToken();
-    if (token == -1) {
+    if (token === -1) {
         message.warn("登陆状态过期，请重新登陆");
         window.location.href = '/manage/login';
         removeToken();
@@ -46,7 +46,7 @@ export const get = ({url, headers}) => {
  */
 export const post = ({url, data, headers}) => {
     const token = getToken();
-    if (token == -1) {
+    if (token === -1) {
         message.warn("登陆状态过期，请重新登陆");
         window.location.href = '/manage/login';
         removeToken();
@@ -77,7 +77,7 @@ export const post = ({url, data, headers}) => {
  */
 export const put = ({url, data, headers}) => {
     const token = getToken();
-    if (token == -1) {
+    if (token === -1) {
         message.warn("登陆状态过期，请重新登陆");
         window.location.href = '/manage/login';
         removeToken();
@@ -107,7 +107,7 @@ export const put = ({url, data, headers}) => {
  */
 export const del = ({url, headers}) => {
     const token = getToken();
-    if (token == -1) {
+    if (token === -1) {
         message.warn("登陆状态过期，请重新登陆");
         window.location.href = '/manage/login';
         removeToken();
@@ -135,9 +135,7 @@ export const unpack = (params) => {
     if (params == null) return '';
     let paramStr = '';
     for (let param in params) {
-        if(params[param] != null){
-            paramStr += `${param}=${params[param]}&`;
-        }
+        paramStr += `${param}=${params[param]}&`;
     }
     paramStr = paramStr.substring(0,paramStr.length-1);
     return paramStr;

@@ -1,7 +1,7 @@
 {
   "name": "qiezizhibo-management-platform",
   "version": "0.2.0",
-  "homepage": "/manage/",
+  "homepage": "/anchor/",
   "private": true,
   "main": "index.js",
   "description": "qiezizhibo-management-platform",

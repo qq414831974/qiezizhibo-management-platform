@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './style/lib/animate.css';
 import './style/index.less';
 import * as serviceWorker from './serviceWorker';
 import {Provider} from 'react-redux';
