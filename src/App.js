@@ -13,7 +13,7 @@ import DocumentTitle from 'react-document-title';
 
 moment.locale('zh-cn');
 const {Content, Footer} = Layout;
-// document.domain = "www.qiezizhibo-api.com";
+document.domain = "manage.qiezizhibo.com";
 
 class App extends Component {
     state = {
