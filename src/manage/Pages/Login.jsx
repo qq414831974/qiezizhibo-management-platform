@@ -35,7 +35,7 @@ class Login extends React.Component {
             setUser(nextAuth.data);
             if (nextAuth.data&&nextAuth.data.role&&nextAuth.data.role.roleCode=='role-e2063edfcb024e0dbc78fc592d2bcf46') {
                 // history.push('/anchor');
-                window.location = "https://manage.qiezizhibo.com/anchor";
+                window.location = "https://manage.qiezizhibo.com/anchor/";
             } else {
                 history.push('/index');
             }
