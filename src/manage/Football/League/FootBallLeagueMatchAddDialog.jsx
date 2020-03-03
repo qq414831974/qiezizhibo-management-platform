@@ -320,7 +320,7 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                     if (e == null) {
                                         return null
                                     }
-                                    if (typeof (e) === 'string') {
+                                    if (typeof(e) === 'string') {
                                         return e.replace(/[^\d]/g, '')
                                     }
                                     return e
