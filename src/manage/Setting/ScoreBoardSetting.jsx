@@ -5,7 +5,7 @@ import BannerUpload from './BannerUpload';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import {getConfig, setConfig, getScoreboard, setScoreboard, deleteScoreboard, upload, getAreasList} from "../../axios";
+import {getScoreboard, setScoreboard, updateScoreboard, upload, getAreasList} from "../../axios";
 import ScoreBoard from './ScoreBoard';
 
 class ScoreBoardSetting extends React.Component {
@@ -17,8 +17,8 @@ class ScoreBoardSetting extends React.Component {
 
     fetch = () => {
         getScoreboard().then((data) => {
-            if (data) {
-                this.setState({scoreboardList: data});
+            if (data && data.code == 200) {
+                this.setState({scoreboardList: data.data});
             }
         });
     }
@@ -26,18 +26,22 @@ class ScoreBoardSetting extends React.Component {
     getScoreBoardOption = () => {
         let dom = [];
         this.state.scoreboardList && this.state.scoreboardList.forEach((item) => {
-            dom.push(<Select.Option key={item.id} value={item}><img src={item.scoreboardpic}
-                                                                    style={{width: 200, height: 40}}/></Select.Option>);
+            dom.push(<Select.Option key={`item-${item.id}`} value={item.id} data={item}>
+                <img src={item.scoreboardpic}
+                     style={{
+                         width: 200,
+                         height: 40
+                     }}/>
+            </Select.Option>);
         });
         return dom;
     }
     onScoreBoardSelect = (e, option) => {
-        this.setState({currentScoreBoard: e});
+        this.setState({currentScoreBoard: option.props.data});
         this.removeScoreBoardPanel();
         setTimeout(() => {
-            this.addScoreBoardPanel(2, e);
+            this.addScoreBoardPanel(2, option.props.data);
         }, 1000)
-
     }
     onScoreBoardAddClick = () => {
         this.removeScoreBoardPanel();
@@ -68,16 +72,20 @@ class ScoreBoardSetting extends React.Component {
             message.warn("比分牌图片未选择", 1);
             return;
         }
-        setScoreboard(position).then((data) => {
+        let setFunc = setScoreboard;
+        if(position && position.id){
+            setFunc = updateScoreboard;
+        }
+        setFunc(position).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.fetch();
                     message.success('修改成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
         this.removeScoreBoardPanel();
@@ -89,11 +97,12 @@ class ScoreBoardSetting extends React.Component {
                 <BreadcrumbCustom first="系统设置"/>
                 <Divider>比分牌设置</Divider>
                 <Select size="large" style={{minWidth: 250}} onSelect={this.onScoreBoardSelect}
-                        value={this.state.currentScoreBoard}>
+                        value={this.state.currentScoreBoard ? this.state.currentScoreBoard.id : null}>
                     {this.getScoreBoardOption()}
                 </Select>
                 <Tooltip title="添加">
-                    <Button className="ml-s" shape="circle" type="primary" icon="plus" onClick={this.onScoreBoardAddClick}/>
+                    <Button className="ml-s" shape="circle" type="primary" icon="plus"
+                            onClick={this.onScoreBoardAddClick}/>
                 </Tooltip>
                 {this.state.extraDom ? this.state.extraDom : null}
             </div>

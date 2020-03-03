@@ -1,5 +1,5 @@
 import React from 'react';
-import {Table, Button, message, Form, Modal, Tooltip} from 'antd';
+import {Table, Button, message, Form, Modal, Tooltip, Input, Icon} from 'antd';
 import {getActivityInfoList} from '../../axios/index';
 import {mergeJSON} from '../../utils/index';
 import copy from 'copy-to-clipboard';
@@ -25,10 +25,15 @@ class UserTable extends React.Component {
     };
 
     componentDidMount() {
+        const pager = {...this.state.pagination};
+        pager.filters = this.getTableFilters(pager, {status: ["enabled"]});
+        this.setState({
+            pagination: pager,
+        });
         this.fetch({
             pageSize: this.state.pagination.pageSize,
             pageNum: 1,
-            filter: {},
+            ...pager.filters,
         });
     };
 
@@ -51,26 +56,26 @@ class UserTable extends React.Component {
         this.fetch({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            sortField: pager.sortField,
-            sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            // sortField: pager.sortField,
+            // sortOrder: pager.sortOrder,
+            ...pager.filters,
         });
     }
     handleTableChange = (pagination, filters, sorter) => {
         const pager = {...this.state.pagination};
         pager.current = pagination.current;
-        pager.sortField = sorter.field;
-        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
-        pager.filters = mergeJSON({nickname: this.state.searchText}, filters);
+        // pager.sortField = sorter.field;
+        // pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
+        pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
         });
         this.fetch({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            sortField: pager.sortField,
-            sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            // sortField: pager.sortField,
+            // sortOrder: pager.sortOrder,
+            ...pager.filters,
         });
     }
     saveLiveSimpleRef = (form) => {
@@ -216,10 +221,45 @@ class UserTable extends React.Component {
         save_link.download = name;
         this.fake_click(save_link);
     }
+    onInputChange = (e) => {
+        this.setState({searchText: e.target.value});
+    }
+    onSearch = () => {
+        const {searchText} = this.state;
+        const pager = {...this.state.pagination};
+        pager.filters = this.getTableFilters(pager);
+        pager.current = 1;
+        this.setState({
+            filterDropdownVisible: false,
+            filtered: !!searchText,
+            pagination: pager,
+        });
+        this.fetch({
+            pageSize: pager.pageSize,
+            pageNum: 1,
+            // sortField: pager.sortField,
+            // sortOrder: pager.sortOrder,
+            ...pager.filters,
+        });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["name"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
+    }
     replaceName = (name) => {
         return name.replace("qsn-", "")
     }
-
     render() {
         const onRecordClick = this.onRecordClick;
         const replaceName = this.replaceName;
@@ -242,18 +282,30 @@ class UserTable extends React.Component {
         const columns = [{
             title: '名称',
             dataIndex: 'name',
-            key: 'status',
-            filters: [
-                {text: '可用', value: 'enabled'},
-                {text: '已结束', value: 'disabled'},
-                {text: '已禁用', value: 'forbidden'},
-                {text: '已删除', value: 'deleted'},
-            ],
-            filterMultiple: false,
+            // filterDropdown: (
+            //     <div className="custom-filter-dropdown">
+            //         <Input
+            //             ref={ele => this.searchInput = ele}
+            //             placeholder="搜索"
+            //             value={this.state.searchText}
+            //             onChange={this.onInputChange}
+            //             onPressEnter={this.onSearch}
+            //         />
+            //         <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+            //     </div>
+            // ),
+            // filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,
+            // filterDropdownVisible: this.state.filterDropdownVisible,
+            // onFilterDropdownVisibleChange: (visible) => {
+            //     this.setState({
+            //         filterDropdownVisible: visible,
+            //     }, () => this.searchInput && this.searchInput.focus());
+            // },
             align: 'center',
             width: '45%',
             render: function (text, record, index) {
                 var type = "enabled";
+                var name = record.name;
                 switch (record.status) {
                     case "enabled" :
                         type = "play-circle";
@@ -275,6 +327,14 @@ class UserTable extends React.Component {
         }, {
             title: '直播时间',
             align: 'center',
+            key: 'status',
+            filters: [
+                {text: '可用', value: 'enabled'},
+                {text: '已结束', value: 'disabled'},
+                {text: '已禁用', value: 'forbidden'},
+                // {text: '已删除', value: 'deleted'},
+            ],
+            filterMultiple: false,
             render: function (text, record, index) {
                 return <p>{parseTimeString(record.startedAt)}~{parseTimeString(record.endedAt)}</p>;
             },

@@ -3,7 +3,7 @@ import {Table, Input, Button, Icon, Modal, Tooltip} from 'antd';
 import {getAllLeagueMatchSeries} from '../../../axios/index';
 import {mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
-import {delLeagueMatchById, delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch} from "../../../axios";
+import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch} from "../../../axios";
 import {Form, message} from "antd/lib/index";
 import FootBallLeagueMatchAddDialog from "../League/FootBallLeagueMatchAddDialog"
 import FootBallLeagueMatchModifyDialog from "../League/FootBallLeagueMatchModifyDialog"
@@ -37,24 +37,23 @@ class FootBallLeagueMatchTable extends React.Component {
     };
 
     fetch = (params = {}) => {
+        params["sortOrder"] = "asc";
+        params["sortField"] = "id";
+        params["areatype"] = 2;
         this.setState({loading: true});
-        if (params.filter) {
-            params.filter = {areatype: 2, ...params.filter}
-        } else {
-            params.filter = {areatype: 2}
-        }
         getAllLeagueMatchSeries(params).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 this.setState({
                     loading: false,
-                    data: data ? data.list : "",
+                    data: data.data ? data.data.records : "",
                     pagination,
                     selectedRowKeys: [],
                 });
             } else {
-                message.error('获取联赛列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取联赛列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -65,36 +64,36 @@ class FootBallLeagueMatchTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     deleteMultiple = () => {
-        delLeagueMatchByIds(this.state.selectedRowKeys).then((data) => {
+        delLeagueMatchByIds({id: this.state.selectedRowKeys}).then((data) => {
             this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
     deleteOne = () => {
-        delLeagueMatchById(this.state.record.id).then((data) => {
+        delLeagueMatchByIds({id: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
         ;
@@ -105,7 +104,7 @@ class FootBallLeagueMatchTable extends React.Component {
     onSearch = () => {
         const {searchText} = this.state;
         const pager = {...this.state.pagination};
-        pager.filters = mergeJSON({name: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
         pager.current = 1;
         this.setState({
             filterDropdownVisible: false,
@@ -117,7 +116,7 @@ class FootBallLeagueMatchTable extends React.Component {
             pageNum: 1,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     onSelectChange = (selectedRowKeys) => {
@@ -132,7 +131,7 @@ class FootBallLeagueMatchTable extends React.Component {
         pager.current = pagination.current;
         pager.sortField = sorter.field;
         pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
-        pager.filters = mergeJSON({name: this.state.searchText}, filters);
+        pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
         });
@@ -141,8 +140,23 @@ class FootBallLeagueMatchTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["name"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
     saveLeagueMatchDialogRef = (form) => {
         this.formAdd = form;
@@ -168,21 +182,21 @@ class FootBallLeagueMatchTable extends React.Component {
             if (err) {
                 return;
             }
-            values["datebegin"] = values["datebegin"] ? values["datebegin"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["dateend"] = values["dateend"] ? values["dateend"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createtime"] = values["createtime"] ? values["createtime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updatetime"] = values["updatetime"] ? values["updatetime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deletetime"] = values["deletetime"] ? values["deletetime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["dateBegin"] = values["dateBegin"] ? values["dateBegin"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["dateEnd"] = values["dateEnd"] ? values["dateEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             createLeagueMatch(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -195,21 +209,21 @@ class FootBallLeagueMatchTable extends React.Component {
             if (err) {
                 return;
             }
-            values["datebegin"] = values["datebegin"] ? values["datebegin"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["dateend"] = values["dateend"] ? values["dateend"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createtime"] = values["createtime"] ? values["createtime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updatetime"] = values["updatetime"] ? values["updatetime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deletetime"] = values["deletetime"] ? values["deletetime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["dateBegin"] = values["dateBegin"] ? values["dateBegin"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["dateEnd"] = values["dateEnd"] ? values["dateEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             updateLeagueMatchById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -293,7 +307,6 @@ class FootBallLeagueMatchTable extends React.Component {
 
         const columns = [{
             title: '名字',
-            sorter: true,
             align: 'center',
             dataIndex: 'name',
             filterDropdown: (
@@ -317,7 +330,7 @@ class FootBallLeagueMatchTable extends React.Component {
             },
             width: '35%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headimg ? record.headimg : defultAvatar}/>
+                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
                        onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
                 </div>;
@@ -328,15 +341,15 @@ class FootBallLeagueMatchTable extends React.Component {
             dataIndex: 'country',
             width: '10%',
             render: function (text, record, index) {
-                return <p>{record.country ? record.country : "-"}/{record.city ? record.city : "-"}</p>
+                return <p>{record.province ? record.province : "-"}/{record.city ? record.city : "-"}</p>
             }
         }, {
             title: '时间',
             align: 'center',
-            dataIndex: 'datebegin',
+            dataIndex: 'dateBegin',
             width: '20%',
             render: function (text, record, index) {
-                return <p>{(record.datebegin ? parseTimeStringYMD(record.datebegin) : "-") + "~" + (record.dateend ? parseTimeStringYMD(record.dateend) : "-")}</p>
+                return <p>{(record.dateBegin ? parseTimeStringYMD(record.dateBegin) : "-") + "~" + (record.dateEnd ? parseTimeStringYMD(record.dateEnd) : "-")}</p>
             }
         }, {
             title: '类型',
@@ -366,7 +379,6 @@ class FootBallLeagueMatchTable extends React.Component {
         ];
         const columns_mobile = [{
             title: '名字',
-            sorter: true,
             align: 'center',
             dataIndex: 'name',
             filterDropdown: (
@@ -390,7 +402,7 @@ class FootBallLeagueMatchTable extends React.Component {
             },
             width: '100%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headimg ? record.headimg : defultAvatar}/>
+                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
                        onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
                 </div>;

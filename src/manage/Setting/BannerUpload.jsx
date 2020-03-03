@@ -4,7 +4,7 @@ import BreadcrumbCustom from '../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import {getAreasList, getConfig, setConfig, upload} from "../../axios";
+import {getAreasList, updateBanner, setBanner, upload} from "../../axios";
 import {Radio} from "antd/lib/index";
 
 const Option = Select.Option;
@@ -49,14 +49,17 @@ class BannerUpload extends React.Component {
         const img = this.props.data ? this.props.data.img : null;
         const url = this.props.data ? this.props.data.url : null;
         const province = this.props.data ? this.props.data.province : null;
-        setConfig({
+        let func = setBanner;
+        if (this.props.data && this.props.data.id) {
+            func = updateBanner;
+        }
+        func({
             id: this.props.data ? this.props.data.id : null,
-            description: this.props.index,
-            value: this.state.imgUrl ? this.state.imgUrl : img,
-            remark: this.state.url ? this.state.url : url,
+            position: this.props.index,
+            img: this.state.imgUrl ? this.state.imgUrl : img,
+            url: this.state.url ? this.state.url : url,
             province: this.state.province ? (this.state.province == "无" ? null : this.state.province) : province,
             areatype: 2,
-            code: "banner"
         }).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
@@ -69,6 +72,9 @@ class BannerUpload extends React.Component {
                 message.error(`轮播图${this.props.index}保存失败` + (data ? data.code + ":" + data.msg : data), 3);
             }
         });
+    }
+    onRadioChange = (e) => {
+        this.setState({areatype: e.target.value})
     }
 
     render() {

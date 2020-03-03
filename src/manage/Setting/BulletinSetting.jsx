@@ -19,11 +19,11 @@ class BulletinSetting extends React.Component {
     }
 
     fetch = () => {
-        getBulletin().then((data) => {
-            if (data) {
-                this.setState({bulletin: data});
+        getBulletin({areatype:2}).then((data) => {
+            if (data && data.code == 200) {
+                this.setState({bulletin: data.data});
             } else {
-                message.error('获取系统配置失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取系统配置失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -38,10 +38,10 @@ class BulletinSetting extends React.Component {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
@@ -80,7 +80,7 @@ class BulletinSetting extends React.Component {
                         message.success('添加成功', 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -100,7 +100,7 @@ class BulletinSetting extends React.Component {
                         message.success('修改成功', 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();

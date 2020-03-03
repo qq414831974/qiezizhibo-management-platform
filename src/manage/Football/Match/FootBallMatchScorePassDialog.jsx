@@ -14,11 +14,11 @@ class FootBallMatchScorePassDialog extends React.Component {
             return;
         }
         getPassAndPossession(this.props.data.id).then((data) => {
-            if (data) {
+            if (data && data.code == 200 && data.data) {
                 const hostteam = this.props.data.hostteam;
                 const guestteam = this.props.data.guestteam;
-                const hostData = data[hostteam.id];
-                const guestData = data[guestteam.id];
+                const hostData = data.data[hostteam.id];
+                const guestData = data.data[guestteam.id];
                 if (hostData == null || guestData == null) {
                     this.setState({
                         hostPass: 0,
@@ -36,7 +36,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                     sliderValue: hostData.possession,
                 });
             } else {
-                message.error('获取传控信息失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取传控信息失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -49,22 +49,22 @@ class FootBallMatchScorePassDialog extends React.Component {
                     this.props.onSuccess();
                     this.props.onClose();
                 }else{
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
 
     submit = () => {
         const params = [{
-            matchid: this.props.data.id,
-            teamid: this.props.data.hostteam.id,
+            matchId: this.props.data.id,
+            teamId: this.props.data.hostteam.id,
             remark: JSON.stringify({pass: this.state.hostPass, possession: this.state.hostPoss}),
         }, {
-            matchid: this.props.data.id,
-            teamid: this.props.data.guestteam.id,
+            matchId: this.props.data.id,
+            teamId: this.props.data.guestteam.id,
             remark: JSON.stringify({pass: this.state.guestPass, possession: this.state.guestPoss}),
         }
         ]
@@ -81,7 +81,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                 </div>
                 <div className="slider-wrapper">
                     <div className="anticon left-0">
-                        <img className="round-img-xs" src={hostteam.headimg ? hostteam.headimg : defultAvatar}/>
+                        <img className="round-img-xs" src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
                         <div className="w-full">
                             <span>{this.state.hostPoss}%</span>
                         </div>
@@ -93,7 +93,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                     })}/>
                     <div className="anticon right-0">
                         <img className="round-img-xs"
-                             src={guestteam.headimg ? guestteam.headimg : defultAvatar}/>
+                             src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
                         <div className="w-full">
                             <span>{this.state.guestPoss}%</span>
                         </div>
@@ -109,7 +109,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                         </div>
                         <div>
                             <img className="round-img-xs"
-                                 src={hostteam.headimg ? hostteam.headimg : defultAvatar}/>
+                                 src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
                             <span>{this.state.hostPass}%</span>
                         </div>
                     </Col>
@@ -120,7 +120,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                         </div>
                         <div>
                             <img className="round-img-xs"
-                                 src={guestteam.headimg ? guestteam.headimg : defultAvatar}/>
+                                 src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
                             <span>{this.state.guestPass}%</span>
                         </div>
                     </Col>

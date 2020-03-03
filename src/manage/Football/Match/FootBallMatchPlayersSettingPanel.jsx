@@ -63,30 +63,37 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         this.setState({
             pageLoaded: false,
         });
-        getMatchById(this.props.matchid).then((data) => {
-            if (data) {
+        getMatchById(this.props.matchId).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    data: data,
+                    data: data.data,
                 });
-                getFormationByMatchTeam({matchId: this.props.matchid, teamId: data.hostteam.id}).then((formation) => {
-                    let matchData = this.state.data;
-                    matchData.hostteam && (matchData.hostteam.formation = formation);
-                    this.setState({
-                        data: matchData,
-                        hostFormation: formation ? formation.type : "4-3-3"
-                    })
-                    getFormationByMatchTeam({
-                        matchId: this.props.matchid,
-                        teamId: data.guestteam.id
-                    }).then((formation) => {
+                getFormationByMatchTeam({
+                    matchId: this.props.matchId,
+                    teamId: data.data.hostteam.id
+                }).then((formation) => {
+                    if (formation && formation.code == 200) {
                         let matchData = this.state.data;
-                        matchData.guestteam && (matchData.guestteam.formation = formation);
+                        matchData.hostteam && (matchData.hostteam.formation = formation.data);
                         this.setState({
-                            pageLoaded: true,
                             data: matchData,
-                            guestFormation: formation ? formation.type : "4-3-3"
+                            hostFormation: formation.data ? formation.data.type : 1
                         })
-                    });
+                        getFormationByMatchTeam({
+                            matchId: this.props.matchId,
+                            teamId: data.data.guestteam.id
+                        }).then((formation) => {
+                            if (formation && formation.code == 200) {
+                                let matchData = this.state.data;
+                                matchData.guestteam && (matchData.guestteam.formation = formation.data);
+                                this.setState({
+                                    pageLoaded: true,
+                                    data: matchData,
+                                    guestFormation: formation.data ? formation.data.type : 1
+                                })
+                            }
+                        });
+                    }
                 });
                 this.fetchHostTeam({
                     pageSize: 100,
@@ -97,7 +104,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     pageNum: 1,
                 });
             } else {
-                message.error('获取比赛失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -108,15 +115,15 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         this.setState({
             hostloading: true,
         });
-        getMatchPlayersByTeamId(this.props.matchid, this.state.data.hostteam.id).then((data) => {
-            if (data) {
+        getMatchPlayersByTeamId(this.props.matchId, this.state.data.hostteam.id).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    hostdata: data ? data : "",
+                    hostdata: data.data ? data.data.records : "",
                     hostloading: false,
                 });
                 // this.getPlayerInfo(data ? data : "");
             } else {
-                message.error('获取主队队员失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取主队队员失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -124,15 +131,15 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         this.setState({
             guestloading: true,
         });
-        getMatchPlayersByTeamId(this.props.matchid, this.state.data.guestteam.id).then((data) => {
-            if (data) {
+        getMatchPlayersByTeamId(this.props.matchId, this.state.data.guestteam.id).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    guestdata: data ? data : "",
+                    guestdata: data.data ? data.data.records : "",
                     guestloading: false,
                 });
                 // this.getPlayerInfo(data ? data : "");
             } else {
-                message.error('获取客队队员失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取客队队员失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -168,15 +175,12 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         let i = 0;
         let position = [];
         let dom = [];
-        if (record.position.indexOf("[") != -1) {
-            position = eval(record.position);
-            position.forEach((item, index) => {
-                dom.push(<Tag key={i} color="#001529">{positionName(item)}</Tag>)
-                i = i + 1;
-            });
-        } else {
-            dom.push(<Tag key={i} color="#001529">{positionName(record.position)}</Tag>)
-        }
+        position = record.position;
+        position.forEach((item, index) => {
+            dom.push(<Tag key={i} color="#001529">{positionName(item)}</Tag>)
+            i = i + 1;
+        });
+
         return <div className="center">{dom}</div>;
     };
     showMatchPlayerAddDialog = (type) => {
@@ -204,10 +208,10 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                         this.refresh();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -226,10 +230,10 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                         this.refresh();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -270,43 +274,43 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
             for (var i = 0; i < item; i++) {
                 times = times - 1;
                 let playerInfo;
-                if (formation.position) {
-                    playerInfo = formation.position[times];
+                if (formation.formation) {
+                    playerInfo = formation.formation[times];
                 }
                 dom_col.push(<Col span={colWidth} key={"player" + "-" + type + "-" + item + "-" + i}>
-                    <div className="center" style={{WebkitTransform: 'perspective(1000)'}}>
+                    <div className="center flex-important" style={{WebkitTransform: 'perspective(1000)'}}>
                         <Avatar size="large" className={type == KECHANG ? "reverse" : ""}
-                                src={playerInfo ? playerInfo.headimg : defultAvatar}/>
+                                src={playerInfo ? playerInfo.headImg : defultAvatar}/>
                     </div>
                 </Col>);
             }
             return dom_col;
         }
-        const formationList = formationStr.split("-")
+        const formationList = this.getFormation(formationStr).split("-")
         const divHeight = 250 * 3 / 4 / formationList.length;
         let dom = []
         for (var i = formationList.length - 1; i >= 0; i--) {
             dom.push(<div style={{height: divHeight}} key={"row-div" + "-" + type + "-" + i}>
-                <Row gutter={1} className="center" key={"row" + "-" + type + "-" + i}>
+                <Row gutter={1} className="center flex-important" key={"row" + "-" + type + "-" + i}>
                     {getColPlayer(formationList[i], Math.floor(24 / formationList[i]), type, formation)}
                 </Row>
             </div>);
         }
         let playerInfo;
         if (formation) {
-            if (formation.position) {
-                playerInfo = formation.position[(times - 1)];
+            if (formation.formation) {
+                playerInfo = formation.formation[(times - 1)];
             }
         }
-        dom.push(<div className="center" style={{WebkitTransform: 'perspective(1000)'}} key={"player-gk" + "-" + type}>
+        dom.push(<div className="center flex-important" style={{WebkitTransform: 'perspective(1000)'}} key={"player-gk" + "-" + type}>
             <Avatar size="large" className={type == KECHANG ? "reverse" : ""}
-                    src={playerInfo ? playerInfo.headimg : defultAvatar}/>
+                    src={playerInfo ? playerInfo.headImg : defultAvatar}/>
         </div>);
         return dom;
     }
     onHostFormationSelect = (e, op) => {
         this.setState({
-            hostFormation: this.getFormation(e),
+            hostFormation: e,
         });
         if (this.state.data.hostteam.formation) {
             this.updateFormation(this.state.data.hostteam.formation.id, e, ZHUCHANG)
@@ -314,7 +318,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
     }
     onGuestFormationSelect = (e, op) => {
         this.setState({
-            guestFormation: this.getFormation(e),
+            guestFormation: e,
         });
         if (this.state.data.guestteam.formation) {
             this.updateFormation(this.state.data.guestteam.formation.id, e, KECHANG)
@@ -325,36 +329,38 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
             if (data && data.code == 200) {
                 if (data.data) {
                     if (type == KECHANG) {
+                        this.state.data.guestteam.formation.type = value;
                         this.setState({
-                            guestFormation: this.getFormation(value)
+                            guestFormation: value,
+                            data: this.state.data
                         });
                     } else {
+                        this.state.data.hostteam.formation.type = value;
                         this.setState({
-                            hostFormation: this.getFormation(value)
+                            hostFormation: value,
+                            data: this.state.data
                         });
                     }
                     message.success('修改成功', 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
     handleMatchPlayerDelete = () => {
         const team = this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam : this.state.data.guestteam;
-        console.log(team)
-        let tFormation = {}
+        let tFormation = team.formation
         for (var i = 1; i <= 11; i++) {
-            if (team.formation.position[i] && team.formation.position[i].id == this.state.currentPlayer.id) {
-                tFormation["id"] = team.formation.id;
-                tFormation["position" + i] = -1;
+            if (tFormation.detail[i] && tFormation.detail[i] == this.state.currentPlayer.id) {
+                delete tFormation.detail[i];
             }
         }
         modifyPlayerInMatchTeam({
-            matchid: this.props.matchid,
-            playerid: this.state.currentPlayer.id,
-            teamid: team.id,
-            isdelete: true,
+            matchId: this.props.matchId,
+            playerId: this.state.currentPlayer.id,
+            teamId: team.id,
+            isDelete: true,
             formation: tFormation
         }).then((data) => {
             if (data && data.code == 200) {
@@ -362,10 +368,10 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
         this.setState({dialogModifyVisible: false, deleteVisible: false});
@@ -391,7 +397,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     <Card>
                         <div className="center">
                             <img className="round-img"
-                                 src={this.state.data ? this.state.data.hostteam.headimg : defultAvatar}/>
+                                 src={this.state.data ? this.state.data.hostteam.headImg : defultAvatar}/>
                         </div>
                         <div className="center w-full">
                             <p style={{fontSize: 22}}
@@ -416,7 +422,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                                            onClick={showModifyDialog.bind(this, ZHUCHANG, item)}>
                                     <div className="center list-item-hover">
                                         <img className="round-img-s"
-                                             src={item.headimg ? item.headimg : defultAvatar}/>
+                                             src={item.headImg ? item.headImg : defultAvatar}/>
                                     </div>
                                     <div className="pl-m">
                                         <p style={{fontSize: 16}}>{item.name}</p>
@@ -432,7 +438,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                                             <img
                                                 style={{opacity: 0.8, width: "40px", height: "40px"}}
                                                 src={item.status == 1 ? shirt : shirt2}/>
-                                            <p style={item.status == 1 ? shirtStyle : shirtStyle2}>{item.shirtnum}</p>
+                                            <p style={item.status == 1 ? shirtStyle : shirtStyle2}>{item.shirtNum}</p>
 
                                         </div>
                                     </Tooltip>
@@ -451,13 +457,13 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                                     className="pull-right mt-ms-r mb-n"
                                     onSelect={onGuestFormationSelect}
                                     style={{minWidth: 100}}>
-                                <Option value="1">4-3-3</Option>
-                                <Option value="2">4-4-2</Option>
-                                <Option value="3">4-5-1</Option>
-                                <Option value="4">4-3-2-1</Option>
-                                <Option value="5">4-6-0</Option>
-                                <Option value="6">3-5-2</Option>
-                                <Option value="7">5-3-2</Option>
+                                <Option value={1}>4-3-3</Option>
+                                <Option value={2}>4-4-2</Option>
+                                <Option value={3}>4-5-1</Option>
+                                <Option value={4}>4-3-2-1</Option>
+                                <Option value={5}>4-6-0</Option>
+                                <Option value={6}>3-5-2</Option>
+                                <Option value={7}>5-3-2</Option>
                             </Select>
                         </div>
                         <div style={{height: 250, minWidth: 250, display: "block"}} className="reverse">
@@ -488,13 +494,13 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                                     className="pull-right mt-xxs mb-n"
                                     onSelect={onHostFormationSelect}
                                     style={{minWidth: 100}}>
-                                <Option value="1">4-3-3</Option>
-                                <Option value="2">4-4-2</Option>
-                                <Option value="3">4-5-1</Option>
-                                <Option value="4">4-3-2-1</Option>
-                                <Option value="5">4-6-0</Option>
-                                <Option value="6">3-5-2</Option>
-                                <Option value="7">5-3-2</Option>
+                                <Option value={1}>4-3-3</Option>
+                                <Option value={2}>4-4-2</Option>
+                                <Option value={3}>4-5-1</Option>
+                                <Option value={4}>4-3-2-1</Option>
+                                <Option value={5}>4-6-0</Option>
+                                <Option value={6}>3-5-2</Option>
+                                <Option value={7}>5-3-2</Option>
                             </Select>
                         </div>
                     </div>
@@ -503,7 +509,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     <Card>
                         <div className="center">
                             <img className="round-img"
-                                 src={this.state.data ? this.state.data.guestteam.headimg : defultAvatar}/>
+                                 src={this.state.data ? this.state.data.guestteam.headImg : defultAvatar}/>
                         </div>
                         <div className="center w-full">
                             <p style={{fontSize: 22}}
@@ -528,7 +534,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                                            onClick={showModifyDialog.bind(this, KECHANG, item)}>
                                     <div className="center list-item-hover">
                                         <img className="round-img-s"
-                                             src={item.headimg ? item.headimg : defultAvatar}/>
+                                             src={item.headImg ? item.headImg : defultAvatar}/>
                                     </div>
                                     <div className="pl-m">
                                         <p style={{fontSize: 16}}>{item.name}</p>
@@ -544,7 +550,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                                             <img
                                                 style={{opacity: 0.8, width: "40px", height: "40px"}}
                                                 src={item.status == 1 ? shirt : shirt2}/>
-                                            <p style={item.status == 1 ? shirtStyle : shirtStyle2}>{item.shirtnum}</p>
+                                            <p style={item.status == 1 ? shirtStyle : shirtStyle2}>{item.shirtNum}</p>
 
                                         </div>
                                     </Tooltip>
@@ -567,7 +573,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     visible={this.state.dialogAddVisible}
                     record={this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam : this.state.data.guestteam}
                     formationId={this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam.formation.id : this.state.data.guestteam.formation.id}
-                    matchId={this.props.matchid}
+                    matchId={this.props.matchId}
                     ref={this.saveMatchPlayerDialogRef}/>
             </Modal>
             <Modal
@@ -594,7 +600,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     visible={this.state.dialogModifyVisible}
                     record={this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam : this.state.data.guestteam}
                     formationId={this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam.formation.id : this.state.data.guestteam.formation.id}
-                    matchId={this.props.matchid}
+                    matchId={this.props.matchId}
                     player={this.state.currentPlayer}
                     ref={this.saveMatchPlayerModifyDialogRef}/>
             </Modal>

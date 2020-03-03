@@ -118,21 +118,21 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 this.setState({loading: false});
             }
         }
-        this.fetchTeamPlayer(this.props.matchid, this.props.data.hostteam.id, HOSTTEAM, callback1);
-        this.fetchTeamPlayer(this.props.matchid, this.props.data.guestteam.id, GUESTTEAM, callback2);
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.hostteam.id, HOSTTEAM, callback1);
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.guestteam.id, GUESTTEAM, callback2);
     }
 
     fetchTeamPlayer = (matchId, teamId, type, callback) => {
-        getMatchPlayersByTeamId(matchId, teamId).then((data) => {
-            if (data) {
+        getMatchPlayersByTeamId(null, teamId).then((data) => {
+            if (data && data.code == 200) {
                 if (type == HOSTTEAM) {
-                    this.setState({hostTeamPlayer: data})
+                    this.setState({hostTeamPlayer: data.data ? data.data.records : []})
                 } else {
-                    this.setState({guestTeamPlayer: data})
+                    this.setState({guestTeamPlayer: data.data ? data.data.records : []})
                 }
                 callback();
             } else {
-                message.error('获取比赛队伍队员失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛队伍队员失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -144,10 +144,10 @@ class FootBallMatchScoreAddDialog extends React.Component {
                     this.props.onSuccess();
                     this.props.onClose();
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg + "-" + data.data : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message + "-" + data.data : data), 3);
             }
         });
     }
@@ -162,9 +162,9 @@ class FootBallMatchScoreAddDialog extends React.Component {
             }
             teamPlayerData.forEach((item, index) => {
                 dom.push(<Option value={item.id + ""} data={item.id}>{<div className="inline-p"><Avatar
-                    src={item.headimg}/>
+                    src={item.headImg}/>
                     <p
-                        className="ml-s">{item.name + "(" + item.shirtnum + "号)"}</p></div>}</Option>)
+                        className="ml-s">{item.name + "(" + item.shirtNum + "号)"}</p></div>}</Option>)
             });
         }
         return dom;
@@ -271,9 +271,9 @@ class FootBallMatchScoreAddDialog extends React.Component {
                                     <img
                                         style={{opacity: 0.8, width: "20px", height: "20px"}}
                                         src={item.status == 1 ? shirt : shirt2}/>
-                                    <p style={item.status == 1 ? shirtStyle : shirtStyle2}>{item.shirtnum}</p>
+                                    <p style={item.status == 1 ? shirtStyle : shirtStyle2}>{item.shirtNum}</p>
                                 </div>
-                                <img className="round-img-s" src={item.headimg ? item.headimg : defultAvatar}/>
+                                <img className="round-img-s" src={item.headImg ? item.headImg : defultAvatar}/>
                                 <p className="mb-n">{item.name}</p>
                             </div>
                         </div>
@@ -384,10 +384,10 @@ class FootBallMatchScoreAddDialog extends React.Component {
     }
     submit = () => {
         const params = {
-            matchid: this.props.data.id,
-            teamid: this.state.team.id,
-            playerid: this.state.player.id,
-            eventtype: this.state.event.key,
+            matchId: this.props.data.id,
+            teamId: this.state.team.id,
+            playerId: this.state.player.id,
+            eventType: this.state.event.key,
             minute: this.state.minute ? this.state.minute : (eventType[this.state.event.key]["minute"] ? eventType[this.state.event.key]["minute"] : this.props.minute),
             remark: this.state.event.key === 25 ? "1" : this.state.remark,
             text: this.state.text,
@@ -585,7 +585,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                         <div
                             className={this.state.team && (data.hostteam.id == this.state.team.id) ? "step-item-hover step-item-selected" : "step-item-hover"}
                             onClick={onTeamSelect.bind(this, true)}>
-                            <img className="round-img mt-s" src={data.hostteam.headimg}/>
+                            <img className="round-img mt-s" src={data.hostteam.headImg}/>
                             <p style={{fontSize: 16}} className="w-full">{data.hostteam.name}</p>
                         </div>
                     </Col>
@@ -593,7 +593,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                         <div
                             className={this.state.team && (data.guestteam.id == this.state.team.id) ? "step-item-hover step-item-selected" : "step-item-hover"}
                             onClick={onTeamSelect.bind(this, false)}>
-                            <img className="round-img mt-s" src={data.guestteam.headimg}/>
+                            <img className="round-img mt-s" src={data.guestteam.headImg}/>
                             <p style={{fontSize: 16}} className="w-full">{data.guestteam.name}</p>
                         </div>
                     </Col>

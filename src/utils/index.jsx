@@ -163,14 +163,14 @@ export const randomNum = (lower, upper) => {
     return Math.floor(Math.random() * (upper - lower)) + lower;
 }
 
-export const getRound = (num,prefix)=>{
+export const getRound = (num, prefix) => {
     let rank = []
     for (let i = 1; i <= num; i++) {
         rank.push(prefix + "第" + toChinesNum(i) + "轮");
     }
     return rank;
 }
-export const getJueSaiRankRound = (num) =>{
+export const getJueSaiRankRound = (num) => {
     let rank = []
     for (let i = 1; i <= num; i++) {
         if (i == 1) {
@@ -180,4 +180,25 @@ export const getJueSaiRankRound = (num) =>{
         }
     }
     return rank.reverse();
+}
+
+export const getNowDate = () => {
+    return moment().format("YYYY/MM/DD hh:mm:ss");
+}
+
+export const getPastMonthDate = () => {
+    return moment().subtract(1, 'month').format("YYYY/MM/DD hh:mm:ss");
+}
+export const distinctById = (arr) => {
+    let map = new Map();
+    let array = [];  // 数组用于返回结果
+    for (let i = 0; i < arr.length; i++) {
+        if(map.has(arr[i].id)) {  // 如果有该key值
+            map.set(arr[i].id, true);
+        } else {
+            map.set(arr[i].id, false);   // 如果没有该key值
+            array.push(arr[i]);
+        }
+    }
+    return array ;
 }

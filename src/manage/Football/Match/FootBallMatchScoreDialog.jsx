@@ -52,7 +52,6 @@ import {
     getMatchTime,
     getMatchById,
     getPlayersByTeamId,
-    getMatchStatus,
     updateMatchById,
     updateMatchScoreStatusById,
 } from "../../../axios";
@@ -185,44 +184,44 @@ class FootBallMatchScoreDialog extends React.Component {
 
 
     fetch = () => {
-        getMatchById(this.props.matchid).then((data) => {
-            if (data) {
+        getMatchById(this.props.matchId).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    data: data,
+                    data: data.data,
                     // hostFormation: data.hostteam?(data.hostteam.formation ? data.hostteam.formation.type : "4-3-3"):{},
                     // guestFormation: data.guestteam?(data.guestteam.formation ? data.guestteam.formation.type : "4-3-3"):{}
                 });
-                data.hostteam && this.getPlayer(data.hostteam.id);
-                data.guestteam && this.getPlayer(data.guestteam.id);
+                data.data.hostteam && this.getPlayer(data.data.hostteam.id);
+                data.data.guestteam && this.getPlayer(data.data.guestteam.id);
                 this.getTimeline();
                 this.getTime();
             } else {
-                message.error('获取比赛失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
     getTime = () => {
-        getMatchTime(this.props.matchid).then((data) => {
-            if (data) {
-                this.setState({status: data});
+        getMatchTime(this.props.matchId).then((data) => {
+            if (data && data.code == 200) {
+                this.setState({status: data.data});
             } else {
-                message.error('获取比赛时间失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛时间失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
     getTimeline = () => {
-        getTimelineByMatchId({id: this.props.matchid}).then((data) => {
-            this.setState({timelineList: data});
-            if (data) {
+        getTimelineByMatchId({matchId: this.props.matchId}).then((data) => {
+            if (data && data.code == 200) {
+                this.setState({timelineList: data.data});
                 let hostPass = 0;
                 let hostPoss = 50;
                 let guestPass = 0;
                 let guestPoss = 50;
-                data && data.forEach((item, index) => {
-                    if (item.eventtype == CHUANKONG) {
+                data.data && data.data.forEach((item, index) => {
+                    if (item.eventType == CHUANKONG) {
                         const passAndPoss = JSON.parse(item.remark)
-                        const teamid = item.teamid
-                        if (teamid == this.state.data.hostteam.id) {
+                        const teamId = item.teamId
+                        if (teamId == this.state.data.hostteam.id) {
                             hostPass = passAndPoss.pass
                             hostPoss = passAndPoss.possession
                         } else {
@@ -234,17 +233,17 @@ class FootBallMatchScoreDialog extends React.Component {
                 let hostPoint = 0;
                 let guestPoint = 0;
                 if (this.state.data.hostteam) {
-                    data && data.forEach((item, index) => {
-                        const isHost = this.state.data.hostteam.id == item.teamid ? true : false;
-                        if (item.eventtype == 1 || item.eventtype == 22) {
+                    data.data && data.data.forEach((item, index) => {
+                        const isHost = this.state.data.hostteam.id == item.teamId ? true : false;
+                        if (item.eventType == 1 || item.eventType == 22) {
                             if (isHost) {
-                                if (item.eventtype == 22) {
+                                if (item.eventType == 22) {
                                     guestPoint = guestPoint + 1;
                                 } else {
                                     hostPoint = hostPoint + 1;
                                 }
                             } else {
-                                if (item.eventtype == 22) {
+                                if (item.eventType == 22) {
                                     hostPoint = hostPoint + 1;
                                 } else {
                                     guestPoint = guestPoint + 1;
@@ -256,23 +255,23 @@ class FootBallMatchScoreDialog extends React.Component {
                 this.setState({
                     hostPoint: hostPoint,
                     guestPoint: guestPoint,
-                    timelineData: data,
+                    timelineData: data.data,
                     hostPass: hostPass,
                     hostPoss: hostPoss,
                     guestPass: guestPass,
                     guestPoss: guestPoss,
                 });
             } else {
-                message.error('获取时间轴失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取时间轴失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
     getPlayer = (teamId) => {
         getPlayersByTeamId(teamId, {pageSize: 100, pageNum: 1,}).then((data) => {
-            if (data && data.list) {
-                this.getPlayerInfo(data ? data.list : "");
+            if (data && data.code == 200) {
+                this.getPlayerInfo(data.data ? data.data.records : "");
             } else {
-                message.error('获取队员列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取队员列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -319,13 +318,13 @@ class FootBallMatchScoreDialog extends React.Component {
                 dom_col.push(<Col span={colWidth}>
                     <div className="center" style={{webkitTransform: 'perspective(1000)'}}>
                         <Avatar size="small" className={reverse ? "reverse" : ""}
-                                src={playerInfo ? playerInfo.headimg : defultAvatar}/>
+                                src={playerInfo ? playerInfo.headImg : defultAvatar}/>
                     </div>
                 </Col>);
             }
             return dom_col;
         }
-        const formationList = formationStr.split("-")
+        const formationList = this.getFormation(formationStr).split("-")
         const divHeight = 150 * 3 / 4 / formationList.length;
         let dom = []
         for (var i = formationList.length - 1; i >= 0; i--) {
@@ -336,15 +335,18 @@ class FootBallMatchScoreDialog extends React.Component {
         }
         let playerInfo;
         if (formation) {
-            if (formation.position) {
-                playerInfo = formation.position[(times - 1)];
+            if (formation.detail) {
+                playerInfo = formation.detail[(times - 1)];
             }
         }
         dom.push(<div className="center" style={{webkitTransform: 'perspective(1000)'}}>
             <Avatar size="small" className={reverse ? "reverse" : ""}
-                    src={playerInfo ? playerInfo.headimg : defultAvatar}/>
+                    src={playerInfo ? playerInfo.headImg : defultAvatar}/>
         </div>);
         return dom;
+    }
+    getFormation = (type) => {
+        return formation[type]
     }
     onTimelineAddClick = () => {
         this.showDrawer();
@@ -370,23 +372,23 @@ class FootBallMatchScoreDialog extends React.Component {
                 return 0;
             });
             data.forEach((item, index) => {
-                if (item.eventtype != CHUANKONG) {
-                    const des = eventType[item.eventtype].text
-                    const hidden = eventType[item.eventtype].hidden
-                    const isChange = item.eventtype == 10 ? true : false;
+                if (item.eventType != CHUANKONG) {
+                    const des = eventType[item.eventType].text
+                    const hidden = eventType[item.eventType].hidden
+                    const isChange = item.eventType == 10 ? true : false;
                     const dot = <div>
                         <div className="w-full center">
                             <img className="round-img-xxs-hover" onClick={onDotClick.bind(this, item)}
-                                 src={eventType[item.eventtype].icon}/>
+                                 src={eventType[item.eventType].icon}/>
                         </div>
                         <span className="w-full center">{des}</span>
                     </div>
-                    const isHost = this.state.data.hostteam ? (this.state.data.hostteam.id == item.teamid ? true : false) : false
+                    const isHost = this.state.data.hostteam ? (this.state.data.hostteam.id == item.teamId ? true : false) : false
                     const dis = isHost ? "timeline-left" : "timeline-right"
-                    const avatar = this.state.playerInfo[item.playerid] ? this.state.playerInfo[item.playerid].headimg : defultAvatar;
-                    const hideTime = eventType[item.eventtype].hideTime;
-                    let name = this.state.playerInfo[item.playerid] ? this.state.playerInfo[item.playerid].name : "";
-                    let shirtNum = this.state.playerInfo[item.playerid] ? this.state.playerInfo[item.playerid].shirtnum : "";
+                    const avatar = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].headImg : defultAvatar;
+                    const hideTime = eventType[item.eventType].hideTime;
+                    let name = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].name : "";
+                    let shirtNum = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].shirtNum : "";
                     let changeDom = [];
                     if (isChange) {
                         changeDom.push(<div className="inline-block center">
@@ -396,11 +398,11 @@ class FootBallMatchScoreDialog extends React.Component {
                             <div>
                                 <div className="center">
                                     <Avatar className="center" size="small"
-                                            src={this.state.playerInfo[item.remark] ? this.state.playerInfo[item.remark].headimg : defultAvatar}/>
+                                            src={this.state.playerInfo[item.remark] ? this.state.playerInfo[item.remark].headImg : defultAvatar}/>
                                 </div>
                                 <div className="center">
                                 <span
-                                    className="w-full">{this.state.playerInfo[item.remark] ? this.state.playerInfo[item.remark].name + `(${this.state.playerInfo[item.remark].shirtnum})` : ""}</span>
+                                    className="w-full">{this.state.playerInfo[item.remark] ? this.state.playerInfo[item.remark].name + `(${this.state.playerInfo[item.remark].shirtNum})` : ""}</span>
                                 </div>
                             </div>
                         </div>);
@@ -461,7 +463,7 @@ class FootBallMatchScoreDialog extends React.Component {
         return dom;
     }
     onDotClick = (item, e) => {
-        const hidden = eventType[item.eventtype].hidden
+        const hidden = eventType[item.eventType].hidden
         if (hidden) {
             this.setState({
                 drawEventModifyVisible: true,
@@ -592,11 +594,11 @@ class FootBallMatchScoreDialog extends React.Component {
                     this.fetch();
                     this.props.refreshFuc();
                     message.success('修改成功', 1);
-                }else{
-                    message.warn(data.msg, 1);
+                } else {
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
         this.setState({dialogStatusVisible: false});
@@ -719,7 +721,7 @@ class FootBallMatchScoreDialog extends React.Component {
                 <Col span={8}>
                     <div className="center">
                         <img className="round-img"
-                             src={this.state.data.hostteam ? this.state.data.hostteam.headimg : defultAvatar}/>
+                             src={this.state.data.hostteam ? this.state.data.hostteam.headImg : defultAvatar}/>
                     </div>
                     <div className="center w-full mt-m">
                         <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.hostteam ? this.state.data.hostteam.name : ""}</p>
@@ -751,7 +753,7 @@ class FootBallMatchScoreDialog extends React.Component {
                 <Col span={8}>
                     <div className="center">
                         <img className="round-img"
-                             src={this.state.data.guestteam ? this.state.data.guestteam.headimg : defultAvatar}/>
+                             src={this.state.data.guestteam ? this.state.data.guestteam.headImg : defultAvatar}/>
                     </div>
                     <div className="center w-full mt-m">
                         <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.guestteam ? this.state.data.guestteam.name : ""}</p>
@@ -788,7 +790,7 @@ class FootBallMatchScoreDialog extends React.Component {
                 >
                     <FootBallMatchScoreAddDialog visible={this.state.drawVisible}
                                                  onHeightChange={onDrawHeightChange}
-                                                 matchid={this.props.matchid}
+                                                 matchId={this.props.matchId}
                                                  data={this.state.data}
                                                  onClose={onDrawClose}
                                                  onSuccess={refreshTimeLine}
@@ -806,7 +808,7 @@ class FootBallMatchScoreDialog extends React.Component {
                 >
                     <FootBallMatchScoreModifyDialog visible={this.state.drawModifyVisible}
                                                     onHeightChange={onDrawHeightChange}
-                                                    matchid={this.props.matchid}
+                                                    matchId={this.props.matchId}
                                                     data={this.state.data}
                                                     record={this.state.record}
                                                     onClose={onModifyDrawClose}
@@ -823,7 +825,7 @@ class FootBallMatchScoreDialog extends React.Component {
                     height={this.state.drawEventHeight}
                 >
                     <FootBallMatchScoreTimeEventAddDialog visible={this.state.drawEventAddVisible}
-                                                          matchid={this.props.matchid}
+                                                          matchId={this.props.matchId}
                                                           data={this.state.data}
                                                           onClose={onEventAddDrawClose}
                                                           onSuccess={refreshTimeLine}
@@ -842,7 +844,7 @@ class FootBallMatchScoreDialog extends React.Component {
                     height={this.state.drawEventHeight}
                 >
                     <FootBallMatchScoreTimeEventModifyDialog visible={this.state.drawEventModifyVisible}
-                                                             matchid={this.props.matchid}
+                                                             matchId={this.props.matchId}
                                                              data={this.state.data}
                                                              record={this.state.record}
                                                              onClose={onEventModifyDrawClose}
@@ -860,7 +862,7 @@ class FootBallMatchScoreDialog extends React.Component {
                     height={300}
                 >
                     <FootBallMatchScorePassDialog visible={this.state.drawPassVisible}
-                                                  matchid={this.props.matchid}
+                                                  matchId={this.props.matchId}
                                                   data={this.state.data}
                                                   onClose={onPassDrawClose}
                                                   onSuccess={refreshTimeLine}

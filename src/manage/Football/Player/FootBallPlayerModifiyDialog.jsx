@@ -117,16 +117,16 @@ class FootBallPlayerModifyDialog extends React.Component {
                 <div>
                     <Form>
                         <FormItem {...formItemLayout} className="bs-form-item round-div ml-l mb-s">
-                            {getFieldDecorator('headimg', {
+                            {getFieldDecorator('headImg', {
                                 // initialValue: logo,
                                 getValueFromEvent(e) {
-                                    return form.getFieldValue('headimg')
+                                    return form.getFieldValue('headImg')
                                 },
                                 onChange(e) {
                                     const file = e.file;
                                     if (file.response) {
                                         form.setFieldsValue({
-                                            headimg: file.response
+                                            headImg: file.response
                                         })
                                     }
                                 }
@@ -141,8 +141,8 @@ class FootBallPlayerModifyDialog extends React.Component {
                                 >
                                     {
                                         <img
-                                            src={form.getFieldValue('headimg') ? form.getFieldValue('headimg') :
-                                                (record.headimg?record.headimg:defultAvatar)}
+                                            src={form.getFieldValue('headImg') ? form.getFieldValue('headImg') :
+                                                (record.headImg?record.headImg:defultAvatar)}
                                             alt="avatar"
                                             className="round-img"/>
                                     }
@@ -159,15 +159,15 @@ class FootBallPlayerModifyDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="英文名" className="bs-form-item">
-                            {getFieldDecorator('englishname', {
-                                initialValue: record.englishname,
+                            {getFieldDecorator('englishName', {
+                                initialValue: record.englishName,
                             })(
                                 <Input placeholder='请输入英文名'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="位置" className="bs-form-item">
                             {getFieldDecorator('position', {
-                                initialValue: eval(record.position),
+                                initialValue: record.position,
                                 // rules: [{required: true, message: '请选择位置!'}],
                             })(
                                 <TreeSelect treeData={positionData}

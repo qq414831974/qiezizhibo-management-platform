@@ -745,7 +745,7 @@ export const getVisit = (param) => get({url: `${config.user_service}/user/visit?
     }).catch(function (error) {
         console.log(error)
     });
-export const getBanner = (params) => get({url: `${config.system_service}/system/config/banner`, data: params})
+export const getBanner = (params) => get({url: `${config.system_service}/system/config/banner?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -796,7 +796,7 @@ export const deleteScoreboard = (params) => del({url: `${config.system_service}/
     }).catch(function (error) {
         console.log(error)
     });
-export const getBulletin = () => get({url: `${config.system_service}/system/config/bulletin`})
+export const getBulletin = (param) => get({url: `${config.system_service}/system/config/bulletin?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

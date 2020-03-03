@@ -5,7 +5,7 @@ import BannerUpload from './BannerUpload';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import {getConfig, delConfig, getAreasList} from "../../axios";
+import {getBanner, delConfig, getAreasList} from "../../axios";
 import ScoreBoard from './ScoreBoard';
 
 class BannerSetting extends React.Component {
@@ -16,12 +16,12 @@ class BannerSetting extends React.Component {
     }
 
     fetch = () => {
-        getConfig({areatype: 2}).then((data) => {
-            if (data) {
+        getBanner({areatype: 2}).then((data) => {
+            if (data && data.code == 200) {
                 let banner = {}
                 let count = 0;
-                if (data.banner) {
-                    data.banner.forEach((item) => {
+                if (data.data) {
+                    data.data.forEach((item) => {
                         banner[count] = {}
                         banner[count]["id"] = item.id;
                         banner[count]["img"] = item.img;
@@ -31,19 +31,19 @@ class BannerSetting extends React.Component {
                         count = count + 1;
                     });
                 }
-                this.setState({banner: banner, hotloader: data.config, bannerCount: count});
+                this.setState({banner: banner, bannerCount: count});
             } else {
-                message.error('获取系统配置失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取系统配置失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
         getAreasList().then((data) => {
-            if (data) {
+            if (data && data.code == 200) {
                 this.setState({
                     areaLoading: false,
-                    areas: data,
+                    areas: data.data,
                 });
             } else {
-                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -92,10 +92,10 @@ class BannerSetting extends React.Component {
                     this.cancelDelete();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         })
     }

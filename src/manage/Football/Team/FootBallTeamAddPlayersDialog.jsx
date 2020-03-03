@@ -73,7 +73,7 @@ class FootBallTeamAddPlayersDialog extends React.Component {
                 <div>
                     <div className="center w-full">
                         <img
-                            src={record.headimg ? record.headimg : avatar}
+                            src={record.headImg ? record.headImg : avatar}
                             alt="avatar"
                             className="round-img"/>
                     </div>
@@ -82,7 +82,7 @@ class FootBallTeamAddPlayersDialog extends React.Component {
                     </div>
                     <Form>
                         <FormItem {...formItemLayout} label="球衣号码" className="bs-form-item">
-                            {getFieldDecorator('shirtnum', {
+                            {getFieldDecorator('shirtNum', {
                                 rules: [{required: true, message: '请输入球衣号码'}],
                             })(
                                 <Input placeholder='请输入球衣号码'/>
@@ -93,6 +93,7 @@ class FootBallTeamAddPlayersDialog extends React.Component {
                                 // rules: [{required: true, message: '请选择位置!'}],
                             })(
                                 <TreeSelect treeData={positionData}
+                                            multiple
                                             placeholder="请选择"
                                             dropdownStyle={{maxHeight: 300, overflow: 'auto'}}
                                             allowClear
@@ -109,22 +110,22 @@ class FootBallTeamAddPlayersDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="入队日期" className="bs-form-item">
-                            {getFieldDecorator('jointime', {
+                            {getFieldDecorator('joinTime', {
                                 // initialValue: moment(),
                             })(
-                                <DatePicker placeholder='请输入入队日期' format={'YYYY-MM-DD'}/>
+                                <DatePicker placeholder='请输入入队日期' format={'YYYY/MM/DD'}/>
                             )}
                         </FormItem>
                         <FormItem style={{margin:0}}>
-                            {getFieldDecorator('playerid', {
+                            {getFieldDecorator('playerId', {
                                 initialValue: record.id,
                             })(
                                 <Input hidden={true} />
                             )}
                         </FormItem>
                         <FormItem style={{margin:0}}>
-                            {getFieldDecorator('teamid', {
-                                initialValue: this.props.teamid,
+                            {getFieldDecorator('teamId', {
+                                initialValue: this.props.teamId,
                             })(
                                 <Input hidden={true} />
                             )}

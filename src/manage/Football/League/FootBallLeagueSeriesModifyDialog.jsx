@@ -9,14 +9,15 @@ import {
     Select,
     Progress,
     Checkbox,
-    Avatar, Tooltip, InputNumber
+    Avatar,
+    Tooltip, InputNumber, message
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
 import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {uploadimg} from "../../../axios/index";
+import {getAreasList, uploadimg} from "../../../axios/index";
 
 import defultAvatar from '../../../static/avatar.jpg';
 import {toChinesNum} from "../../../utils";
@@ -45,7 +46,17 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
     state = {}
 
     componentDidMount() {
-        //receiveData({record: this.props.record}, 'responsive');
+        this.setState({loading: true});
+        getAreasList().then((data) => {
+            if (data && data.code ==200) {
+                this.setState({
+                    loading: false,
+                    areas: data.data,
+                });
+            } else {
+                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        });
     }
 
     handleAvatarChange = (info) => {
@@ -169,8 +180,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
     getAreasOption = () => {
         let dom = [];
         this.state.areas.forEach((item) => {
-            dom.push(<Option value={item.province} data={item.province}
-                             key={`area-${item.id}`}>{item.province}</Option>);
+            dom.push(<Option value={item.province} data={item.province} key={`area-${item.id}`}>{item.province}</Option>);
         })
         return dom;
     }
@@ -189,7 +199,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                             <div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
                                 <span>系列赛：</span>
                                 <Avatar src={leagueData.headimg ? leagueData.headimg : defultAvatar}/>
-                                <span className="ml-s">{leagueData.name}{leagueData.englishname ? "(" + leagueData.englishname + ")" : ""}</span>
+                                <span className="ml-s">{leagueData.name}{leagueData.englishName ? "(" + leagueData.englishName + ")" : ""}</span>
                             </div>
                         </div>
                         <FormItem {...formItemLayout} className="bs-form-item round-div ml-l mb-s">
@@ -303,11 +313,11 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                             {getFieldDecorator('regulations.population', {
                                 initialValue: record.regulations ? record.regulations.population : null,
                                 getValueFromEvent(e) {
-                                    if (e == null) {
+                                    if(e == null){
                                         return null
                                     }
-                                    if (typeof (e) === 'string') {
-                                        return e.replace(/[^\d]/g, '')
+                                    if(typeof(e) === 'string'){
+                                        return e.replace(/[^\d]/g,'')
                                     }
                                     return e
                                 },
@@ -315,16 +325,16 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 <InputNumber placeholder='请输入'/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="英文名" className="bs-form-item">
-                            {getFieldDecorator('englishname', {
-                                initialValue: record.englishname,
+                        <FormItem {...formItemLayout} hidden={true} label="英文名" className="bs-form-item">
+                            {getFieldDecorator('englishName', {
+                                initialValue: record.englishName,
                             })(
-                                <Input placeholder='请输入英文名'/>
+                                <Input hidden={true} placeholder='请输入英文名'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="主办方" className="bs-form-item">
-                            {getFieldDecorator('majorsponsor', {
-                                initialValue: record.majorsponsor,
+                            {getFieldDecorator('majorSponsor', {
+                                initialValue: record.majorSponsor,
                             })(
                                 <Input placeholder='请输入主办方'/>
                             )}
@@ -368,9 +378,9 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 <div className="inline-block">
                                     {isMobile ? <span>开始：</span> : null}
                                     <FormItem>
-                                        {getFieldDecorator('datebegin', {
+                                        {getFieldDecorator('dateBegin', {
                                             rules: [{required: true, message: '请选择开始时间!'}],
-                                            initialValue: record.datebegin ? moment(record.datebegin) : null,
+                                            initialValue: record.dateBegin ? moment(record.dateBegin) : null,
                                         })(
                                             <DatePicker showTime
                                                         format={'YYYY-MM-DD HH:mm'}/>
@@ -381,9 +391,9 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 <div className="inline-block">
                                     {isMobile ? <span>结束：</span> : null}
                                     <FormItem>
-                                        {getFieldDecorator('dateend', {
+                                        {getFieldDecorator('dateEnd', {
                                             rules: [{required: true, message: '请选择结束时间!'}],
-                                            initialValue: record.dateend ? moment(record.dateend) : null,
+                                            initialValue: record.dateEnd ? moment(record.dateEnd) : null,
                                         })(
                                             <DatePicker showTime
                                                         format={'YYYY-MM-DD HH:mm'}/>
@@ -393,8 +403,8 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                             </div>
                         </FormItem>}
                         <FormItem {...formItemLayout} label="联系电话" className="bs-form-item">
-                            {getFieldDecorator('phonenumber', {
-                                initialValue: record.phonenumber,
+                            {getFieldDecorator('phoneNumber', {
+                                initialValue: record.phoneNumber,
                             })(
                                 <Input placeholder='请输入联系电话'/>
                             )}

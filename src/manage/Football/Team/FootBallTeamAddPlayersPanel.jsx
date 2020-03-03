@@ -76,28 +76,25 @@ class FootBallTeamAddPlayersPanel extends React.Component {
     };
 
     fetch = (params = {}) => {
+        params["areatype"] = 2;
         this.setState({
             loading: true,
         });
-        if (params.filter) {
-            params.filter = {areatype: 2, ...params.filter}
-        } else {
-            params.filter = {areatype: 2}
-        }
         getAllPlayersNotInTeam(params, this.props.record.id).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 pagination.onChange = this.handleListChange;
                 pagination.simple = true;
                 this.setState({
                     pageLoaded: true,
-                    data: data ? data.list : "",
+                    data: data.data ? data.data.records : [],
                     pagination,
                     loading: false,
                 });
             } else {
-                message.error('获取球员列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取球员列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -106,19 +103,20 @@ class FootBallTeamAddPlayersPanel extends React.Component {
             teamloading: true,
         });
         getPlayersByTeamId(this.props.record.id, params).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 const pagination = {...this.state.teampagination};
-                pagination.total = data ? data.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 pagination.onChange = this.handleTeamListChange;
                 pagination.size = "small";
                 pagination.simple = true;
                 this.setState({
-                    teamdata: data ? data.list : "",
+                    teamdata: data.data ? data.data.records : [],
                     teampagination: pagination,
                     teamloading: false,
                 });
             } else {
-                message.error('获取球队球员列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取球队球员列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -129,7 +127,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
         const teampager = {...this.state.teampagination};
         this.fetchTeam({
@@ -143,7 +141,8 @@ class FootBallTeamAddPlayersPanel extends React.Component {
     onSearch = () => {
         const {searchText} = this.state;
         const pager = {...this.state.pagination};
-        pager.filters = mergeJSON({name: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
+        pager.current = 1;
         this.setState({
             searchDropdownVisible: false,
             searched: !!searchText,
@@ -154,26 +153,23 @@ class FootBallTeamAddPlayersPanel extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
-    onFilterChange = (e) => {
-        const filter = e.target.value.split(",")
-        const pager = {...this.state.pagination};
-        pager.sortField = filter[0];
-        pager.sortOrder = filter[1];
-        this.setState({
-            filterDropdownVisible: false,
-            filtered: !!filter,
-            pagination: pager,
-        });
-        this.fetch({
-            pageSize: pager.pageSize,
-            pageNum: pager.current,
-            sortField: pager.sortField,
-            sortOrder: pager.sortOrder,
-            filter: pager.filters,
-        });
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["name"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
     handleListChange = (page, pageSize) => {
         const pager = {...this.state.pagination};
@@ -186,7 +182,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     handleTeamListChange = (page, pageSize) => {
@@ -224,8 +220,8 @@ class FootBallTeamAddPlayersPanel extends React.Component {
     handleTeamPlayerModifyCancel = (form) => {
         this.setState({dialogTeamPlayerModifyVisible: false});
     }
-    handleTeamPlayerDelete = (teamid, playerid) => {
-        const values = {teamid: teamid, playerid: playerid, isdelete: true}
+    handleTeamPlayerDelete = (teamId, playerId) => {
+        const values = {teamId: teamId, playerId: playerId, isDelete: true}
         modifyPlayerInTeam(values).then((data) => {
             this.setState({dialogTeamPlayerModifyVisible: false});
             if (data && data.code == 200) {
@@ -233,10 +229,10 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                     this.refresh();
                     message.success('修改成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -246,6 +242,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
             if (err) {
                 return;
             }
+            values["joinTime"] = values["joinTime"] ? values["joinTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             modifyPlayerInTeam(values).then((data) => {
                 this.setState({dialogTeamPlayerModifyVisible: false});
                 if (data && data.code == 200) {
@@ -253,10 +250,10 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                         this.refresh();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
                 form.resetFields();
             });
@@ -269,6 +266,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
             if (err) {
                 return;
             }
+            values["joinTime"] = values["joinTime"] ? values["joinTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             addPlayerToTeam(values).then((data) => {
                 this.setState({dialogTeamPlayerVisible: false});
                 if (data && data.code == 200) {
@@ -276,10 +274,10 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                         this.refresh();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
                 form.resetFields();
             });
@@ -293,15 +291,11 @@ class FootBallTeamAddPlayersPanel extends React.Component {
         let i = 0;
         let position = [];
         let dom = [];
-        if (record.position.indexOf("[") != -1) {
-            position = eval(record.position);
-            position.forEach((item, index) => {
-                dom.push(<Tag key={i} color="#001529">{positionName(item)}</Tag>)
-                i = i + 1;
-            });
-        } else {
-            dom.push(<Tag key={i} color="#001529">{positionName(record.position)}</Tag>)
-        }
+        position = record.position;
+        position.forEach((item, index) => {
+            dom.push(<Tag key={i} color="#001529">{positionName(item)}</Tag>)
+            i = i + 1;
+        });
         return <div className="center">{dom}</div>;
     };
     getPositionName = (p) => {
@@ -324,12 +318,12 @@ class FootBallTeamAddPlayersPanel extends React.Component {
         const getPosition = this.getPosition;
         const shirtStyle = {position: "absolute", fontSize: 16, color: "#FFFFFF", paddingBottom: "15px"};
         const shirtStyle2 = {position: "absolute", fontSize: 16, color: "#000000", paddingBottom: "15px"};
-        const teamid = record ? record.id : null;
-        const playerid = this.state.playerModifyData ? this.state.playerModifyData.id : null;
+        const teamId = record ? record.id : null;
+        const playerId = this.state.playerModifyData ? this.state.playerModifyData.id : null;
         const searchContent = <Row gutter={5}>
             <Col span={16}>
                 <Input
-                    placeholder="Search name"
+                    placeholder="搜索"
                     value={this.state.searchText}
                     onChange={this.onInputChange}
                     onPressEnter={this.onSearch}
@@ -339,11 +333,6 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                 <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
             </Col>
         </Row>;
-        const filterContent =
-            <RadioGroup defaultValue="name,asc" size="small" onChange={this.onFilterChange}>
-                <RadioButton value="name,asc">按名字正序</RadioButton>
-                <RadioButton value="name,desc">按名字倒序</RadioButton>
-            </RadioGroup>;
         const header = <div>
             <Popover content={searchContent}
                      trigger="click"
@@ -351,17 +340,11 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                      onVisibleChange={this.handleSearchPopVisibleChange}>
                 <Button shape="circle" icon="search" style={{color: this.state.searched ? '#108ee9' : '#aaa'}}/>
             </Popover>
-            <Popover content={filterContent}
-                     trigger="click"
-                     visible={this.state.filterDropdownVisible}
-                     onVisibleChange={this.handleFilterPopVisibleChange}>
-                <Button shape="circle" icon="filter" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>
-            </Popover>
         </div>;
         return this.state.pageLoaded ? <div className="gutter-example">
             {/*<div className="w-full center">*/}
             {/*<img*/}
-            {/*src={record.headimg}*/}
+            {/*src={record.headImg}*/}
             {/*alt="avatar"*/}
             {/*className="round-img-m"/>*/}
             {/*</div>*/}
@@ -397,7 +380,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                                                          src={plus}/>
                                                 </div>
                                                 <img className="round-img-m"
-                                                     src={item.headimg ? item.headimg : defultAvatar}/>
+                                                     src={item.headImg ? item.headImg : defultAvatar}/>
                                             </div>
                                             <div className="center">
                                                 <p className="text-ellipsis">{item.name}</p>
@@ -412,7 +395,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                 <Col className="gutter-row" md={4}>
                     <div className="center">
                         <img className="round-img"
-                             src={record.headimg ? record.headimg : defultAvatar}/>
+                             src={record.headImg ? record.headImg : defultAvatar}/>
                     </div>
                     <div className="center">
                         <p className="pl-s">{record.name}</p>
@@ -442,7 +425,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                                                          src={plus}/>
                                                 </div>
                                                 <img className="round-img-s"
-                                                     src={item.headimg ? item.headimg : defultAvatar}/>
+                                                     src={item.headImg ? item.headImg : defultAvatar}/>
                                             </div>
                                             <div className="pl-m">
                                                 <p style={{fontSize: 16}}>{item.name}</p>
@@ -458,7 +441,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                                                     <img
                                                         style={{opacity: 0.8, width: "40px", height: "40px"}}
                                                         src={item.status == 1 ? shirt : shirt2}/>
-                                                    <p style={item.status == 1 ? shirtStyle : shirtStyle2}>{item.shirtnum}</p>
+                                                    <p style={item.status == 1 ? shirtStyle : shirtStyle2}>{item.shirtNum}</p>
 
                                                 </div>
                                             </Tooltip>
@@ -477,7 +460,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                 title={
                     <div>
                         <div className="inline-block">
-                            <Avatar size="large" src={record.headimg}/>
+                            <Avatar size="large" src={record.headImg}/>
                         </div>
                         <div className="inline-block">
                             <p className="pl-s">{record.name}</p>
@@ -491,7 +474,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
             >
                 <AddPlayerToTeam
                     record={this.state.playerData}
-                    teamid={teamid}
+                    teamId={teamId}
                     visible={this.state.dialogTeamPlayerVisible}
                     ref={this.saveTeamPlayerDialogRef}/>
             </Modal>
@@ -502,7 +485,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                 title={
                     <div>
                         <div className="inline-block">
-                            <Avatar size="large" src={record.headimg}/>
+                            <Avatar size="large" src={record.headImg}/>
                         </div>
                         <div className="inline-block">
                             <p className="pl-s">{record.name}</p>
@@ -510,7 +493,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                     </div>
                 }
                 footer={[
-                    <Popconfirm title="确定删除吗?" onConfirm={handleTeamPlayerDelete.bind(this, teamid, playerid)}
+                    <Popconfirm title="确定删除吗?" onConfirm={handleTeamPlayerDelete.bind(this, teamId, playerId)}
                                 okText="是" cancelText="否">
                         <Button key="delete" type="danger" className="pull-left">
                             删除
@@ -527,7 +510,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
             >
                 <ModifyPlayerInTeam
                     record={this.state.playerModifyData}
-                    teamid={teamid}
+                    teamId={teamId}
                     visible={this.state.dialogTeamPlayerModifyVisible}
                     ref={this.saveTeamPlayerModifyDialogRef}/>
             </Modal>

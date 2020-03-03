@@ -9,14 +9,14 @@ import {
     Select,
     Progress,
     Checkbox,
-    Avatar, Tooltip, InputNumber,
+    Avatar, Tooltip, InputNumber, message,
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
 import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {uploadimg} from "../../../axios/index";
+import {getAreasList, uploadimg} from "../../../axios/index";
 import avatar from '../../../static/avatar.jpg';
 import {toChinesNum} from '../../../utils/index';
 import {upload} from "../../../axios";
@@ -45,7 +45,17 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
     state = {}
 
     componentDidMount() {
-
+        this.setState({loading: true});
+        getAreasList().then((data) => {
+            if (data && data.code == 200) {
+                this.setState({
+                    loading: false,
+                    areas: data.data,
+                });
+            } else {
+                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        });
     }
 
     handleAvatarChange = (info) => {
@@ -167,8 +177,7 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
     getAreasOption = () => {
         let dom = [];
         this.state.areas.forEach((item) => {
-            dom.push(<Option value={item.province} data={item.province}
-                             key={`area-${item.id}`}>{item.province}</Option>);
+            dom.push(<Option value={item.province} data={item.province} key={`area-${item.id}`}>{item.province}</Option>);
         })
         return dom;
     }
@@ -187,22 +196,21 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                         <div className="w-full center">
                             <div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
                                 <span>系列赛：</span>
-                                <Avatar src={leagueData.headimg ? leagueData.headimg : defultAvatar}/>
-                                <span
-                                    className="ml-s">{leagueData.name}{leagueData.englishname ? "(" + leagueData.englishname + ")" : ""}</span>
+                                <Avatar src={leagueData.headImg ? leagueData.headImg : defultAvatar}/>
+                                <span className="ml-s">{leagueData.name}{leagueData.englishName ? "(" + leagueData.englishName + ")" : ""}</span>
                             </div>
                         </div>
                         <FormItem {...formItemLayout} className="bs-form-item round-div ml-l mb-s">
-                            {getFieldDecorator('headimg', {
+                            {getFieldDecorator('headImg', {
                                 // initialValue: logo,
                                 getValueFromEvent(e) {
-                                    return form.getFieldValue('headimg')
+                                    return form.getFieldValue('headImg')
                                 },
                                 onChange(e) {
                                     const file = e.file;
                                     if (file.response) {
                                         form.setFieldsValue({
-                                            headimg: file.response
+                                            headImg: file.response
                                         })
                                     }
                                 }
@@ -217,7 +225,7 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                                 >
                                     {
                                         <img
-                                            src={form.getFieldValue('headimg') ? form.getFieldValue('headimg') : avatar}
+                                            src={form.getFieldValue('headImg') ? form.getFieldValue('headImg') : avatar}
                                             alt="avatar"
                                             className="round-img"/>
                                     }
@@ -302,7 +310,7 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                         {this.state.isSeries ? null : this.getRoundDom()}
                         <FormItem {...formItemLayout} label="几人制" className="bs-form-item">
                             {getFieldDecorator('regulations.population', {
-                                // initialValue: record.englishname,
+                                // initialValue: record.englishName,
                                 getValueFromEvent(e) {
                                     if (e == null) {
                                         return null
@@ -317,14 +325,14 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} hideen={true} label="英文名" className="bs-form-item">
-                            {getFieldDecorator('englishname', {
-                                // initialValue: record.englishname,
+                            {getFieldDecorator('englishName', {
+                                // initialValue: record.englishName,
                             })(
                                 <Input hideen={true} placeholder='请输入英文名'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="主办方" className="bs-form-item">
-                            {getFieldDecorator('majorsponsor', {})(
+                            {getFieldDecorator('majorSponsor', {})(
                                 <Input placeholder='请输入主办方'/>
                             )}
                         </FormItem>
@@ -364,7 +372,7 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                                 <div className="inline-block">
                                     {isMobile ? <span>开始：</span> : null}
                                     <FormItem>
-                                        {getFieldDecorator('datebegin', {
+                                        {getFieldDecorator('dateBegin', {
                                             rules: [{required: true, message: '请选择开始时间!'}],
                                         })(
                                             <DatePicker showTime
@@ -376,7 +384,7 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                                 <div className="inline-block">
                                     {isMobile ? <span>结束：</span> : null}
                                     <FormItem>
-                                        {getFieldDecorator('dateend', {
+                                        {getFieldDecorator('dateEnd', {
                                             rules: [{required: true, message: '请选择结束时间!'}],
                                         })(
                                             <DatePicker showTime
@@ -388,7 +396,7 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                         </FormItem>
                         }
                         <FormItem {...formItemLayout} label="联系电话" className="bs-form-item">
-                            {getFieldDecorator('phonenumber', {})(
+                            {getFieldDecorator('phoneNumber', {})(
                                 <Input placeholder='请输入联系电话'/>
                             )}
                         </FormItem>
@@ -398,8 +406,7 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="描述" className="bs-form-item">
-                            {getFieldDecorator('description', {
-                            })(
+                            {getFieldDecorator('description', {})(
                                 <Input.TextArea placeholder='描述'/>
                             )}
                         </FormItem>

@@ -7,7 +7,7 @@ import {connect} from "react-redux";
 import {Link, Redirect} from 'react-router-dom';
 import {Form, message, Tabs} from "antd/lib/index";
 import MatchSimpleForm from "../Match/FootBallMatchModifyDialog";
-import {delMatchById, getMatchById, updateMatchById} from "../../../axios";
+import {delMatchByIds, getMatchById, updateMatchById} from "../../../axios";
 import FootBallMatchPlayersSettingPanel from "./FootBallMatchPlayersSettingPanel";
 import FootBallMatchPlayersMediaPanel from "./FootBallMatchPlayersMediaPanel";
 import {getQueryString} from "../../../utils";
@@ -37,13 +37,13 @@ class FootBallMatchDetailManagement extends React.Component {
 
     fetch = (params = {}) => {
         getMatchById(params).then((data) => {
-            if (data) {
+            if (data && data.code == 200) {
                 this.setState({
                     pageLoaded: true,
-                    data: data,
+                    data: data.data,
                 });
             } else {
-                message.error('获取比赛失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -57,16 +57,21 @@ class FootBallMatchDetailManagement extends React.Component {
             if (err) {
                 return;
             }
+            values["startTime"] = values["startTime"] ? values["startTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["endTime"] = values["endTime"] ? values["endTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             updateMatchById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.fetch(this.props.match.params.id);
                         message.success('修改成功', 1);
                     }else{
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -82,7 +87,7 @@ class FootBallMatchDetailManagement extends React.Component {
         this.setState({deleteVisible: false});
     }
     delete = () => {
-        delMatchById(this.props.match.params.id).then((data) => {
+        delMatchByIds({id: [this.props.match.params.id]}).then((data) => {
             this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -92,10 +97,10 @@ class FootBallMatchDetailManagement extends React.Component {
                         history.push(`/football/footballMatch`);
                     }, 2000);
                 }else{
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     };
@@ -140,13 +145,13 @@ class FootBallMatchDetailManagement extends React.Component {
                                         <TabPane tab="球队首发阵型设置" key="2">
                                             <FootBallMatchPlayersSettingPanel
                                                 visible={this.state.currentTab == 2 ? true : false}
-                                                matchid={id}/>
+                                                matchId={id}/>
                                         </TabPane> : null}
                                     {matchType.indexOf(RECOMMOMED) >= 0 ?
                                         <TabPane tab="球员集锦" key="3">
                                             <FootBallMatchPlayersMediaPanel
                                                 visible={this.state.currentTab == 3 ? true : false}
-                                                matchid={id}/>
+                                                matchId={id}/>
                                         </TabPane> : null}
                                 </Tabs>
                             </Card>

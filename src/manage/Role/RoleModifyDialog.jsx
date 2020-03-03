@@ -3,17 +3,17 @@ import {
     Form,
     Input,
     Icon,
-    TreeSelect,
+    TreeSelect, Tooltip, Select,
 } from 'antd';
 import 'moment/locale/zh-cn';
 import {receiveData} from "../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {getRoleList} from "../../axios";
+import {getPermissionList} from "../../axios";
 import {message} from "antd/lib/index";
+import {distinctById} from "../../utils"
 
-
-const TreeNode = TreeSelect.TreeNode;
+const Option = Select.Option;
 
 const FormItem = Form.Item;
 
@@ -33,46 +33,96 @@ class RoleModifyDialog extends React.Component {
 
     componentDidMount() {
         if (this.props.visible) {
-            getRoleList().then((data) => {
-                if (data && data.length >= 1) {
-                    this.setState({
-                        data: data,
-                        loading: false,
-                    });
-                } else {
-                    message.error('获取权限信息失败：' + (data ? data.code + ":" + data.msg : data), 3);
-                }
-            });
+            this.fetch(null, 1);
+            this.isCompositions = true;
         }
     }
 
-    getTreeNode = (data) => {
+    fetch = (searchText, pageNum) => {
+        getPermissionList({pageSize: 10, pageNum: pageNum, permissionName: searchText}).then((data) => {
+            if (data && data.code == 200 && data.data.records) {
+                this.setState({
+                    data: pageNum == 1 ? (data.data ? data.data.records : []) :
+                        (data.data ? this.state.data.concat(data.data.records) : []),
+                    loading: false,
+                    pageNum: data.data.current,
+                    pageSize: data.data.size,
+                    pageTotal: data.data.total,
+                });
+            } else {
+                message.error('获取权限信息失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        });
+    }
+
+    getPermissionOption = () => {
         let dom = [];
-        if (data) {
-            data.forEach((item, index) => {
-                dom.push(<TreeNode value={item.menuCode} title={item.name} key={item.menuCode}>
-                    {item.childMenu ? this.getTreeNode(item.childMenu) : null}
-                </TreeNode>)
-            });
-        }
+        let data = this.state.data || [];
+        let recordData = this.props.record && this.props.record.permissions ? this.props.record.permissions : [];
+        data = distinctById(data.concat(recordData));
+        data.forEach((item, index) => {
+            dom.push(<Option value={item.id} style={{height: 50}} key={item.permissionCode}>
+                <Tooltip placement="rightTop" title={
+                    this.getPermissionTip(item)
+                }>
+                    <p className="mb-n">{item.permissionName}</p>
+                </Tooltip>
+            </Option>)
+        });
         return dom;
     }
-
-    getMenuListString = (record) => {
-        let list = [];
-        if (record.menuList) {
-            record.menuList.forEach((item, index) => {
-                list.push(item.menuCode);
-            });
+    getPermissionTip = (item) => {
+        return <div>
+            <p key={item.id + item.permissionCode + "url"}>{`url: ${item.url}`}</p>
+            <p key={item.id + item.permissionCode + "method"}>{`method: ${item.method}`}</p>
+            <p key={item.id + item.permissionCode + "des"}>{`描述: ${item.descritpion}`}</p>
+        </div>;
+    }
+    handleSearch = (e) => {
+        const value = e.target.value;
+        this.setState({searchText: value});
+        // setTimeout(()=>{
+        if (this.isCompositions) {
+            this.fetch(value, 1);
         }
-        return list;
+        // },100);
+    }
+    //中文输入中的状态 参考 https://blog.csdn.net/qq1194222919/article/details/80747192
+    onInputCompositionStart = () => {
+        this.isCompositions = false;
+    }
+    onInputCompositionEnd = () => {
+        this.isCompositions = true;
+        this.fetch(this.state.searchText, 1);
+    }
+    handleShowMore = (e) => {
+        const num = Math.floor(e.target.scrollTop / 50);
+        if (num + 5 >= this.state.data.length) {
+            this.handleOnLoadMore(e);
+        }
+    }
+    handleOnLoadMore = (e) => {
+        let data = this.state.data;
+        e.target.scrollTop = data.length * 50;
+        if (this.state.loading) {
+            return;
+        }
+        if (data.length >= this.state.pageTotal) {
+            this.setState({
+                hasMore: false,
+                loading: false,
+            });
+            return;
+        }
+        this.fetch(this.state.searchText, this.state.pageNum + 1);
+    }
+    handleChange = (value) => {
+        this.setState({value});
     }
 
     render() {
         const {visible, form, record} = this.props;
         const {getFieldDecorator} = form;
-        const getTreeNode = this.getTreeNode;
-        const getMenuListString = this.getMenuListString;
         return (
             visible ?
                 <Form>
@@ -87,29 +137,35 @@ class RoleModifyDialog extends React.Component {
                     <FormItem {...formItemLayout}
                               label="权限"
                               className="bs-form-item-nowrap">
-                        {getFieldDecorator('menuList', {
+                        {getFieldDecorator('permissions', {
                             rules: [{required: true, message: '请选择权限!'}],
-                            initialValue: getMenuListString(record)
+                            initialValue: record.permissions ? record.permissions.flatMap(role => role.id) : null,
                         })(
-                            <TreeSelect disabled={this.state.loading}
-                                        placeholder="请选择"
-                                        dropdownStyle={{maxHeight: 300, overflow: 'auto'}}
-                                        onChange={this.onSelectChange}
-                                        allowClear
-                                        multiple
-                                        treeCheckable={true}
-                                        showCheckedStrategy={TreeSelect.SHOW_PARENT}
-                                        filterTreeNode={(inputValue, treeNode) => {
-                                            return treeNode.props.title.indexOf(inputValue) != -1 || treeNode.props.value.indexOf(inputValue) != -1;
-                                        }}>
-                                {getTreeNode(this.state.data)}
-                            </TreeSelect>
+                            <Select
+                                showSearch
+                                style={{minWidth: 300}}
+                                placeholder="请选择"
+                                defaultActiveFirstOption={false}
+                                showArrow={false}
+                                filterOption={false}
+                                onChange={this.handleChange}
+                                onPopupScroll={this.handleShowMore}
+                                notFoundContent={null}
+                                mode="multiple"
+                                loading={this.state.loading}
+                                getInputElement={() => (
+                                    <input onInput={this.handleSearch}
+                                           onCompositionStart={this.onInputCompositionStart}
+                                           onCompositionEnd={this.onInputCompositionEnd}/>)}
+                            >
+                                {this.getPermissionOption()}
+                            </Select>
                         )}
                         <Icon className="ml-s" style={{fontSize: 16}} type="loading" hidden={!this.state.loading}/>
                     </FormItem>
                     <FormItem {...formItemLayout} className="bs-form-item">
-                        {getFieldDecorator('roleCode', {
-                            initialValue: record.roleCode
+                        {getFieldDecorator('id', {
+                            initialValue: record.id
                         })(
                             <Input hidden={true}/>
                         )}

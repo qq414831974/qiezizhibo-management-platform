@@ -103,7 +103,7 @@ class LiveSimpleForm extends React.Component {
     }
     showVideoPlayDialog = () => {
         const {record} = this.props;
-        if (!record.isPushing) {
+        if(!record.isPushing){
             alert("未在推流，无法播放");
             return;
         }

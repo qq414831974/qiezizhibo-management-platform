@@ -114,16 +114,16 @@ class FootBallPlayerAddDialog extends React.Component {
                 <div>
                     <Form>
                         <FormItem {...formItemLayout} className="bs-form-item round-div ml-l mb-s">
-                            {getFieldDecorator('headimg', {
+                            {getFieldDecorator('headImg', {
                                 // initialValue: logo,
                                 getValueFromEvent(e) {
-                                    return form.getFieldValue('headimg')
+                                    return form.getFieldValue('headImg')
                                 },
                                 onChange(e) {
                                     const file = e.file;
                                     if (file.response) {
                                         form.setFieldsValue({
-                                            headimg: file.response
+                                            headImg: file.response
                                         })
                                     }
                                 }
@@ -138,7 +138,7 @@ class FootBallPlayerAddDialog extends React.Component {
                                 >
                                     {
                                         <img
-                                            src={form.getFieldValue('headimg') ? form.getFieldValue('headimg') : avatar}
+                                            src={form.getFieldValue('headImg') ? form.getFieldValue('headImg') : avatar}
                                             alt="avatar"
                                             className="round-img"/>
                                     }
@@ -154,8 +154,8 @@ class FootBallPlayerAddDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="英文名" className="bs-form-item">
-                            {getFieldDecorator('englishname', {
-                                // initialValue: record.englishname,
+                            {getFieldDecorator('englishName', {
+                                // initialValue: record.englishName,
                             })(
                                 <Input placeholder='请输入英文名'/>
                             )}

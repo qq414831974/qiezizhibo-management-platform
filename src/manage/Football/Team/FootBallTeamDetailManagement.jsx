@@ -29,19 +29,19 @@ class FootBallTeamDetailManagement extends React.Component {
             pageLoaded: false,
         });
         getTeamById(params).then((data) => {
-            if (data) {
+            if (data && data.code == 200) {
                 this.setState({
                     pageLoaded: true,
-                    data: data,
+                    data: data.data,
                 });
             } else {
-                message.error('获取队伍失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取队伍失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
 
     saveTeamModifyDialogRef = (form) => {
-        this.formModify = form ? form.props.form : form;
+        this.formModify = form;
     };
     handleTeamModifyCreate = () => {
         const form = this.formModify;
@@ -55,10 +55,10 @@ class FootBallTeamDetailManagement extends React.Component {
                         this.fetch(this.props.match.params.id);
                         message.success('修改成功', 1);
                     }else{
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -90,7 +90,7 @@ class FootBallTeamDetailManagement extends React.Component {
                                         <TeamSimple visible={this.state.currentTab == "1" ? true : false}
                                                     record={this.state.data}
                                                     detail={true} handleSave={this.handleTeamModifyCreate}
-                                                    wrappedComponentRef={this.saveTeamModifyDialogRef}/></TabPane>
+                                                    ref={this.saveTeamModifyDialogRef}/></TabPane>
                                     <TabPane tab="球队人员设置" key="2">
                                         <TeamAddPlayersPanel record={this.state.data}/>
                                     </TabPane>

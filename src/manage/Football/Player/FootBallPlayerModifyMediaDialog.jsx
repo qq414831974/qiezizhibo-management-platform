@@ -46,19 +46,19 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
 
     componentDidMount() {
         getMediaInPlayer({
-            mediaid: this.props.record.id,
-            playerid: this.props.playerId
+            mediaId: this.props.record.id,
+            playerId: this.props.playerId
         }).then((data) => {
-            if (data) {
-                if (data.matchid) {
-                    this.fetchMatch(data.matchid);
+            if (data && data.code == 200) {
+                if (data.data.matchId) {
+                    this.fetchMatch(data.data.matchId);
                 } else {
                     this.setState({
                         matchLoaded: true,
                     });
                 }
             } else {
-                message.error('获取关联信息失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取关联信息失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -68,13 +68,13 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
             matchLoaded: false,
         });
         getMatchById(params).then((data) => {
-            if (data) {
+            if (data && data.code == 200) {
                 this.setState({
                     matchLoaded: true,
-                    match: data,
+                    match: data.data,
                 });
             } else {
-                message.error('获取比赛失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -82,36 +82,36 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
         this.setState({
             loading: true,
         });
-        getAllMatchs({pageSize: 20, pageNum: pageNum, filter: {name: searchText}}).then((data) => {
-            if (data && data.list) {
+        getAllMatchs({pageSize: 20, pageNum: pageNum, name: searchText}).then((data) => {
+            if (data && data.code == 200 && data.data) {
                 this.setState({
-                    data: pageNum == 1 ? (data ? data.list : []) :
-                        (data ? this.state.data.concat(data.list) : []),
+                    data: pageNum == 1 ? (data.data ? data.data.records : []) :
+                        (data ? this.state.data.concat(data.data.records) : []),
                     loading: false,
-                    pageNum: data.pageNum,
-                    pageSize: data.pageSize,
-                    pageTotal: data.total,
+                    pageNum: data.data.current,
+                    pageSize: data.data.size,
+                    pageTotal: data.data.total,
                 });
             } else {
-                message.error('获取比赛列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
     updateMediaInPlayer = (matchId) => {
         updateMediaInPlayer({
-            matchid: matchId,
-            mediaid: this.props.record.id,
-            playerid: this.props.playerId
+            matchId: matchId,
+            mediaId: this.props.record.id,
+            playerId: this.props.playerId
         }).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.fetchMatch(matchId);
                     message.success('修改关联比赛成功', 1);
                 }else{
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改关联比赛失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('修改关联比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -195,14 +195,14 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
         const handleAvatarChange = this.handleAvatarChange;
         const currentMatch = this.state.match;
         const options = this.state.data.map(d => <Option style={{height: 50}} key={d.id} value={d.id}>
-            <Tooltip title={d.name + "-" + d.starttime}>
+            <Tooltip title={d.name + "-" + d.startTime}>
                 {(d.hostteam == null || d.guestteam == null) ?
                     <span>{d.name}</span>
                     : <div className="center">
-                        <Avatar src={d.hostteam ? d.hostteam.headimg : defultAvatar}/>
+                        <Avatar src={d.hostteam ? d.hostteam.headImg : defultAvatar}/>
                         <p className="ml-s">{d.hostteam ? d.hostteam.name : ""}</p>
                         <p className="ml-s mr-s">{d.score}</p>
-                        <Avatar src={d.guestteam ? d.guestteam.headimg : defultAvatar}/>
+                        <Avatar src={d.guestteam ? d.guestteam.headImg : defultAvatar}/>
                         <p className="ml-s">{d.guestteam ? d.guestteam.name : ""}</p>
                     </div>}
             </Tooltip>
@@ -240,15 +240,15 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
                         <div className="center w-full">
                             {(currentMatch.hostteam == null || currentMatch.guestteam == null) ?
                                 <Tooltip
-                                    title={currentMatch.name + "-" + currentMatch.starttime}><span>{currentMatch.name}</span></Tooltip>
-                                : <Tooltip title={currentMatch.name + "-" + currentMatch.starttime}>
+                                    title={currentMatch.name + "-" + currentMatch.startTime}><span>{currentMatch.name}</span></Tooltip>
+                                : <Tooltip title={currentMatch.name + "-" + currentMatch.startTime}>
                                     <div className="center">
                                         <Avatar
-                                            src={currentMatch.hostteam ? currentMatch.hostteam.headimg : defultAvatar}/>
+                                            src={currentMatch.hostteam ? currentMatch.hostteam.headImg : defultAvatar}/>
                                         <p className="ml-s">{currentMatch.hostteam ? currentMatch.hostteam.name : ""}</p>
                                         <p className="ml-s mr-s">{currentMatch.score}</p>
                                         <Avatar
-                                            src={currentMatch.guestteam ? currentMatch.guestteam.headimg : defultAvatar}/>
+                                            src={currentMatch.guestteam ? currentMatch.guestteam.headImg : defultAvatar}/>
                                         <p className="ml-s">{currentMatch.guestteam ? currentMatch.guestteam.name : ""}</p>
                                     </div>
                                 </Tooltip>}
@@ -328,15 +328,15 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="人数放大最小" className="bs-form-item">
-                            {getFieldDecorator('viewexpendmin', {
-                                initialValue: record.viewexpendmin,
+                            {getFieldDecorator('viewExpendMin', {
+                                initialValue: record.viewExpendMin,
                             })(
                                 <Input placeholder='人数放大最小'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="人数放大最大" className="bs-form-item">
-                            {getFieldDecorator('viewexpendmax', {
-                                initialValue: record.viewexpendmax,
+                            {getFieldDecorator('viewExpendMax', {
+                                initialValue: record.viewExpendMax,
                             })(
                                 <Input placeholder='人数放大最大'/>
                             )}
@@ -356,7 +356,7 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
                             )}
                         </FormItem>
                         <div className="w-full center">
-                            <span>创建时间：{record.createtime}</span>
+                            <span>创建时间：{record.createTime}</span>
                         </div>
                         <FormItem style={{margin: 0}}>
                             {getFieldDecorator('id', {

@@ -14,7 +14,7 @@ import {bindActionCreators} from "redux";
 class RoleTable extends React.Component {
     state = {
         data: [],
-        pagination: {pageSize: 5, filters: {}},
+        pagination: {pageSize: 10, filters: {}},
         loading: false,
         filterDropdownVisible: false,
         searchText: '',
@@ -35,17 +35,18 @@ class RoleTable extends React.Component {
     fetch = (params = {}) => {
         this.setState({loading: true});
         getAllRoles(params).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200 && data.data.records) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 this.setState({
                     loading: false,
-                    data: data ? data.list : "",
+                    data: data.data ? data.data.records : "",
                     pagination,
                     selectedRowKeys: [],
                 });
             } else {
-                message.error('获取权限列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取权限列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -56,39 +57,37 @@ class RoleTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
         this.setState({selectedRowKeys: []});
     }
     deleteRole = () => {
-        delRoleByIds([this.state.record.roleCode]).then((data) => {
+        delRoleByIds({id: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
     deleteRoles = () => {
-        delRoleByIds(this.state.selectedRowKeys).then((data) => {
-            if (data != null & data.data != null) {
-                this.setState({deleteVisible: false});
-                if (data && data.code == 200) {
-                    if (data.data) {
-                        this.refresh();
-                        message.success('删除成功', 1);
-                    } else {
-                        message.warn(data.msg, 1);
-                    }
+        delRoleByIds({id: this.state.selectedRowKeys}).then((data) => {
+            this.setState({deleteVisible: false});
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.refresh();
+                    message.success('删除成功', 1);
                 } else {
-                    message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.warn(data.message, 1);
                 }
+            } else {
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
@@ -98,17 +97,19 @@ class RoleTable extends React.Component {
     onSearch = () => {
         const {searchText} = this.state;
         const pager = {...this.state.pagination};
-        pager.filters = mergeJSON({role_name: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
+        pager.current = 1;
         this.setState({
             filterDropdownVisible: false,
             filtered: !!searchText,
+            pagination: pager,
         });
         this.fetch({
             pageSize: pager.pageSize,
-            pageNum: pager.current,
+            pageNum: 1,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     onSelectChange = (selectedRowKeys) => {
@@ -123,7 +124,7 @@ class RoleTable extends React.Component {
         pager.current = pagination.current;
         pager.sortField = sorter.field;
         pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
-        pager.filters = mergeJSON({role_name: this.state.searchText}, filters);
+        pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
         });
@@ -132,8 +133,23 @@ class RoleTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["roleName"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
     saveRoleAddDialogRef = (form) => {
         this.formAdd = form;
@@ -162,14 +178,13 @@ class RoleTable extends React.Component {
             }
             packingValues(values);
             createRole(values).then((data) => {
-                console.log(data)
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('添加成功', 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -191,7 +206,7 @@ class RoleTable extends React.Component {
                         message.success('修改成功', 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -216,19 +231,19 @@ class RoleTable extends React.Component {
         this.setState({deleteVisible: false});
     }
     packingValues = (values) => {
-        const menuList = values.menuList;
+        const menuList = values.permissions;
         const list = [];
         if (menuList) {
             menuList.forEach((item, index) => {
-                list.push({menuCode: item})
+                list.push({id: item})
             })
-            values.menuList = list;
+            values.permissions = list;
         }
     }
     getRoleTip = (param) => {
         let dom = [];
-        param.menuList.forEach((item, index) => {
-            dom.push(<p key={item.roleCode + item.menuCode}>{item.name}</p>);
+        param.permissions.forEach((item, index) => {
+            dom.push(<p key={item.id + item.permissionCode}>{item.permissionName}</p>);
         });
         return dom;
     }
@@ -259,7 +274,6 @@ class RoleTable extends React.Component {
 
         const columns = [{
             title: '名字',
-            sorter: true,
             key: 'role_name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
@@ -307,7 +321,6 @@ class RoleTable extends React.Component {
         ];
         const columns_moblie = [{
             title: '名字',
-            sorter: true,
             key: 'role_name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
@@ -343,7 +356,7 @@ class RoleTable extends React.Component {
         },
         ];
         return <div><Table columns={isMobile ? columns_moblie : columns}
-                           rowKey={record => record.roleCode}
+                           rowKey={record => record.id}
                            rowSelection={isMobile ? null : rowSelection}
                            dataSource={this.state.data}
                            pagination={this.state.pagination}
@@ -371,7 +384,7 @@ class RoleTable extends React.Component {
         />
             <Modal
                 className={isMobile ? "top-n" : ""}
-                title="添加用户"
+                title="添加权限"
                 visible={this.state.dialogAddVisible}
                 footer={[
                     <Button key="back" onClick={this.handleRoleAddCancel}>取消</Button>,
@@ -383,7 +396,7 @@ class RoleTable extends React.Component {
             </Modal>
             <Modal
                 className={isMobile ? "top-n" : ""}
-                title="修改用户"
+                title="修改权限"
                 visible={this.state.dialogModifyVisible}
                 footer={[
                     <Button key="delete" type="danger" className="pull-left"

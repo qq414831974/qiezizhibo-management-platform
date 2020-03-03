@@ -3,7 +3,7 @@ import {Table, Input, Button, Icon, Modal, Upload, Spin, Tooltip} from 'antd';
 import {getAllTeams} from '../../../axios/index';
 import {mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
-import {delTeamByIds, updateTeamById, createTeam, delTeamById, uploaddocx_team} from "../../../axios";
+import {delTeamByIds, updateTeamById, createTeam, uploaddocx_team} from "../../../axios";
 import {Form, message, notification} from "antd/lib/index";
 import FootBallTeamAddDialog from "../Team/FootBallTeamAddDialog"
 import FootBallTeamModifyDialog from "../Team/FootBallTeamModifyDialog"
@@ -37,24 +37,21 @@ class FootBallTeamTable extends React.Component {
     };
 
     fetch = (params = {}) => {
+        params["areatype"] = 2;
         this.setState({loading: true});
-        if (params.filter) {
-            params.filter = {areatype: 2, ...params.filter}
-        } else {
-            params.filter = {areatype: 2}
-        }
         getAllTeams(params).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 this.setState({
                     loading: false,
-                    data: data ? data.list : "",
+                    data: data.data ? data.data.records : "",
                     pagination,
                     selectedRowKeys: [],
                 });
             } else {
-                message.error('获取队伍列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取队伍列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -65,36 +62,36 @@ class FootBallTeamTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     delete = () => {
-        delTeamById(this.state.record.id).then((data) => {
+        delTeamByIds({id: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
     deleteMulti = () => {
-        delTeamByIds(this.state.selectedRowKeys).then((data) => {
+        delTeamByIds({id: this.state.selectedRowKeys}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
@@ -111,7 +108,7 @@ class FootBallTeamTable extends React.Component {
     onSearch = () => {
         const {searchText} = this.state;
         const pager = {...this.state.pagination};
-        pager.filters = mergeJSON({name: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
         pager.current = 1;
         this.setState({
             filterDropdownVisible: false,
@@ -123,7 +120,7 @@ class FootBallTeamTable extends React.Component {
             pageNum: 1,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     handleTableChange = (pagination, filters, sorter) => {
@@ -131,7 +128,7 @@ class FootBallTeamTable extends React.Component {
         pager.current = pagination.current;
         pager.sortField = sorter.field;
         pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
-        pager.filters = mergeJSON({name: this.state.searchText}, filters);
+        pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
         });
@@ -140,8 +137,23 @@ class FootBallTeamTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["name"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
     showTeamAddDialog = () => {
         this.setState({dialogAddVisible: true});
@@ -168,9 +180,9 @@ class FootBallTeamTable extends React.Component {
                 return;
             }
             values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createtime"] = values["createtime"] ? values["createtime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updatetime"] = values["updatetime"] ? values["updatetime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deletetime"] = values["deletetime"] ? values["deletetime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
 
             createTeam(values).then((data) => {
                 if (data && data.code == 200) {
@@ -178,10 +190,10 @@ class FootBallTeamTable extends React.Component {
                         this.refresh();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -195,9 +207,9 @@ class FootBallTeamTable extends React.Component {
                 return;
             }
             values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createtime"] = values["createtime"] ? values["createtime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updatetime"] = values["updatetime"] ? values["updatetime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deletetime"] = values["deletetime"] ? values["deletetime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
 
             updateTeamById(values).then((data) => {
                 if (data && data.code == 200) {
@@ -205,10 +217,10 @@ class FootBallTeamTable extends React.Component {
                         this.refresh();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -242,7 +254,7 @@ class FootBallTeamTable extends React.Component {
             this.setState({
                 uploadloading: false,
             });
-            message.success(info.file.response + "10秒后自动刷新(或者待会手动刷新)", 10);
+            message.success(info.file.response.message + "10秒后自动刷新(或者待会手动刷新)", 10);
             setTimeout(() => {
                 this.refresh();
             }, 10000);
@@ -251,7 +263,7 @@ class FootBallTeamTable extends React.Component {
             this.setState({
                 uploadloading: false,
             });
-            message.error(info.file.response.msg, 10);
+            message.error(info.file.response.message, 10);
             return;
         }
     }
@@ -281,14 +293,13 @@ class FootBallTeamTable extends React.Component {
 
         const columns = [{
             title: '队名',
-            sorter: true,
             align: 'center',
             dataIndex: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
                         ref={ele => this.searchInput = ele}
-                        placeholder="Search name"
+                        placeholder="搜索"
                         value={this.state.searchText}
                         onChange={this.onInputChange}
                         onPressEnter={this.onSearch}
@@ -305,9 +316,9 @@ class FootBallTeamTable extends React.Component {
             },
             width: '30%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headimg ? record.headimg : defultAvatar}/>
+                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
                 </div>;
             },
         }, {
@@ -373,14 +384,13 @@ class FootBallTeamTable extends React.Component {
         ];
         const columns_moblie = [{
             title: '队名',
-            sorter: true,
             align: 'center',
             dataIndex: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
                         ref={ele => this.searchInput = ele}
-                        placeholder="Search name"
+                        placeholder="搜索"
                         value={this.state.searchText}
                         onChange={this.onInputChange}
                         onPressEnter={this.onSearch}
@@ -397,9 +407,9 @@ class FootBallTeamTable extends React.Component {
             },
             width: '100%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headimg ? record.headimg : defultAvatar}/>
+                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
                 </div>;
             },
         },
@@ -422,7 +432,7 @@ class FootBallTeamTable extends React.Component {
                                    <Upload
                                        className="ml-s"
                                        accept=".docx"
-                                       action={uploaddocx_team+'?areatype=2'}
+                                       action={uploaddocx_team}
                                        listType="text"
                                        withCredentials={true}
                                        showUploadList={false}

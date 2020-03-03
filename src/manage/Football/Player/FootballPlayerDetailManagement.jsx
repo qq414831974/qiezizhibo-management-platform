@@ -22,7 +22,7 @@ import {
     getMatchById,
     getPlayerMedia,
     addMediaToPlayer,
-    modifyMediaToPlayer,
+    modifyMedia,
     deleteMediaToPlayer,
 } from "../../../axios/index";
 import avatar from '../../../static/avatar.jpg';
@@ -73,16 +73,16 @@ class FootballPlayerDetailManagement extends React.Component {
     fetch = () => {
         this.setState({playerLoading: true, mediaLoading: true});
         getPlayerById(this.props.match.params.id).then(data => {
-            if (data && data.id) {
-                this.setState({player: data});
+            if (data && data.code == 200) {
+                this.setState({player: data.data});
             }
             this.setState({playerLoading: false});
         });
-        getPlayerMedia({playerID: this.props.match.params.id}).then(data => {
-            if (data && data.length) {
-                this.setState({mediaList: data});
+        getPlayerMedia({playerId: this.props.match.params.id}).then(data => {
+            if (data && data.code == 200 && data.data.length) {
+                this.setState({mediaList: data.data});
             } else {
-                this.setState({mediaList: undefined});
+                this.setState({mediaList: null});
             }
             this.setState({mediaLoading: false});
         });
@@ -110,16 +110,16 @@ class FootballPlayerDetailManagement extends React.Component {
             if (err) {
                 return;
             }
-            modifyMediaToPlayer(values).then((data) => {
+            modifyMedia(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('修改成功', 1);
                     }else{
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -147,7 +147,7 @@ class FootballPlayerDetailManagement extends React.Component {
     handleDeleteOK = () => {
         this.state.currentMedia &&
         deleteMediaToPlayer({
-            playerID: this.props.match.params.id,
+            playerId: this.props.match.params.id,
             mediaId: this.state.currentMedia.id,
         }).then(data => {
             this.setState({deleteVisible: false, modifyMediaVisible: false});
@@ -156,10 +156,10 @@ class FootballPlayerDetailManagement extends React.Component {
                     message.success('删除成功', 1);
                     this.refresh();
                 }else{
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -169,20 +169,20 @@ class FootballPlayerDetailManagement extends React.Component {
         }
         if (e.file.status == "done") {
             this.setState({percent: 100});
-            const media = e.file.response;
+            const media = e.file.response.data;
             addMediaToPlayer(this.state.matchId ? {
-                playerid: this.props.match.params.id,
-                mediaid: media.id,
-                matchid: this.state.matchId
+                playerId: this.props.match.params.id,
+                mediaId: media.id,
+                matchId: this.state.matchId
             } : {
-                playerid: this.props.match.params.id,
-                mediaid: media.id,
+                playerId: this.props.match.params.id,
+                mediaId: media.id,
             }).then(data => {
-                if (data && data.data == true) {
+                if (data && data.code == 200 && data.data) {
                     message.success('上传视频成功', 1);
                     this.refresh();
                 } else {
-                    message.error('上传视频失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                    message.error('上传视频失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
             });
         }
@@ -212,7 +212,7 @@ class FootballPlayerDetailManagement extends React.Component {
                 <div className="dark-white pa-s">
                     <div className="w-full center">
                         <Avatar size="large"
-                                src={this.state.player ? (this.state.player.headimg ? this.state.player.headimg : avatar) : avatar}/>
+                                src={this.state.player ? (this.state.player.headImg ? this.state.player.headImg : avatar) : avatar}/>
                     </div>
                     <div className="w-full center">
                         <span style={{fontSize: 18}}>{this.state.player ? this.state.player.name : "无名"}</span>
@@ -234,7 +234,7 @@ class FootballPlayerDetailManagement extends React.Component {
                         <List
                             rowKey={record => record.id}
                             grid={{gutter: 16, lg: 3, md: 2, xs: 1}}
-                            dataSource={this.state.mediaList ? this.state.mediaList : []}
+                            dataSource={this.state.mediaList ? this.state.mediaList.map(media=>media.media) : []}
                             loading={this.state.mediaLoading}
                             renderItem={item => (<List.Item>
                                 <div className="video-list-item pa-xs" style={{transform: "translate(0px, 0px)"}}>
@@ -255,7 +255,7 @@ class FootballPlayerDetailManagement extends React.Component {
                                         {/*onClick={this.handleMediaDelete.bind(this, item)}/>*/}
                                     </div>
                                     <div className="video-list-item-bottom center">
-                                        <p className="video-list-item-bottom-text">上传时间：{moment(item.createtime).format("MM-DD HH:mm")}</p>
+                                        <p className="video-list-item-bottom-text">上传时间：{moment(item.createTime).format("MM-DD HH:mm")}</p>
                                     </div>
                                 </div>
                             </List.Item>)}

@@ -24,20 +24,20 @@ class FootBallMatchSchedule extends React.Component {
         });
     }
 
-    fetch = (param) =>{
+    fetch = (param) => {
         this.setState({loading: true});
         getAllMatchSchedule(param).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total : 0;
-                pagination.current = data ? data.pageNum : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 this.setState({
                     loading: false,
-                    data: data ? data.list : "",
+                    data: data.data ? data.data.records : "",
                     pagination,
                 });
             } else {
-                message.error('获取列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -46,7 +46,7 @@ class FootBallMatchSchedule extends React.Component {
         this.fetch({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            status: pager.filters.status && pager.filters.status.length > 0 ? pager.filters.status[0]: null,
+            status: pager.filters.status && pager.filters.status.length > 0 ? pager.filters.status[0] : null,
         });
     }
     handleTableChange = (pagination, filters, sorter) => {
@@ -59,17 +59,17 @@ class FootBallMatchSchedule extends React.Component {
         this.fetch({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            status: pager.filters.status && pager.filters.status.length > 0 ? pager.filters.status[0]: null,
+            status: pager.filters.status && pager.filters.status.length > 0 ? pager.filters.status[0] : null,
         });
     }
     onNameClick = (record, e) => {
         this.setState({record: record});
         this.showDeleteDialog();
     };
-    showDeleteDialog = () =>{
+    showDeleteDialog = () => {
         this.setState({deleteVisible: true});
     }
-    hideDeleteDialog = () =>{
+    hideDeleteDialog = () => {
         this.setState({deleteVisible: false});
     }
     handleDeleteOK = () => {
@@ -79,20 +79,21 @@ class FootBallMatchSchedule extends React.Component {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
-                }else{
-                    message.warn(data.msg, 1);
+                } else {
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
+
     render() {
         const onNameClick = this.onNameClick;
         const columns = [{
             title: '比赛',
             align: 'center',
-            dataIndex: 'matchid',
+            dataIndex: 'matchId',
             key: 'status',
             width: '50%',
             filters: [
@@ -109,21 +110,21 @@ class FootBallMatchSchedule extends React.Component {
                     return <span>{record.name}</span>
                 }
                 return <div className="center cursor-hand" onClick={onNameClick.bind(this, item)}>
-                    <Avatar src={hostteam.headimg ? hostteam.headimg : defultAvatar}/>
+                    <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
                     <p className="ml-s">{hostteam.name}</p>
                     <p className="ml-s mr-s">VS</p>
-                    <Avatar src={guestteam.headimg ? guestteam.headimg : defultAvatar}/>
+                    <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
                     <p className="ml-s">{guestteam.name}</p>
                 </div>;
             },
-        },{
+        }, {
             title: '时间',
             align: 'center',
             dataIndex: 'datebegin',
             width: '20%',
             render: function (text, item, index) {
                 const record = item.match;
-                return <span>{(record.starttime ? parseTimeString(record.starttime) : "-")}</span>
+                return <span>{(record.startTime ? parseTimeString(record.startTime) : "-")}</span>
             }
         }, {
             title: '比分',
@@ -133,7 +134,7 @@ class FootBallMatchSchedule extends React.Component {
                 const record = item.match;
                 return <span>{record.score ? (record.score + (record.penaltyscore ? `(${record.penaltyscore})` : "")) : "-"}</span>;
             },
-        },{
+        }, {
             title: '状态',
             align: 'center',
             dataIndex: 'status',
@@ -175,6 +176,7 @@ class FootBallMatchSchedule extends React.Component {
         );
     }
 }
+
 const mapStateToProps = state => {
     const {auth = {data: {}}, responsive = {data: {}}} = state.httpData;
     console.log(state)

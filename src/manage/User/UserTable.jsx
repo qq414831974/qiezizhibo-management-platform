@@ -1,9 +1,9 @@
 import React from 'react';
-import {Table, Input, Button, Icon, Modal, Tooltip} from 'antd';
-import {getAllUser} from '../../axios/index';
+import {Table, Input, Button, Icon, Modal, Tooltip, Radio} from 'antd';
+import {getAllRoles, getAllUser} from '../../axios/index';
 import {mergeJSON} from '../../utils/index';
 import {Avatar} from 'antd';
-import {delUserByIds, updateUserById, createUser, delUserById} from "../../axios";
+import {delUserByIds, updateUserById, createUser} from "../../axios";
 import {Form, message} from "antd/lib/index";
 import UserAddDialog from './UserAddDialog';
 import UserModifyDialog from './UserModifyDialog';
@@ -25,6 +25,7 @@ class UserTable extends React.Component {
         dialogModifyVisible: false,
         dialogAddVisible: false,
         record: {},
+        nameRadioValue: "name",
     };
 
     componentDidMount() {
@@ -37,17 +38,18 @@ class UserTable extends React.Component {
     fetch = (params = {}) => {
         this.setState({loading: true});
         getAllUser(params).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200 && data.data.records) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 this.setState({
                     loading: false,
-                    data: data.list,
+                    data: data.data.records,
                     pagination,
                     selectedRowKeys: [],
                 });
             } else {
-                message.error('获取用户列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取用户列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -58,36 +60,36 @@ class UserTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     deleteUser = () => {
-        delUserById(this.state.record.userNo).then((data) => {
+        delUserByIds({userNos: [this.state.record.userNo]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
     deleteUsers = () => {
-        delUserByIds(this.state.selectedRowKeys).then((data) => {
+        delUserByIds({userNos: this.state.selectedRowKeys}).then((data) => {
             this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
@@ -97,7 +99,7 @@ class UserTable extends React.Component {
     onSearch = () => {
         const {searchText} = this.state;
         const pager = {...this.state.pagination};
-        pager.filters = mergeJSON({name: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
         pager.current = 1;
         this.setState({
             filterDropdownVisible: false,
@@ -109,7 +111,7 @@ class UserTable extends React.Component {
             pageNum: 1,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     onSelectChange = (selectedRowKeys) => {
@@ -124,7 +126,7 @@ class UserTable extends React.Component {
         pager.current = pagination.current;
         pager.sortField = sorter.field;
         pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
-        pager.filters = mergeJSON({name: this.state.searchText}, filters);
+        pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
         });
@@ -133,8 +135,23 @@ class UserTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (this.state.nameRadioValue && searchText != null && searchText != '') {
+            pager.filters[this.state.nameRadioValue] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
     saveUserAddDialogRef = (form) => {
         this.formAdd = form;
@@ -160,16 +177,23 @@ class UserTable extends React.Component {
             if (err) {
                 return;
             }
+            if(values.role){
+                values.role = values.role.flatMap(role => {
+                    const r = {};
+                    r["id"] = role
+                    return r;
+                })
+            }
             createUser(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -182,16 +206,23 @@ class UserTable extends React.Component {
             if (err) {
                 return;
             }
+            if(values.role){
+                values.role = values.role.flatMap(role => {
+                    const r = {};
+                    r["id"] = role
+                    return r;
+                })
+            }
             updateUserById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -217,10 +248,17 @@ class UserTable extends React.Component {
     }
     getMenuList = (param) => {
         let dom = [];
-        param.menuList && param.menuList.forEach((item, index) => {
-            dom.push(<p key={item.roleCode + item.menuCode}>{item.name}</p>);
-        });
+        param.forEach(role => {
+            role.permissions && role.permissions.forEach((item, index) => {
+                dom.push(<p key={item.id + item.permissionCode}>{item.permissionName}</p>);
+            });
+        })
         return dom;
+    }
+    onNameDropDownRadioChange = (e) => {
+        this.setState({
+            nameRadioValue: e.target.value,
+        });
     }
 
     render() {
@@ -249,18 +287,25 @@ class UserTable extends React.Component {
 
         const columns = [{
             title: '名字',
-            sorter: true,
             dataIndex: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
-                    <Input
-                        ref={ele => this.searchInput = ele}
-                        placeholder="Search name"
-                        value={this.state.searchText}
-                        onChange={this.onInputChange}
-                        onPressEnter={this.onSearch}
-                    />
-                    <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    <div>
+                        <Input
+                            ref={ele => this.searchInput = ele}
+                            placeholder="搜索"
+                            value={this.state.searchText}
+                            onChange={this.onInputChange}
+                            onPressEnter={this.onSearch}
+                        />
+                        <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    </div>
+                    <div className="custom-filter-dropdown-radio">
+                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.nameRadioValue}>
+                            <Radio value={"name"}>按昵称</Radio>
+                            <Radio value={"userName"}>按用户名</Radio>
+                        </Radio.Group>
+                    </div>
                 </div>
             ),
             filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,
@@ -279,10 +324,15 @@ class UserTable extends React.Component {
         }, {
             title: '角色',
             key: 'roleName',
+            filterMultiple: false,
             filters: [
-                {text: '系统管理员', value: 'sysadmin'},
-                {text: '管理员', value: 'admin'},
-                {text: '用户', value: 'user'},
+                {text: '系统管理员', value: '系统管理员'},
+                {text: '管理员', value: '管理员'},
+                {text: '用户', value: '用户'},
+                {text: '微信用户', value: '微信用户'},
+                {text: '直播人员', value: '直播人员'},
+                {text: '赛事方', value: '赛事方'},
+                {text: '预设用户', value: '预设用户'},
             ],
             width: '20%',
             align: 'center',
@@ -291,12 +341,13 @@ class UserTable extends React.Component {
                     return "无";
                 }
                 return <Tooltip title={getMenuList(record.role)}>
-                    {record.role ? record.role.roleName : "未知"}
+                    {record.role ? record.role.flatMap((role) => role.roleName).toString() : "未知"}
                 </Tooltip>;
             },
         }, {
             title: '状态',
             key: 'status',
+            filterMultiple: false,
             filters: [
                 {text: '启用', value: 1},
                 {text: '禁用', value: 2},
@@ -325,6 +376,11 @@ class UserTable extends React.Component {
             width: '10%',
             align: 'center',
         }, {
+            title: '创建时间',
+            dataIndex: 'createTime',
+            width: '20%',
+            align: 'center',
+        }, {
             title: '备注',
             dataIndex: 'remark',
             align: 'center',
@@ -341,18 +397,25 @@ class UserTable extends React.Component {
         ];
         const columns_moblie = [{
             title: '名字',
-            sorter: true,
             dataIndex: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
-                    <Input
-                        ref={ele => this.searchInput = ele}
-                        placeholder="Search name"
-                        value={this.state.searchText}
-                        onChange={this.onInputChange}
-                        onPressEnter={this.onSearch}
-                    />
-                    <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    <div>
+                        <Input
+                            ref={ele => this.searchInput = ele}
+                            placeholder="搜索"
+                            value={this.state.searchText}
+                            onChange={this.onInputChange}
+                            onPressEnter={this.onSearch}
+                        />
+                        <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    </div>
+                    <div className="custom-filter-dropdown-radio">
+                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.nameRadioValue}>
+                            <Radio value={"name"}>按昵称</Radio>
+                            <Radio value={"userName"}>按用户名</Radio>
+                        </Radio.Group>
+                    </div>
                 </div>
             ),
             filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,

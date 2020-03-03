@@ -48,17 +48,17 @@ class FootBallLeagueSeriesAddLeagueDialog extends React.Component {
             name: searchText,
             areatype: 2
         }).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200 && data.data.records) {
                 this.setState({
-                    data: pageNum == 1 ? (data ? data.list : []) :
-                        (data ? this.state.data.concat(data.list) : []),
+                    data: pageNum == 1 ? (data.data ? data.data.records : []) :
+                        (data.data ? this.state.data.concat(data.data.records) : []),
                     loading: false,
-                    pageNum: data.pageNum,
-                    pageSize: data.pageSize,
-                    pageTotal: data.total,
+                    pageNum: data.data.current,
+                    pageSize: data.data.size,
+                    pageTotal: data.data.total,
                 });
             } else {
-                message.error('获取联赛列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取联赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -112,7 +112,7 @@ class FootBallLeagueSeriesAddLeagueDialog extends React.Component {
         const options = this.state.data.map(d => <Option style={{height: 50}} key={d.id} value={d.id}>
             <Tooltip title={d.remark}>
                 <div>
-                    <Avatar src={d.headimg}/>
+                    <Avatar src={d.headImg}/>
                     <span className="ml-s">{d.name}</span>
                 </div>
             </Tooltip>
@@ -123,7 +123,7 @@ class FootBallLeagueSeriesAddLeagueDialog extends React.Component {
                 <div>
                     <Form>
                         <FormItem {...formItemLayout} label="联赛" className="bs-form-item">
-                            {getFieldDecorator('ids', {
+                            {getFieldDecorator('id', {
                                 rules: [{required: true, message: '请选择!'}],
                             })(
                                 <Select
