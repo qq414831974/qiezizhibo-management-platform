@@ -2,7 +2,7 @@
  * Created by wufan on 2018/10/18.
  */
 import React from 'react';
-import {Row, Col, Card, Avatar, Icon} from 'antd';
+import {Row, Col, Card, Avatar, Icon, message} from 'antd';
 import EchartsViews from './EchartsViews';
 import EchartsProjects from './EchartsProjects';
 import avatar from '../../static/avatar.jpg';
@@ -22,7 +22,7 @@ class Dashboard extends React.Component {
 
     fetch = () => {
         //获取直播列表
-        getActivityInfoList({pageSize: 1000, pageNum: 1, filter: {},}, {name: "qsn-"}).then((data) => {
+        getActivityInfoList({pageSize: 100, pageNum: 1, status: "enabled"}).then((data) => {
             if (data && data.items && data.items.length > 0) {
                 this.setState({
                     activityData: data.items,
@@ -30,11 +30,16 @@ class Dashboard extends React.Component {
             }
         });
         //获取近期的比赛
-        getRecentMatches({areatype: 2}).then((data) => {
-            if (data && data.length > 0) {
-                this.setState({
-                    matchData: data,
-                });
+        getRecentMatches({areatype: 2}).then((res) => {
+            if (res && res.code == 200) {
+                const data = res.data;
+                if (data && data.total > 0) {
+                    this.setState({
+                        matchData: data.records,
+                    });
+                }
+            } else {
+                message.error('获取近期比赛信息失败：' + (res ? res.code + ":" + res.message : res), 3);
             }
         });
     }
@@ -89,7 +94,7 @@ class Dashboard extends React.Component {
                             <Col span={10}>
                                 <div className="team-host">
                                     <p className="team-name">{hostteam.name}</p>
-                                    <Avatar className="team-avatar" src={hostteam.headimg ? hostteam.headimg : avatar}/>
+                                    <Avatar className="team-avatar" src={hostteam.headImg ? hostteam.headImg : avatar}/>
                                 </div>
                             </Col>
                             <Col span={4}>
@@ -105,7 +110,7 @@ class Dashboard extends React.Component {
                             <Col span={10}>
                                 <div className="team-guest">
                                     <Avatar className="team-avatar"
-                                            src={guestteam.headimg ? guestteam.headimg : avatar}/>
+                                            src={guestteam.headImg ? guestteam.headImg : avatar}/>
                                     <p className="team-name">{guestteam.name}</p>
                                 </div>
                             </Col>

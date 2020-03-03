@@ -16,7 +16,7 @@ class CommentManagement extends React.Component {
                     <Col className="gutter-row">
                         <div className="gutter-box">
                             <Card bordered={false}>
-                                <CommentTable matchid={this.props.match.params.id}/>
+                                <CommentTable matchId={this.props.match.params.id}/>
                             </Card>
                         </div>
                     </Col>

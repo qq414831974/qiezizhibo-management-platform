@@ -4,104 +4,99 @@
 import axios from 'axios';
 import {get, post, put, del, unpack} from './tools';
 import * as config from './config';
+import {getNowDate, getPastMonthDate} from '../utils';
 
 export const npmDependencies = () => get('./npm.json').then(res => res.data).catch(err => console.log(err));
 
 export const weibo = () => get('./weibo.json').then(res => res.data).catch(err => console.log(err));
 
-export const webSocket = (activityid) => `wss://www.qiezizhibo-api.com/api/websocket/${activityid}`;
+export const webSocket = (activityid) => `${config.websocket_service}/websocket/${activityid}`;
 
-export const uploadimg = 'https://www.qiezizhibo-api.com/api/uploadimg?avatar=true';
+export const uploadimg = `${config.system_service}/file/upload/image?avatar=true`;
 
-export const uploadmedia = 'https://www.qiezizhibo-api.com/api/uploadmedia';
+export const uploadmedia = `${config.system_service}/file/upload/media`;
 
-export const upload = 'https://www.qiezizhibo-api.com/api/uploadimg';
+export const upload = `${config.system_service}/file/upload/image`;
 
-export const uploaddocx_team = 'https://www.qiezizhibo-api.com/api/import/team';
+export const uploaddocx_team = `${config.system_service}/file/import/team`;
 
-export const uploaddocx_match = 'https://www.qiezizhibo-api.com/api/import/match';
+export const uploaddocx_match = `${config.system_service}/file/import/match`;
 
-export const login = (params) => post({url: 'https://www.qiezizhibo-api.com/api/login', data: params})
+export const login = (params) => post({url: `${config.auth_service}/auth`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const loginout = () => get({url: 'https://www.qiezizhibo-api.com/api/logout'})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getAllUser = (params) => post({url: 'https://www.qiezizhibo-api.com/api/getAllUser', data: params})
+export const getAuthUserDetail = (params) => post({url: `${config.auth_service}/auth/user`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const getAllDefaultUser = () => get({url: 'https://www.qiezizhibo-api.com/api/defaultUser'})
+export const getUserInfo = (params) => get({url: `${config.user_service}/user/${params.id}?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const createUser = (params) => post({url: 'https://www.qiezizhibo-api.com/api/user/', data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const delUserByIds = (params) => post({url: 'https://www.qiezizhibo-api.com/api/deleteUserInfo', data: params})
+export const getAllUser = (params) => get({url: `${config.user_service}/user?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const updateUserById = (params) => put({url: 'https://www.qiezizhibo-api.com/api/user', data: params})
+export const getAllDefaultUser = () => get({url: `${config.user_service}/user/defaultUser`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const createUser = (params) => post({url: `${config.user_service}/user`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const delUserById = (id) => del({url: 'https://www.qiezizhibo-api.com/api/user/' + id})
+export const delUserByIds = (params) => del({url: `${config.user_service}/user?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const updateUserById = (params) => put({url: `${config.user_service}/user`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 
-export const createActivity = (params) => post({url: 'https://www.qiezizhibo-api.com/api/activity', data: params})
+export const createActivity = (params) => post({url: `${config.live_service}/activity`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getActivityInfo = (id) => get({url: 'https://www.qiezizhibo-api.com/api/activity/' + id})
+export const getActivityInfo = (id) => get({url: `${config.live_service}/activity/${id}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getActivityInfoList = (params, params2) => post({
-    url: `https://www.qiezizhibo-api.com/api/getAllActivity?${unpack(params2)}`,
-    data: params
-})
+export const getActivityInfoList = (params) => get({url: `${config.live_service}/activity?name=qsn-&&${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const modifyActivityInfo = (id, params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/activity/' + id,
-    data: params
-})
+export const modifyActivityInfo = (id, params) => put({url: `${config.live_service}/activity/${id}`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 export const modifyActivityFakeInfo = (id, params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/activity/' + id + '/fake',
+    url: `${config.live_service}/activity/${id}/fake`,
     data: params
 })
     .then(function (response) {
@@ -109,14 +104,14 @@ export const modifyActivityFakeInfo = (id, params) => put({
     }).catch(function (error) {
         console.log(error)
     });
-export const getActivityDetailInfo = (id) => get({url: 'https://www.qiezizhibo-api.com/api/activity/' + id + "/template"})
+export const getActivityDetailInfo = (id) => get({url: `${config.live_service}/activity/${id}/template`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 export const modifyActivityDetailInfo = (id, params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/activity/' + id + "/template",
+    url: `${config.live_service}/activity/${id}/template`,
     data: params
 })
     .then(function (response) {
@@ -124,14 +119,14 @@ export const modifyActivityDetailInfo = (id, params) => put({
     }).catch(function (error) {
         console.log(error)
     });
-export const getActivityIngest = (id) => get({url: 'https://www.qiezizhibo-api.com/api/activity/' + id + "/ingest"})
+export const getActivityIngest = (id) => get({url: `${config.live_service}/activity/${id}/ingest`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 export const postActivityIngest = (id, params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/activity/' + id + "/ingest",
+    url: `${config.live_service}/activity/${id}/ingest`,
     data: params
 })
     .then(function (response) {
@@ -140,7 +135,7 @@ export const postActivityIngest = (id, params) => post({
         console.log(error)
     });
 export const putActivityIngest = (id, params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/activity/' + id + "/ingest",
+    url: `${config.live_service}/activity/${id}/ingest`,
     data: params
 })
     .then(function (response) {
@@ -148,14 +143,14 @@ export const putActivityIngest = (id, params) => put({
     }).catch(function (error) {
         console.log(error)
     });
-export const getAllPlayers = (params) => post({url: 'https://www.qiezizhibo-api.com/api/getAllPlayers', data: params})
+export const getAllPlayers = (params) => get({url: `${config.football_service}/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const getAllPlayersNotInTeam = (params, teamId) => post({
-    url: 'https://www.qiezizhibo-api.com/api/getAllPlayersNotInTeam?teamId=' + teamId,
+export const getAllPlayersNotInTeam = (params, teamId) => get({
+    url: `${config.football_service}/player?${unpack({teamId: teamId, notinteam: true, ...params})}`,
     data: params
 })
     .then(function (response) {
@@ -163,38 +158,32 @@ export const getAllPlayersNotInTeam = (params, teamId) => post({
     }).catch(function (error) {
         console.log(error);
     });
-export const createPlayer = (params) => post({url: 'https://www.qiezizhibo-api.com/api/player', data: params})
+export const createPlayer = (params) => post({url: `${config.football_service}/player`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getPlayerById = (id) => get({url: 'https://www.qiezizhibo-api.com/api/player/' + id})
+export const getPlayerById = (id) => get({url: `${config.football_service}/player/${id}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const updatePlayerById = (params) => put({url: 'https://www.qiezizhibo-api.com/api/player', data: params})
+export const updatePlayerById = (params) => put({url: `${config.football_service}/player`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const delPlayerByIds = (params) => post({url: 'https://www.qiezizhibo-api.com/api/deletePlayerInfo', data: params})
+export const delPlayerByIds = (params) => del({url: `${config.football_service}/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const delPlayerById = (id) => del({url: 'https://www.qiezizhibo-api.com/api/player/' + id})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getPlayersByTeamId = (id, params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/getPlayersByTeamId/' + id,
+export const getPlayersByTeamId = (id, params) => get({
+    url: `${config.football_service}/player?${unpack({teamId: id, ...params})}`,
     data: params
 })
     .then(function (response) {
@@ -203,50 +192,44 @@ export const getPlayersByTeamId = (id, params) => post({
         console.log(error);
     });
 
-export const getAllTeams = (params) => post({url: 'https://www.qiezizhibo-api.com/api/getAllTeams', data: params})
+export const getAllTeams = (params) => get({url: `${config.football_service}/team?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const createTeam = (params) => post({url: 'https://www.qiezizhibo-api.com/api/team', data: params})
+export const createTeam = (params) => post({url: `${config.football_service}/team`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getTeamById = (id) => get({url: 'https://www.qiezizhibo-api.com/api/team/' + id})
+export const getTeamById = (id) => get({url: `${config.football_service}/team/${id}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const updateTeamById = (params) => put({url: 'https://www.qiezizhibo-api.com/api/team', data: params})
+export const updateTeamById = (params) => put({url: `${config.football_service}/team`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const delTeamByIds = (params) => post({url: 'https://www.qiezizhibo-api.com/api/deleteTeamInfo', data: params})
+export const delTeamByIds = (params) => del({url: `${config.football_service}/team?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const delTeamById = (id) => del({url: 'https://www.qiezizhibo-api.com/api/team/' + id})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const addPlayerToTeam = (params) => post({url: 'https://www.qiezizhibo-api.com/api/addPlayerToTeam', data: params})
+export const addPlayerToTeam = (params) => post({url: `${config.football_service}/team/player`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 export const addPlayerToMatchTeam = (params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/addPlayerToMatchTeam',
+    url: `${config.football_service}/team/match/player`,
     data: params
 })
     .then(function (response) {
@@ -255,7 +238,7 @@ export const addPlayerToMatchTeam = (params) => post({
         console.log(error)
     });
 export const modifyPlayerInTeam = (params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/modifyPlayerInTeam',
+    url: `${config.football_service}/team/player`,
     data: params
 })
     .then(function (response) {
@@ -264,7 +247,7 @@ export const modifyPlayerInTeam = (params) => put({
         console.log(error)
     });
 export const modifyPlayerInMatchTeam = (params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/modifyPlayerInMatchTeam',
+    url: `${config.football_service}/team/match/player`,
     data: params
 })
     .then(function (response) {
@@ -272,51 +255,45 @@ export const modifyPlayerInMatchTeam = (params) => put({
     }).catch(function (error) {
         console.log(error)
     });
-export const getAllMatchs = (params) => post({url: 'https://www.qiezizhibo-api.com/api/getAllMatchs', data: params})
+export const getAllMatchs = (params) => get({url: `${config.football_service}/match?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const createMatch = (params) => post({url: 'https://www.qiezizhibo-api.com/api/match', data: params})
+export const createMatch = (params) => post({url: `${config.football_service}/match`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getMatchById = (id) => get({url: 'https://www.qiezizhibo-api.com/api/match/' + id})
+export const getMatchById = (id) => get({url: `${config.football_service}/match/${id}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const updateMatchById = (params) => put({url: 'https://www.qiezizhibo-api.com/api/match', data: params})
+export const updateMatchById = (params) => put({url: `${config.football_service}/match`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const updateMatchScoreStatusById = (params) => put({url: 'https://www.qiezizhibo-api.com/api/match/score', data: params})
+export const updateMatchScoreStatusById = (params) => put({url: `${config.football_service}/match/score`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
-export const delMatchByIds = (params) => post({url: 'https://www.qiezizhibo-api.com/api/deleteMatchInfo', data: params})
+export const delMatchByIds = (params) => del({url: `${config.football_service}/match?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
-    });
-export const delMatchById = (id) => del({url: 'https://www.qiezizhibo-api.com/api/match/' + id})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
     });
 
-export const getAllLeagueMatchSeries = (params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/getAllLeagueMatchs',
+export const getAllLeagueMatchSeries = (params) => get({
+    url: `${config.football_service}/league?${unpack({leagueType: 3, ...params})}`,
     data: params
 })
     .then(function (response) {
@@ -325,7 +302,7 @@ export const getAllLeagueMatchSeries = (params) => post({
         console.log(error);
     });
 export const getAllLeagueMatchs = (params) => get({
-    url: `https://www.qiezizhibo-api.com/api/leagueMatchs?${unpack(params)}`,
+    url: `${config.football_service}/league?${unpack({leagueType: 4, ...params})}`,
 })
     .then(function (response) {
         return response.data;
@@ -333,7 +310,7 @@ export const getAllLeagueMatchs = (params) => get({
         console.log(error);
     });
 export const createLeagueMatch = (params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/footballLeagueMatch',
+    url: `${config.football_service}/league`,
     data: params
 })
     .then(function (response) {
@@ -341,14 +318,14 @@ export const createLeagueMatch = (params) => post({
     }).catch(function (error) {
         console.log(error)
     });
-export const getLeagueMatchById = (id) => get({url: 'https://www.qiezizhibo-api.com/api/leagueMatch/' + id})
+export const getLeagueMatchById = (id) => get({url: `${config.football_service}/league/${id}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error);
     });
 export const updateLeagueMatchById = (params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/footballLeagueMatch',
+    url: `${config.football_service}/league`,
     data: params
 })
     .then(function (response) {
@@ -356,8 +333,8 @@ export const updateLeagueMatchById = (params) => put({
     }).catch(function (error) {
         console.log(error);
     });
-export const updateLeagueMatchByIdSelective = (params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/footballLeagueMatch?selective=true',
+export const delLeagueMatchByIds = (params) => del({
+    url: `${config.football_service}/league?${unpack(params)}`,
     data: params
 })
     .then(function (response) {
@@ -365,41 +342,33 @@ export const updateLeagueMatchByIdSelective = (params) => put({
     }).catch(function (error) {
         console.log(error);
     });
-export const delLeagueMatchByIds = (params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/deleteLeagueMatchInfo',
-    data: params
+export const getMatchPlayersByTeamId = (matchid, teamid) => get({
+    url: `${config.football_service}/player?${unpack({
+        teamId: teamid,
+        matchId: matchid,
+        pageSize: 100,
+        pageNum: 1,
+    })}`
 })
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
-        console.log(error);
-    });
-export const delLeagueMatchById = (id) => del({url: 'https://www.qiezizhibo-api.com/api/footballLeagueMatch/' + id})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getMatchPlayersByTeamId = (matchid, teamid) => get({url: 'https://www.qiezizhibo-api.com/api/getMatchPlayersByTeamId?matchid=' + matchid + '&teamid=' + teamid})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
         console.log(error)
     });
 
-export const getFormationById = (params) => get({url: 'https://www.qiezizhibo-api.com/api/footballFormation/' + params})
+export const getFormationById = (id) => get({url: `${config.football_service}/match/formation/${id}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getFormationByMatchTeam = (params) => get({url: `https://www.qiezizhibo-api.com/api/footballFormation?${unpack(params)}`})
+export const getFormationByMatchTeam = (params) => get({url: `${config.football_service}/match/formation?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const updateFormation = (params) => put({url: 'https://www.qiezizhibo-api.com/api/footballFormation', data: params})
+export const updateFormation = (params) => put({url: `${config.football_service}/match/formation`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -407,20 +376,14 @@ export const updateFormation = (params) => put({url: 'https://www.qiezizhibo-api
     });
 
 
-export const preUpload = (filename, filesize) => get({url: 'https://www.qiezizhibo-api.com/api/preupload?filename=' + filename + (filesize ? '&filesize=' + filesize : '')})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const prelogin = () => get({url: 'https://www.qiezizhibo-api.com/api/prelogin'})
+export const preUpload = (filename, filesize) => get({url: `${config.live_service}/activity/preupload?filename=${filename}${filesize ? ('&filesize=' + filesize) : ''}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 export const createMedia = (id, params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/activity/' + id + '/media',
+    url: `${config.live_service}/activity/${id}/media`,
     data: params
 })
     .then(function (response) {
@@ -429,20 +392,20 @@ export const createMedia = (id, params) => post({
         console.log(error)
     });
 
-export const getMediaList = (id) => get({url: 'https://www.qiezizhibo-api.com/api/activity/' + id + '/media'})
+export const getMediaList = (id) => get({url: `${config.live_service}/activity/${id}/media`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteMedia = (id) => del({url: 'https://www.qiezizhibo-api.com/api/activity/media/' + id})
+export const deleteMedia = (id) => del({url: `${config.live_service}/activity/media/${id}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 export const bulkMedia = (id, params) => put({
-    url: 'https://www.qiezizhibo-api.com/api/activity/' + id + '/media/bulk',
+    url: `${config.live_service}/activity/${id}/media/bulk`,
     data: params
 })
     .then(function (response) {
@@ -450,60 +413,72 @@ export const bulkMedia = (id, params) => put({
     }).catch(function (error) {
         console.log(error)
     });
-export const getTransProgress = (id, taskIds) => get({url: 'https://www.qiezizhibo-api.com/api/activity/' + id + '/progress?taskIds=' + taskIds})
+export const getTransProgress = (id, taskIds) => get({url: `${config.live_service}/activity/${id}/progress?taskIds=${taskIds}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 
-export const getPing = (id) => get({url: 'https://www.qiezizhibo-api.com/api/activity/' + id + '/ping'})
+export const getPing = (id) => get({url: `${config.live_service}/activity/${id}/ping`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 
-export const getFunc = (params) => post({url: 'https://www.qiezizhibo-api.com/get', data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getAllRoles = (params) => post({url: 'https://www.qiezizhibo-api.com/api/getAllRoles', data: params})
+export const getAllRoles = (params) => get({url: `${config.user_service}/role?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 
-export const getRoleList = () => get({url: 'https://www.qiezizhibo-api.com/api/getRoleList'})
+export const getPermissionList = (params) => get({url: `${config.user_service}/permission?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const createRole = (params) => post({url: 'https://www.qiezizhibo-api.com/api/role', data: params})
+export const createPermission = (params) => post({url: `${config.user_service}/permission`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updatePermissionById = (params) => put({url: `${config.user_service}/permission`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const delPermissionByIds = (params) => del({url: `${config.user_service}/permission?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const createRole = (params) => post({url: `${config.user_service}/role`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 
-export const updateRoleById = (params) => put({url: 'https://www.qiezizhibo-api.com/api/role', data: params})
+export const updateRoleById = (params) => put({url: `${config.user_service}/role`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const delRoleByIds = (params) => post({url: 'https://www.qiezizhibo-api.com/api/deleteRoles', data: params})
+export const delRoleByIds = (params) => del({url: `${config.user_service}/role?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getTimelineByMatchId = (params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/getTimelineByMatchId',
+export const getTimelineByMatchId = (params) => get({
+    url: `${config.football_service}/timeline?${unpack(params)}`,
     data: params
 })
     .then(function (response) {
@@ -511,35 +486,20 @@ export const getTimelineByMatchId = (params) => post({
     }).catch(function (error) {
         console.log(error)
     });
-export const updateTimeline = (params) => put({url: 'https://www.qiezizhibo-api.com/api/timeline', data: params})
+export const updateTimeline = (params) => put({url: `${config.football_service}/timeline`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const addTimeline = (params) => post({url: 'https://www.qiezizhibo-api.com/api/timeline', data: params})
+export const addTimeline = (params) => post({url: `${config.football_service}/timeline`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteTimelineById = (id) => del({url: 'https://www.qiezizhibo-api.com/api/timeline/' + id})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteTimelineByIds = (params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/deleteTimeline',
-    data: params
-})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteTimelineByMatchId = (params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/deleteTimelineByMatchId',
+export const deleteTimelineByIds = (params) => del({
+    url: `${config.football_service}/timeline?${unpack(params)}`,
     data: params
 })
     .then(function (response) {
@@ -548,7 +508,7 @@ export const deleteTimelineByMatchId = (params) => post({
         console.log(error)
     });
 export const updatePassAndPossession = (params) => post({
-    url: 'https://www.qiezizhibo-api.com/api/passAndPossession',
+    url: `${config.football_service}/timeline/passAndPossession`,
     data: params
 })
     .then(function (response) {
@@ -556,50 +516,51 @@ export const updatePassAndPossession = (params) => post({
     }).catch(function (error) {
         console.log(error)
     });
-export const getPassAndPossession = (matchid, teamid) => get({url: 'https://www.qiezizhibo-api.com/api/passAndPossession?matchid=' + matchid + (teamid ? ('&teamid=' + teamid) : '')})
+export const getPassAndPossession = (matchid, teamid) => get({
+    url: `${config.football_service}/timeline/passAndPossession?${unpack({
+        matchId: matchid,
+        teamId: teamid
+    })}`
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getMatchTime = (matchid) => get({url: 'https://www.qiezizhibo-api.com/api/getMatchTime/' + matchid})
+export const getMatchTime = (matchid) => get({url: `${config.football_service}/timeline/time?${unpack({matchId: matchid})}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getRecentMatches = (params) => get({url: `https://www.qiezizhibo-api.com/api/getRecentMatches?${unpack(params)}`})
+export const getRecentMatches = (param) => get({
+    url: `${config.football_service}/match?${unpack({
+        pageSize: 20,
+        pageNum: 1,
+        dateBegin: getPastMonthDate(),
+        dateEnd: getNowDate(),
+        ...param
+    })}`
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getOneMatch = () => get({url: 'https://www.qiezizhibo-api.com/api/getOneMatch'})
+export const getCommentByMatchId = (param) => get({url: `${config.chat_service}/comment?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getLiveDetail = (id) => get({url: `https://www.qiezizhibo-api.com/api/activity/${id}/getLiveDetail`})
+export const getCommentCountByMatchId = (matchId) => get({url: `${config.chat_service}/comment/count?${unpack({matchId: matchId})}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getAllComment = (param) => post({url: `https://www.qiezizhibo-api.com/api/getAllComment`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getMessageByMatchId = (matchId, pageNum, pageSize) => get({url: `https://www.qiezizhibo-api.com/api/comment?matchId=${matchId}&pageNum=${pageNum}&pageSize=${pageSize}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getCommentByMatchId = (matchId, param) => post({
-    url: `https://www.qiezizhibo-api.com/api/getLiveComment?matchId=${matchId}`,
+export const addCommentByMatchId = (param) => post({
+    url: `${config.chat_service}/comment`,
     data: param
 })
     .then(function (response) {
@@ -607,161 +568,140 @@ export const getCommentByMatchId = (matchId, param) => post({
     }).catch(function (error) {
         console.log(error)
     });
-export const getCommentCountByMatchId = (matchId) => get({url: `https://www.qiezizhibo-api.com/api/comment/count?matchId=${matchId}`})
+export const updateComment = (param) => put({url: `${config.chat_service}/comment`, data: param})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const addCommentByMatchId = (matchId, param) => post({
-    url: `https://www.qiezizhibo-api.com/api/comment?matchId=${matchId}`,
-    data: param
+export const pendCommentById = (id) => put({
+    url: `${config.chat_service}/comment/status?${unpack({id: [id]})}&status=0`,
+    data: null
 })
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const updateComment = (param) => put({url: `https://www.qiezizhibo-api.com/api/comment`, data: param})
+export const passCommentById = (id) => put({
+    url: `${config.chat_service}/comment/status?${unpack({id: [id]})}&status=1`,
+    data: null
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const pendCommentById = (id) => put({url: `https://www.qiezizhibo-api.com/api/comment/${id}?status=0`, data: null})
+export const banCommentById = (id) => put({
+    url: `${config.chat_service}/comment/status?${unpack({id: [id]})}&status=2`,
+    data: null
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const passCommentById = (id) => put({url: `https://www.qiezizhibo-api.com/api/comment/${id}?status=1`, data: null})
+export const pendCommentByIds = (ids) => put({
+    url: `${config.chat_service}/comment/status?${unpack({id: ids})}&status=0`,
+    data: ids
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const banCommentById = (id) => put({url: `https://www.qiezizhibo-api.com/api/comment/${id}?status=2`, data: null})
+export const passCommentByIds = (ids) => put({
+    url: `${config.chat_service}/comment/status?${unpack({id: ids})}&status=1`,
+    data: ids
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const pendCommentByIds = (ids) => put({url: `https://www.qiezizhibo-api.com/api/commentStatus?status=0`, data: ids})
+export const banCommentByIds = (ids) => put({
+    url: `${config.chat_service}/comment/status?${unpack({id: ids})}&status=2`,
+    data: ids
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const passCommentByIds = (ids) => put({url: `https://www.qiezizhibo-api.com/api/commentStatus?status=1`, data: ids})
+export const deleteCommentByIds = (ids) => del({url: `${config.chat_service}/comment?${unpack(ids)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const banCommentByIds = (ids) => put({url: `https://www.qiezizhibo-api.com/api/commentStatus?status=2`, data: ids})
+export const getLeagueTeam = (params) => get({url: `${config.football_service}/league/rank/team?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteCommentById = (id) => del({url: `https://www.qiezizhibo-api.com/api/comment/${id}`})
+export const getTeamInLeague = (id) => get({url: `${config.football_service}/league/${id}/team`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteCommentByIds = (ids) => post({url: `https://www.qiezizhibo-api.com/api/deleteComment`, data: ids})
+export const addTeamToLeague = (params) => post({url: `${config.football_service}/league/team`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getMatchs = (params) => get({url: `https://www.qiezizhibo-api.com/api/matchs?${unpack(params)}`})
+export const updateTeamInLeague = (params) => put({url: `${config.football_service}/league/team`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getMatchStatus = (params) => get({url: `https://www.qiezizhibo-api.com/api/matchStatus?matchid=${params}`})
+export const deleteTeamInLeague = (params) => del({url: `${config.football_service}/league/team?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getLeagueTeam = (params) => get({url: `https://www.qiezizhibo-api.com/api/league/team?${unpack(params)}`})
+export const getLeaguePlayer = (params) => get({url: `${config.football_service}/league/rank/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getTeamInLeague = (params) => get({url: `https://www.qiezizhibo-api.com/api/league/getLeagueTeam?${unpack(params)}`})
+export const getLeaguePlayerByLeagueTeam = (params) => get({url: `${config.football_service}/league/rank/player/${params.playerId}?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const addTeamToLeague = (params) => post({url: `https://www.qiezizhibo-api.com/api/league/team`, data: params})
+export const getPlayerMedia = (params) => get({url: `${config.media_service}/media/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const updateTeamInLeague = (params) => put({url: `https://www.qiezizhibo-api.com/api/league/team`, data: params})
+export const addMediaToPlayer = (params) => post({url: `${config.media_service}/media/player`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteTeamInLeague = (params) => del({url: `https://www.qiezizhibo-api.com/api/league/team?${unpack(params)}`})
+export const modifyMedia = (params) => put({url: `${config.media_service}/media`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getLeaguePlayer = (params) => get({url: `https://www.qiezizhibo-api.com/api/league/player?${unpack(params)}`})
+export const deleteMediaToPlayer = (params) => del({url: `${config.media_service}/media/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getLeaguePlayerByLeagueTeam = (params) => get({url: `https://www.qiezizhibo-api.com/api/league/getLeaguePlayer?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getMedia = (params) => get({url: `https://www.qiezizhibo-api.com/api/media?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getPlayerMedia = (params) => get({url: `https://www.qiezizhibo-api.com/api/media/player?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const addMediaToPlayer = (params) => post({url: 'https://www.qiezizhibo-api.com/api/media/player', data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const modifyMediaToPlayer = (params) => put({url: 'https://www.qiezizhibo-api.com/api/media/player', data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteMediaToPlayer = (params) => del({url: `https://www.qiezizhibo-api.com/api/media/player?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateMediaInPlayer = (params) => post({
-    url: `https://www.qiezizhibo-api.com/api/updateMediaInPlayer`,
+export const updateMediaInPlayer = (params) => put({
+    url: `${config.media_service}/media/player`,
     data: params
 })
     .then(function (response) {
@@ -769,187 +709,196 @@ export const updateMediaInPlayer = (params) => post({
     }).catch(function (error) {
         console.log(error)
     });
-export const getMediaInPlayer = (params) => post({url: `https://www.qiezizhibo-api.com/api/getMediaInPlayer`, data: params})
+export const getMediaInPlayer = (params) => get({url: `${config.media_service}/media/player/${params.mediaId}?playerId=${params.playerId}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const addLeaguePlayer = (params) => post({url: `https://www.qiezizhibo-api.com/api/league/player`, data: params})
+export const addLeaguePlayer = (params) => post({url: `${config.football_service}/league/player`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const updatePlayerInLeague = (params) => put({url: `https://www.qiezizhibo-api.com/api/league/player`, data: params})
+export const updatePlayerInLeague = (params) => put({url: `${config.football_service}/league/player`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const delPlayerInLeague = (params) => del({url: `https://www.qiezizhibo-api.com/api/league/player?${unpack(params)}`})
+export const delPlayerInLeague = (params) => del({url: `${config.football_service}/league/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getMatchMedia = (params) => get({url: `https://www.qiezizhibo-api.com/api/media/recommend?${unpack(params)}`})
+export const getMatchMedia = (params) => get({url: `${config.media_service}/media/match?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const search = (params) => get({url: `https://www.qiezizhibo-api.com/api/search?${unpack(params)}`})
+export const getVisit = (param) => get({url: `${config.user_service}/user/visit?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getVisit = (params) => get({url: `https://www.qiezizhibo-api.com/api/getVisit?${unpack(params)}`})
+export const getBanner = (params) => get({url: `${config.system_service}/system/config/banner`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const setConfig = (params) => post({url: `https://www.qiezizhibo-api.com/api/config`, data: params})
+export const setBanner = (params) => post({url: `${config.system_service}/system/config/banner`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const delConfig = (params) => del({url: `https://www.qiezizhibo-api.com/api/config?${unpack(params)}`})
+export const updateBanner = (params) => put({url: `${config.system_service}/system/config/banner`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getConfig = (params) => get({url: `https://www.qiezizhibo-api.com/api/config?${unpack(params)}`})
+export const delConfig = (params) => del({url: `${config.system_service}/system/config?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getScoreboard = () => get({url: `https://www.qiezizhibo-api.com/api/config/scoreboard`})
+export const getScoreboard = () => get({url: `${config.system_service}/system/config/scoreboard`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const setScoreboard = (params) => post({url: `https://www.qiezizhibo-api.com/api/config/scoreboard`, data: params})
+export const setScoreboard = (params) => post({url: `${config.system_service}/system/config/scoreboard`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteScoreboard = (params) => del({url: `https://www.qiezizhibo-api.com/api/config/scoreboard?${unpack(params)}`})
+export const updateScoreboard = (params) => put({
+    url: `${config.system_service}/system/config/scoreboard`,
+    data: params
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getBulletin = () => get({url: `https://www.qiezizhibo-api.com/api/config/bulletin`})
+export const deleteScoreboard = (params) => del({url: `${config.system_service}/system/config?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const setBulletin = (params) => post({url: `https://www.qiezizhibo-api.com/api/config/bulletin`, data: params})
+export const getBulletin = () => get({url: `${config.system_service}/system/config/bulletin`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteBulletin = (params) => del({url: `https://www.qiezizhibo-api.com/api/config/bulletin?${unpack(params)}`})
+export const setBulletin = (params) => post({url: `${config.system_service}/system/config/bulletin`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getAllMatchSchedule = (params) => get({url: `https://www.qiezizhibo-api.com/api/schedule/match?${unpack(params)}`})
+export const deleteBulletin = (params) => del({url: `${config.system_service}/system/config?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const addMatchSchedule = (params) => post({url: `https://www.qiezizhibo-api.com/api/schedule/match`, data: params})
+export const getAllMatchSchedule = (params) => get({url: `${config.system_service}/schedule/match?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const delMatchSchedule = (params) => del({url: `https://www.qiezizhibo-api.com/api/schedule/match?${unpack(params)}`})
+export const addMatchSchedule = (params) => post({url: `${config.system_service}/schedule/match`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const genLeagueTeamRank = (params) => get({url: `https://www.qiezizhibo-api.com/api/genLeagueTeamRank?${unpack(params)}`})
+export const delMatchSchedule = (params) => del({url: `${config.system_service}/schedule/match?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const genLeaguePlayerRank = (params) => get({url: `https://www.qiezizhibo-api.com/api/genLeaguePlayerRank?${unpack(params)}`})
+export const genLeagueTeamRank = (params) => post({url: `${config.football_service}/league/rank/team?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getLeagueInfoBySeriesId = (id) => get({url: `https://www.qiezizhibo-api.com/api/leagueSeries?leagueId=${id}`})
+export const genLeaguePlayerRank = (params) => post({url: `${config.football_service}/league/rank/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const addLeagueIntoSeries = (params) => post({url: `https://www.qiezizhibo-api.com/api/leagueSeries`, data: params})
+export const getLeagueInfoBySeriesId = (params) => get({url: `${config.football_service}/league?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const removeLeagueIntoSeries = (params) => del({url: `https://www.qiezizhibo-api.com/api/leagueSeries?${unpack(params)}`})
+export const addLeagueIntoSeries = (params) => post({url: `${config.football_service}/league/series`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getNoSeriesLeague = (params) => get({url: `https://www.qiezizhibo-api.com/api/getNoSeriesLeague?${unpack(params)}`})
+export const removeLeagueIntoSeries = (params) => del({url: `${config.football_service}/league/series?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getAreasList = () => get({url: 'https://www.qiezizhibo-api.com/api/areas'})
+export const getNoSeriesLeague = (params) => get({url: `${config.football_service}/league?${unpack({leagueType: 2, ...params})}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const createArea = (params) => post({url: 'https://www.qiezizhibo-api.com/api/areas', data: params})
+export const getAreasList = () => get({url: `${config.system_service}/system/config/area`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const delAreaById = (id) => del({url: `https://www.qiezizhibo-api.com/api/areas/${id}`})
+export const createArea = (params) => post({url: `${config.system_service}/system/config/area`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getLeagueReport = (id) => get({url: `https://www.qiezizhibo-api.com/api/league/${id}/report`, data: null})
+export const delAreaById = (params) => del({url: `${config.system_service}/system/config/area?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const genLeagueReport = (id) => post({url: `https://www.qiezizhibo-api.com/api/league/${id}/report`, data: null})
+export const getLeagueReport = (id) => get({url: `${config.football_service}/league/${id}/report`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getArticleList = (params) => get({url: `https://www.qiezizhibo-api.com/api/article?${unpack(params)}`})
+export const genLeagueReport = (id) => post({url: `${config.football_service}/league/${id}/report`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getArticleList = (params) => get({url: `${config.system_service}/system/gongzhong/article?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

@@ -140,7 +140,7 @@ class FootBallMatchAddDialog extends React.Component {
         this.setState({
             listloading: true,
         });
-        getActivityInfoList(params, {name: "qsn-"}).then((data) => {
+        getActivityInfoList(params).then((data) => {
             if (data && data.items) {
                 const pagination = {...this.state.pagination};
                 pagination.total = data ? data.pager.total : 0;

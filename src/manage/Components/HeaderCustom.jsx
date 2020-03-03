@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Menu, Icon, Layout, Badge, Popover} from 'antd';
 import screenfull from 'screenfull';
-import {loginout} from '../../axios/index';
+// import {loginout} from '../../axios/index';
 import {queryString} from '../../utils/index';
 import avatar from '../../static/avatar.jpg';
 import SiderCustom from './SiderCustom';
@@ -40,10 +40,10 @@ class HeaderCustom extends Component {
         e.key === 'logout' && this.logout();
     };
     logout = () => {
-        loginout().then((data) => {
+        // loginout().then((data) => {
             // localStorage.removeItem('user');
             this.props.history.push('/login')
-        });
+        // });
     };
     popoverHide = () => {
         this.setState({

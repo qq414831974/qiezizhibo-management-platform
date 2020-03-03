@@ -34,7 +34,7 @@ class UserTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
-        getActivityInfoList(params, {name: "qsn-"}).then((data) => {
+        getActivityInfoList(params).then((data) => {
             const pagination = {...this.state.pagination};
             pagination.total = data ? data.pager.total : 0;
             pagination.current = data ? data.pager.page : 0;
