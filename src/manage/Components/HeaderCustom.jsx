@@ -7,7 +7,7 @@ import avatar from '../../static/avatar.jpg';
 import SiderCustom from './SiderCustom';
 import {connect} from 'react-redux';
 import {withRouter} from 'react-router-dom';
-import {getUser} from "../../utils/tools";
+import {getUser,removeUser,removeToken,removeRole} from "../../utils/tools";
 
 const {Header} = Layout;
 const SubMenu = Menu.SubMenu;
@@ -42,7 +42,10 @@ class HeaderCustom extends Component {
     logout = () => {
         // loginout().then((data) => {
         //     // localStorage.removeItem('user');
-        //     this.props.history.push('/login')
+        removeUser();
+        removeRole();
+        removeToken();
+        this.props.history.push('/login')
         // });
     };
     popoverHide = () => {
