@@ -28,7 +28,7 @@ const formItemLayout = {
     },
 };
 
-class RoleModifyDialog extends React.Component {
+class PermissionModifyDialog extends React.Component {
     state = {loading: true}
 
     componentDidMount() {
@@ -127,45 +127,44 @@ class RoleModifyDialog extends React.Component {
             visible ?
                 <Form>
                     <FormItem {...formItemLayout} label="名字" className="bs-form-item">
-                        {getFieldDecorator('roleName', {
+                        {getFieldDecorator('permissionName', {
                             rules: [{required: true, message: '请输入名字!'}],
-                            initialValue: record.roleName
+                            initialValue: record.permissionName,
                         })(
                             <Input placeholder='请输入名字!'/>
                         )}
                     </FormItem>
-                    <FormItem {...formItemLayout}
-                              label="权限"
-                              className="bs-form-item-nowrap">
-                        {getFieldDecorator('permissions', {
-                            rules: [{required: true, message: '请选择权限!'}],
-                            initialValue: record.permissions ? record.permissions.flatMap(role => role.id) : null,
+                    <FormItem {...formItemLayout} label="url" className="bs-form-item">
+                        {getFieldDecorator('url', {
+                            rules: [{required: true, message: '请输入url!'}],
+                            initialValue: record.url,
                         })(
-                            <Select
-                                showSearch
-                                style={{minWidth: 300}}
-                                placeholder="请选择"
-                                defaultActiveFirstOption={false}
-                                showArrow={false}
-                                filterOption={false}
-                                onChange={this.handleChange}
-                                onPopupScroll={this.handleShowMore}
-                                notFoundContent={null}
-                                mode="multiple"
-                                loading={this.state.loading}
-                                getInputElement={() => (
-                                    <input onInput={this.handleSearch}
-                                           onCompositionStart={this.onInputCompositionStart}
-                                           onCompositionEnd={this.onInputCompositionEnd}/>)}
-                            >
-                                {this.getPermissionOption()}
+                            <Input placeholder='请输入url!'/>
+                        )}
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="方法" className="bs-form-item">
+                        {getFieldDecorator('method', {
+                            rules: [{required: true, message: '请选择方法!'}],
+                            initialValue: record.method,
+                        })(
+                            <Select placeholder="请选择方法!">
+                                <Option value="get">get</Option>
+                                <Option value="post">post</Option>
+                                <Option value="put">put</Option>
+                                <Option value="delete">delete</Option>
                             </Select>
                         )}
-                        <Icon className="ml-s" style={{fontSize: 16}} type="loading" hidden={!this.state.loading}/>
                     </FormItem>
-                    <FormItem {...formItemLayout} className="bs-form-item">
+                    <FormItem {...formItemLayout} label="描述" className="bs-form-item">
+                        {getFieldDecorator('descritpion', {
+                            initialValue: record.descritpion,
+                        })(
+                            <Input placeholder='请输入描述!'/>
+                        )}
+                    </FormItem>
+                    <FormItem className="bs-form-item">
                         {getFieldDecorator('id', {
-                            initialValue: record.id
+                            initialValue: record.id,
                         })(
                             <Input hidden={true}/>
                         )}
@@ -185,4 +184,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(RoleModifyDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(PermissionModifyDialog);

@@ -6,7 +6,7 @@ import {Row, Col, Card, Tooltip, Tag, List, Button, Modal, Avatar, Select, Spin,
 import {
     getMatchPlayersByTeamId,
     getMatchById,
-    getMatchMedia, modifyMediaToPlayer, deleteMediaToPlayer
+    getMatchMedia, modifyMedia, deleteMediaToPlayer
 } from "../../../axios";
 import defultAvatar from '../../../static/avatar.jpg';
 import shirt from '../../../static/shirt.png';
@@ -41,10 +41,10 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
         this.setState({
             pageLoaded: false,
         });
-        getMatchById(this.props.matchid).then((data) => {
-            if (data) {
+        getMatchById(this.props.matchId).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    data: data,
+                    data: data.data,
                 });
                 this.fetchHostTeam({
                     pageSize: 100,
@@ -54,13 +54,13 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
                     pageSize: 100,
                     pageNum: 1,
                 });
-                getMatchMedia({pageNum: 1, pageSize: 100, matchId: this.props.matchid}).then(data => {
-                    if (data && data.list) {
-                        this.setState({mediaList: data.list});
+                getMatchMedia({pageNum: 1, pageSize: 100, matchId: this.props.matchId}).then(data => {
+                    if (data && data.code == 200) {
+                        this.setState({mediaList: data.data ? data.data : []});
                     }
                 })
             } else {
-                message.error('获取比赛失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -71,15 +71,15 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
         this.setState({
             hostloading: true,
         });
-        getMatchPlayersByTeamId(this.props.matchid, this.state.data.hostteam.id).then((data) => {
-            if (data) {
+        getMatchPlayersByTeamId(null, this.state.data.hostteam.id).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    hostdata: data ? data : "",
+                    hostdata: data.data ? data.data.records : "",
                     hostloading: false,
                 });
                 // this.getPlayerInfo(data ? data : "");
             } else {
-                message.error('获取主队队员失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取主队队员失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -87,15 +87,15 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
         this.setState({
             guestloading: true,
         });
-        getMatchPlayersByTeamId(this.props.matchid, this.state.data.guestteam.id).then((data) => {
-            if (data) {
+        getMatchPlayersByTeamId(null, this.state.data.guestteam.id).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    guestdata: data ? data : "",
+                    guestdata:data.data ? data.data.records : "",
                     guestloading: false,
                 });
                 // this.getPlayerInfo(data ? data : "");
             } else {
-                message.error('获取客队队员失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取客队队员失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -115,11 +115,11 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
         let dom = [];
         data && data.forEach(item => {
             dom.push(<Link to={
-                `/football/footballPlayer/${item.id}?matchId=${this.props.matchid}`
+                `/football/footballPlayer/${item.id}?matchId=${this.props.matchId}`
             }>
                 <div className="inline-block cell-hover border-radius-10px border-gray pa-xs ml-s cursor-hand">
-                    <Avatar src={item.headimg ? item.headimg : defultAvatar}/>
-                    <span>{`${item.name}(${item.shirtnum})`}</span>
+                    <Avatar src={item.headImg ? item.headImg : defultAvatar}/>
+                    <span>{`${item.name}(${item.shirtNum})`}</span>
                 </div>
             </Link>);
         });
@@ -148,16 +148,16 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
             if (err) {
                 return;
             }
-            modifyMediaToPlayer(values).then((data) => {
+            modifyMedia(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('修改成功', 1);
-                    }else{
-                        message.warn(data.msg, 1);
+                    } else {
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -185,7 +185,7 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
     handleDeleteOK = () => {
         this.state.currentMedia &&
         deleteMediaToPlayer({
-            playerID: this.state.currentMedia.playerid,
+            playerId: this.state.currentMedia.playerId,
             mediaId: this.state.currentMedia.id,
         }).then(data => {
             this.setState({deleteVisible: false, modifyMediaVisible: false});
@@ -193,11 +193,11 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
                 if (data.data) {
                     message.success('删除成功', 1);
                     this.refresh();
-                }else{
-                    message.warn(data.msg, 1);
+                } else {
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -222,7 +222,7 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
                 <div>
                     <div className="center">
                         <img className="round-img-xs"
-                             src={this.state.data ? this.state.data.hostteam.headimg : defultAvatar}/>
+                             src={this.state.data ? this.state.data.hostteam.headImg : defultAvatar}/>
                     </div>
                     <div className="center w-full">
                         <p style={{fontSize: 12}}
@@ -234,7 +234,7 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
             <Col span={12}>
                 <div className="center">
                     <img className="round-img-xs"
-                         src={this.state.data ? this.state.data.guestteam.headimg : defultAvatar}/>
+                         src={this.state.data ? this.state.data.guestteam.headImg : defultAvatar}/>
                 </div>
                 <div className="center w-full">
                     <p style={{fontSize: 12}}
@@ -247,14 +247,20 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
                 <List
                     rowKey={record => record.id}
                     grid={{gutter: 16, lg: 3, md: 2, xs: 1}}
-                    dataSource={this.state.mediaList ? this.state.mediaList : []}
+                    dataSource={this.state.mediaList ? this.state.mediaList.map(media=>{
+                        media.media.player= media.player;
+                        media.media.playerId= media.playerId;
+                        media.media.match= media.match;
+                        media.media.matchId= media.matchId;
+                        return media.media;
+                    }) : []}
                     loading={this.state.mediaLoading}
                     renderItem={item => (<List.Item>
                         <div className="video-list-item pa-xs" style={{transform: "translate(0px, 0px)"}}>
                             <div className="video-list-item-top-left">
                                 <Avatar
-                                    src={item.player ? (item.player.headimg ? item.player.headimg : defultAvatar) : defultAvatar}/>
-                                <span>{`${item.player?item.player.name:""}`}</span>
+                                    src={item.player ? (item.player.headImg ? item.player.headImg : defultAvatar) : defultAvatar}/>
+                                <span>{`${item.player ? item.player.name : ""}`}</span>
                             </div>
                             <img className="video-list-item-img"
                                  src={item.poster ? item.poster : nopic}/>
@@ -273,7 +279,7 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
                                 {/*onClick={this.handleMediaDelete.bind(this, item)}/>*/}
                             </div>
                             <div className="video-list-item-bottom center">
-                                <p className="video-list-item-bottom-text">上传时间：{moment(item.createtime).format("MM-DD HH:mm")}</p>
+                                <p className="video-list-item-bottom-text">上传时间：{moment(item.createTime).format("MM-DD HH:mm")}</p>
                             </div>
                         </div>
                     </List.Item>)}
@@ -300,7 +306,7 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
                 <ModifyMediaDialog
                     visible={this.state.modifyMediaVisible}
                     record={this.state.currentMedia}
-                    playerId={this.state.currentMedia ? this.state.currentMedia.playerid : {}}
+                    playerId={this.state.currentMedia ? this.state.currentMedia.playerId : {}}
                     player={this.state.currentMedia ? this.state.currentMedia.player : {}}
                     ref={this.saveModifyMeidaDialogRef}/>
             </Modal>

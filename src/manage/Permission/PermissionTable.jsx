@@ -1,21 +1,17 @@
 import React from 'react';
-import {Table, Input, Button, Icon, Modal, Upload, Spin, Tooltip} from 'antd';
-import {getAllTeams} from '../../../axios/index';
-import {mergeJSON} from '../../../utils/index';
-import {Avatar} from 'antd';
-import {delTeamByIds, updateTeamById, createTeam, uploaddocx_team} from "../../../axios";
-import {Form, message, notification} from "antd/lib/index";
-import FootBallTeamAddDialog from "../Team/FootBallTeamAddDialog"
-import FootBallTeamModifyDialog from "../Team/FootBallTeamModifyDialog"
-import {parseTimeStringYMD} from "../../../utils";
-import defultAvatar from '../../../static/avatar.jpg';
-import {Link} from 'react-router-dom';
-import {bindActionCreators} from "redux";
-import {receiveData} from "../../../action";
+import {Table, Input, Button, Icon, Modal, Tooltip, Tag, Radio} from 'antd';
+import {getPermissionList} from '../../axios/index';
+import {mergeJSON} from '../../utils/index';
+import {delPermissionByIds, updatePermissionById, createPermission} from "../../axios";
+import {Form, message} from "antd/lib/index";
+import PermissionAddDialog from './PermissionAddDialog';
+import PermissionModifyDialog from './PermissionModifyDialog';
+import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import copy from "copy-to-clipboard/index";
+import {bindActionCreators} from "redux";
 
-class FootBallTeamTable extends React.Component {
+
+class PermissionTable extends React.Component {
     state = {
         data: [],
         pagination: {pageSize: 10, filters: {}},
@@ -27,6 +23,7 @@ class FootBallTeamTable extends React.Component {
         dialogModifyVisible: false,
         dialogAddVisible: false,
         record: {},
+        nameRadioValue: "permissionName",
     };
 
     componentDidMount() {
@@ -38,8 +35,8 @@ class FootBallTeamTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
-        getAllTeams(params).then((data) => {
-            if (data && data.code == 200) {
+        getPermissionList(params).then((data) => {
+            if (data && data.code == 200 && data.data.records) {
                 const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
                 pagination.current = data.data ? data.data.current : 1;
@@ -50,7 +47,7 @@ class FootBallTeamTable extends React.Component {
                     selectedRowKeys: [],
                 });
             } else {
-                message.error('获取队伍列表失败：' + (data ? data.code + ":" + data.message : data), 3);
+                message.error('获取权限列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -63,9 +60,10 @@ class FootBallTeamTable extends React.Component {
             sortOrder: pager.sortOrder,
             ...pager.filters,
         });
+        this.setState({selectedRowKeys: []});
     }
-    delete = () => {
-        delTeamByIds({id: [this.state.record.id]}).then((data) => {
+    deletePermission = () => {
+        delPermissionByIds({id: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -79,9 +77,9 @@ class FootBallTeamTable extends React.Component {
             }
         });
     };
-    deleteMulti = () => {
-        delTeamByIds({id: this.state.selectedRowKeys}).then((data) => {
-            this.setState({deleteVisible: false, dialogModifyVisible: false});
+    deletePermissions = () => {
+        delPermissionByIds({id: this.state.selectedRowKeys}).then((data) => {
+            this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
@@ -94,13 +92,6 @@ class FootBallTeamTable extends React.Component {
             }
         });
     };
-    onNameClick = (record, e) => {
-        this.setState({record: record});
-        this.showTeamModifyDialog();
-    };
-    onSelectChange = (selectedRowKeys) => {
-        this.setState({selectedRowKeys});
-    }
     onInputChange = (e) => {
         this.setState({searchText: e.target.value});
     }
@@ -122,6 +113,13 @@ class FootBallTeamTable extends React.Component {
             ...pager.filters,
         });
     }
+    onSelectChange = (selectedRowKeys) => {
+        this.setState({selectedRowKeys});
+    }
+    onNameClick = (record, e) => {
+        this.setState({record: record});
+        this.showPermissionModifyDialog();
+    }
     handleTableChange = (pagination, filters, sorter) => {
         const pager = {...this.state.pagination};
         pager.current = pagination.current;
@@ -142,8 +140,8 @@ class FootBallTeamTable extends React.Component {
     getTableFilters = (pager, filters) => {
         const {searchText} = this.state;
         pager.filters = {};
-        if (searchText != null && searchText != '') {
-            pager.filters["name"] = searchText;
+        if (this.state.nameRadioValue && searchText != null && searchText != '') {
+            pager.filters[this.state.nameRadioValue] = searchText;
         }
         if (filters) {
             for (let param in filters) {
@@ -154,42 +152,37 @@ class FootBallTeamTable extends React.Component {
         }
         return pager.filters;
     }
-    showTeamAddDialog = () => {
+    savePermissionAddDialogRef = (form) => {
+        this.formAdd = form;
+    }
+    savePermissionModifyDialogRef = (form) => {
+        this.formModify = form;
+    }
+    showPermissionAddDialog = () => {
         this.setState({dialogAddVisible: true});
     };
-    showTeamModifyDialog = () => {
+    showPermissionModifyDialog = () => {
         this.setState({dialogModifyVisible: true});
     };
-    handleTeamAddCancel = () => {
+    handlePermissionAddCancel = () => {
         this.setState({dialogAddVisible: false});
     };
-    handleTeamModifyCancel = () => {
+    handlePermissionModifyCancel = () => {
         this.setState({dialogModifyVisible: false});
     };
-    saveTeamDialogRef = (form) => {
-        this.formAdd = form;
-    };
-    saveTeamModifyDialogRef = (form) => {
-        this.formModify = form;
-    };
-    handleTeamAddCreate = () => {
+    handlePermissionAddCreate = () => {
         const form = this.formAdd;
+        const packingValues = this.packingValues;
         form.validateFields((err, values) => {
             if (err) {
                 return;
             }
-            values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-
-            createTeam(values).then((data) => {
+            packingValues(values);
+            createPermission(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('添加成功', 1);
-                    } else {
-                        message.warn(data.message, 1);
                     }
                 } else {
                     message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
@@ -199,24 +192,19 @@ class FootBallTeamTable extends React.Component {
             this.setState({dialogAddVisible: false});
         });
     };
-    handleTeamModifyCreate = () => {
+    handlePermissionModifyCreate = () => {
         const form = this.formModify;
+        const packingValues = this.packingValues;
         form.validateFields((err, values) => {
             if (err) {
                 return;
             }
-            values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-
-            updateTeamById(values).then((data) => {
+            packingValues(values);
+            updatePermissionById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('修改成功', 1);
-                    } else {
-                        message.warn(data.message, 1);
                     }
                 } else {
                     message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
@@ -226,53 +214,44 @@ class FootBallTeamTable extends React.Component {
             this.setState({dialogModifyVisible: false});
         });
     };
-    handleDelete = () => {
+    handlePermissionDelete = () => {
         this.setState({
             deleteVisible: true,
-            handleDeleteOK: this.delete,
+            handleDeleteOK: this.deletePermission,
             deleteCols: 1,
         });
     }
-    handleDeleteMulti = () => {
+    handlePermissionsDelete = () => {
         this.setState({
             deleteVisible: true,
-            handleDeleteOK: this.deleteMulti,
+            handleDeleteOK: this.deletePermissions,
             deleteCols: this.state.selectedRowKeys ? this.state.selectedRowKeys.length : 0,
         })
     }
     handleDeleteCancel = () => {
         this.setState({deleteVisible: false});
     }
-    handleUploadChange = (info) => {
-        if (info.file.status === 'uploading') {
-            this.setState({uploadloading: true});
-            return;
-        }
-        if (info.file.status === 'done') {
-            // Get this url from response in real world.
-            this.setState({
-                uploadloading: false,
-            });
-            message.success(info.file.response.message + "10秒后自动刷新(或者待会手动刷新)", 10);
-            setTimeout(() => {
-                this.refresh();
-            }, 10000);
-        }
-        if (info.file.status === 'error') {
-            this.setState({
-                uploadloading: false,
-            });
-            message.error(info.file.response.message, 10);
-            return;
+    packingValues = (values) => {
+        const menuList = values.permissions;
+        const list = [];
+        if (menuList) {
+            menuList.forEach((item, index) => {
+                list.push({id: item})
+            })
+            values.permissions = list;
         }
     }
-
+    onNameDropDownRadioChange = (e) => {
+        this.setState({
+            nameRadioValue: e.target.value,
+        });
+    }
     render() {
         const onNameClick = this.onNameClick;
         const {selectedRowKeys} = this.state;
 
-        const AddDialog = Form.create()(FootBallTeamAddDialog);
-        const ModifyDialog = Form.create()(FootBallTeamModifyDialog);
+        const AddDialog = Form.create()(PermissionAddDialog);
+        const ModifyDialog = Form.create()(PermissionModifyDialog);
 
         const isMobile = this.props.responsive.data.isMobile;
 
@@ -291,19 +270,26 @@ class FootBallTeamTable extends React.Component {
         };
 
         const columns = [{
-            title: '队名',
-            align: 'center',
-            dataIndex: 'name',
+            title: '名字',
+            key: 'permissionName',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
-                    <Input
-                        ref={ele => this.searchInput = ele}
-                        placeholder="搜索"
-                        value={this.state.searchText}
-                        onChange={this.onInputChange}
-                        onPressEnter={this.onSearch}
-                    />
-                    <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    <div>
+                        <Input
+                            ref={ele => this.searchInput = ele}
+                            placeholder="搜索"
+                            value={this.state.searchText}
+                            onChange={this.onInputChange}
+                            onPressEnter={this.onSearch}
+                        />
+                        <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    </div>
+                    <div className="custom-filter-dropdown-radio">
+                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.nameRadioValue}>
+                            <Radio value={"permissionName"}>按名称</Radio>
+                            <Radio value={"url"}>按url</Radio>
+                        </Radio.Group>
+                    </div>
                 </div>
             ),
             filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,
@@ -313,78 +299,40 @@ class FootBallTeamTable extends React.Component {
                     filterDropdownVisible: visible,
                 }, () => this.searchInput && this.searchInput.focus());
             },
-            width: '30%',
+            width: '20%',
+            align: 'center',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
-                    <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
+                return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.permissionName}</a>;
+            },
+        },{
+            title: 'url / 方法',
+            key: 'url',
+            align: 'left',
+            render: function (text, record, index) {
+                return <div>
+                    <span className="mr-s">{`${record.url}`}</span>
+                    <Tag>{`${record.method}`}</Tag>
                 </div>;
             },
-        }, {
-            title: '国籍',
+        },{
+            title: '描述',
+            dataIndex: 'descritpion',
+            key: 'descritpion',
             align: 'center',
-            dataIndex: 'country',
-            width: '10%',
-            render: function (text, record, index) {
-                return <p>{record.country ? record.country : "-"}/{record.city ? record.city : "-"}</p>
-            }
-        }, {
-            title: '人数',
-            align: 'center',
-            dataIndex: 'population',
-            width: '5%',
-        }, {
-            title: '所属人/单位',
-            dataIndex: 'owner',
-            align: 'center',
-            // filters: [
-            //     {text: '教练', value: 'co'},
-            //     {text: '门将', value: 'gk'},
-            //     {text: '后卫', value: 'b'},
-            //     {text: '中场', value: 'm'},
-            //     {text: '前锋', value: 'f'},
-            // ],
-            width: '10%',
-            render: function (text, record, index) {
-                return <p>{record.owner ? record.owner : "-"}</p>
-            }
-        }, {
-            title: '创建日',
-            align: 'center',
-            dataIndex: 'birthdate',
-            width: '10%',
-            render: function (text, record, index) {
-                return <p>{record.birthdate ? parseTimeStringYMD(record.birthdate) : "-"}</p>
-            }
-        }, {
-            title: '口号',
-            align: 'center',
-            dataIndex: 'slogan',
-            width: '10%',
-            render: function (text, record, index) {
-                return <p>{record.slogan ? record.slogan : "-"}</p>
-            }
-        }, {
-            title: '备注',
-            align: 'center',
-            dataIndex: 'remark',
-            width: '20%',
-        }, {
-            title: <span>id</span>,
-            align: 'center',
-            width: '5%',
-            render: function (text, record, index) {
-                return <p className="cursor-hand" onClick={() => {
-                    copy(`${record.id}`);
-                    message.success('id已复制到剪贴板');
-                }}>{record.id ? `${record.id}` : "-"}</p>
-            }
         }
+            // {
+            //     title: '',
+            //     key: '操作',
+            //     width: 50,
+            //     fixed: 'right',
+            //     render: function (text, record, index) {
+            //         return <span><UserDropDownMenu record={record} onComplete={onComplete}/></span>
+            //     },
+            // }
         ];
         const columns_moblie = [{
-            title: '队名',
-            align: 'center',
-            dataIndex: 'name',
+            title: '名字',
+            key: 'permissionName',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
@@ -405,11 +353,9 @@ class FootBallTeamTable extends React.Component {
                 }, () => this.searchInput && this.searchInput.focus());
             },
             width: '100%',
+            align: 'center',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
-                    <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
-                </div>;
+                return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.roleName}</a>;
             },
         },
         ];
@@ -421,36 +367,16 @@ class FootBallTeamTable extends React.Component {
                            loading={this.state.loading}
                            onChange={this.handleTableChange}
                            bordered
-                           size="small"
                            title={() =>
                                <div>
-                                   <Tooltip title="刷新">
+                                   <Tooltip title="添加">
                                        <Button type="primary" shape="circle" icon="plus"
-                                               onClick={this.showTeamAddDialog}/>
+                                               onClick={this.showPermissionAddDialog}/>
                                    </Tooltip>
-                                   <Upload
-                                       className="ml-s"
-                                       accept=".docx"
-                                       action={uploaddocx_team}
-                                       listType="text"
-                                       withCredentials={true}
-                                       showUploadList={false}
-                                       onChange={this.handleUploadChange}
-                                       disabled={this.state.uploadloading}
-                                   >
-                                       {
-                                           <Tooltip title="导入">
-                                               <Button type="primary"
-                                                       shape="circle"
-                                                       icon={this.state.uploadloading ? "loading" : "import"}/>
-                                           </Tooltip>
-                                       }
-
-                                   </Upload>
                                    <Tooltip title="删除">
                                        <Button type="danger" shape="circle" icon="delete"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
-                                               onClick={this.handleDeleteMulti}>{selectedRowKeys.length}</Button>
+                                               onClick={this.handlePermissionsDelete}>{selectedRowKeys.length}</Button>
                                    </Tooltip>
                                    <Tooltip title="刷新">
                                        <Button type="primary" shape="circle" icon="reload" className="pull-right"
@@ -461,45 +387,30 @@ class FootBallTeamTable extends React.Component {
                            }
         />
             <Modal
-                width={600}
+                className={isMobile ? "top-n" : ""}
+                title="添加权限"
                 visible={this.state.dialogAddVisible}
-                title="添加球队"
-                okText="确定"
-                onCancel={this.handleTeamAddCancel}
-                destroyOnClose="true"
-                onOk={this.handleTeamAddCreate}
-            >
-                <AddDialog
-                    visible={this.state.dialogAddVisible}
-                    ref={this.saveTeamDialogRef}/>
-            </Modal>
-
-            <Modal
-                width={600}
-                visible={this.state.dialogModifyVisible}
-                title="编辑球队"
-                okText="确定"
-                onCancel={this.handleTeamModifyCancel}
-                destroyOnClose="true"
-                onOk={this.handleTeamModifyCreate}
                 footer={[
-                    <Button key="more" type="primary" className="pull-left">
-                        <Link to={
-                            "/football/footballTeam/" + this.state.record.id
-                        }>详细设置</Link>
-                    </Button>,
-                    <Button key="delete" type="danger" className="pull-left"
-                            onClick={this.handleDelete}>删除</Button>,
-                    <Button key="back" onClick={this.handleTeamModifyCancel}>取消</Button>,
-                    <Button key="submit" type="primary" onClick={this.handleTeamModifyCreate}>
-                        确定
-                    </Button>
+                    <Button key="back" onClick={this.handlePermissionAddCancel}>取消</Button>,
+                    <Button key="submit" type="primary" onClick={this.handlePermissionAddCreate}>确定</Button>,
                 ]}
-            >
-                <ModifyDialog
-                    visible={this.state.dialogModifyVisible}
-                    ref={this.saveTeamModifyDialogRef}
-                    record={this.state.record}/>
+                onCancel={this.handlePermissionAddCancel}>
+                <AddDialog visible={this.state.dialogAddVisible}
+                           ref={this.savePermissionAddDialogRef}/>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="修改权限"
+                visible={this.state.dialogModifyVisible}
+                footer={[
+                    <Button key="delete" type="danger" className="pull-left"
+                            onClick={this.handlePermissionDelete}>删除</Button>,
+                    <Button key="back" onClick={this.handlePermissionModifyCancel}>取消</Button>,
+                    <Button key="submit" type="primary" onClick={this.handlePermissionModifyCreate}>确定</Button>,
+                ]}
+                onCancel={this.handlePermissionModifyCancel}>
+                <ModifyDialog visible={this.state.dialogModifyVisible} record={this.state.record}
+                              ref={this.savePermissionModifyDialogRef}/>
             </Modal>
             <Modal
                 className={isMobile ? "top-n" : ""}
@@ -523,4 +434,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FootBallTeamTable);
+export default connect(mapStateToProps, mapDispatchToProps)(PermissionTable);

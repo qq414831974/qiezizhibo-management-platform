@@ -1,7 +1,13 @@
 export const menus = [
     { key: '/index', title: '首页', icon: 'home', },
     { key: '/user', title: '用户管理', icon: 'user', },
-    { key: '/role', title: '权限管理', icon: 'audit', },
+    {
+        key: '/role', title: '权限管理', icon: 'idcard',
+        sub: [
+            { key: '/role/role', title: '角色管理', icon: 'user', },
+            { key: '/role/permission', title: '权限管理', icon: 'audit', },
+        ],
+    },
     { key: '/area', title: '地区管理', icon: 'environment', },
     {
         key: '/football', title: '球赛管理', icon: 'dribbble',
@@ -18,7 +24,7 @@ export const menus = [
             { key: '/setting/banner', title: '轮播图', icon: 'picture', },
             { key: '/setting/bulletin', title: '公告栏', icon: 'notification', },
             { key: '/setting/scoreboard', title: '比分牌', icon: 'table', },
-            { key: '/setting/wechat', title: '小程序', icon: 'wechat', },
+            // { key: '/setting/wechat', title: '小程序', icon: 'wechat', },
         ],
     },
 ];

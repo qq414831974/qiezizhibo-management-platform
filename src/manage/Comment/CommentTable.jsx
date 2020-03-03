@@ -5,7 +5,6 @@ import {receiveData} from "../../action";
 import {message, Input, Icon, Tooltip, Button, Table, Modal, Avatar} from 'antd';
 import {
     getCommentByMatchId,
-    deleteCommentById,
     deleteCommentByIds,
     addCommentByMatchId,
     updateComment,
@@ -38,7 +37,7 @@ class CommentTable extends React.Component {
 
     componentDidMount() {
         this.fetch({
-            matchId: this.props.matchid,
+            matchId: this.props.matchId,
             pageSize: this.state.pagination.pageSize,
             pageNum: 1
         });
@@ -46,56 +45,57 @@ class CommentTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
-        getCommentByMatchId(params.matchId,params).then((data) => {
-            if (data && data.list) {
+        getCommentByMatchId(params).then((data) => {
+            if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 this.setState({
                     loading: false,
-                    data: data.list,
+                    data: data.data ? data.data.records : "",
                     pagination,
                     selectedRowKeys: [],
                     dialogModifyVisible: false,
                 });
             } else {
-                message.error('获取评论列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取评论列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
     refresh = () => {
         const pager = {...this.state.pagination};
         this.fetch({
-            matchId: this.props.matchid,
+            matchId: this.props.matchId,
             pageSize: pager.pageSize,
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     deleteComment = () => {
-        deleteCommentById(this.state.record.id).then((data) => {
+        deleteCommentByIds({id: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
     deleteComments = () => {
-        deleteCommentByIds(this.state.selectedRowKeys).then((data) => {
+        deleteCommentByIds({id: this.state.selectedRowKeys}).then((data) => {
             this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
@@ -105,18 +105,18 @@ class CommentTable extends React.Component {
     onSearch = () => {
         const {searchText} = this.state;
         const pager = {...this.state.pagination};
-        pager.filters = mergeJSON({content: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
         this.setState({
             filterDropdownVisible: false,
             filtered: !!searchText,
         });
         this.fetch({
-            matchId: this.props.matchid,
+            matchId: this.props.matchId,
             pageSize: pager.pageSize,
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     onSelectChange = (selectedRowKeys) => {
@@ -130,18 +130,33 @@ class CommentTable extends React.Component {
         pager.current = pagination.current;
         pager.sortField = sorter.field;
         pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
-        pager.filters = mergeJSON({name: this.state.searchText}, filters);
+        pager.filters = this.getTableFilters(pager);
         this.setState({
             pagination: pager,
         });
         this.fetch({
-            matchId: this.props.matchid,
+            matchId: this.props.matchId,
             pageSize: pager.pageSize,
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["content"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
     saveCommentAddDialogRef = (form) => {
         this.formAdd = form;
@@ -167,14 +182,14 @@ class CommentTable extends React.Component {
             if (err) {
                 return;
             }
-            addCommentByMatchId(this.props.matchid, values).then((data) => {
+            addCommentByMatchId({matchId: this.props.matchId, ...values}).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
-                        message.success(data.msg, 1);
+                        message.success(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -191,10 +206,10 @@ class CommentTable extends React.Component {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
-                        message.success(data.msg, 1);
+                        message.success(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -223,10 +238,10 @@ class CommentTable extends React.Component {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('取消审核失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('取消审核失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -235,10 +250,10 @@ class CommentTable extends React.Component {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('审核失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('审核失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -247,10 +262,10 @@ class CommentTable extends React.Component {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('禁用失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('禁用失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -259,10 +274,10 @@ class CommentTable extends React.Component {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('取消审核失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('取消审核失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -271,10 +286,10 @@ class CommentTable extends React.Component {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('审核失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('审核失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -283,16 +298,16 @@ class CommentTable extends React.Component {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('禁用失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('禁用失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
 
     render() {
-        if (!(this.props.matchid)) {
+        if (!(this.props.matchId)) {
             return <Redirect push to="/live"/>;
         }
         const onNameClick = this.onNameClick;
@@ -389,11 +404,11 @@ class CommentTable extends React.Component {
             },
         }, {
             title: '创建时间',
-            key: 'createdat',
+            key: 'createdAt',
             width: '10%',
             align: 'center',
             render: function (text, record, index) {
-                return (record.createdat ? parseTimeString(record.createdat) : "-")
+                return (record.createdAt ? parseTimeString(record.createdAt) : "-")
             }
         },
         ];
@@ -404,7 +419,7 @@ class CommentTable extends React.Component {
                 <div className="custom-filter-dropdown">
                     <Input
                         ref={ele => this.searchInput = ele}
-                        placeholder="Search name"
+                        placeholder="搜索"
                         value={this.state.searchText}
                         onChange={this.onInputChange}
                         onPressEnter={this.onSearch}
@@ -497,7 +512,7 @@ class CommentTable extends React.Component {
                     <Button key="submit" type="primary" onClick={this.handleCommentAddCreate}>确定</Button>,
                 ]}
                 onCancel={this.handleCommentAddCancel}>
-                <AddDialog visible={this.state.dialogAddVisible} matchid={this.props.matchid}
+                <AddDialog visible={this.state.dialogAddVisible} matchId={this.props.matchId}
                            ref={this.saveCommentAddDialogRef}/>
             </Modal>
             <Modal

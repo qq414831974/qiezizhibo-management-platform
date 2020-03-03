@@ -36,13 +36,13 @@ class BulletinModifyDialog extends React.Component {
 
     componentDidMount() {
         getAreasList().then((data) => {
-            if (data) {
+            if (data && data.code) {
                 this.setState({
                     areaLoading: false,
-                    areas: data,
+                    areas: data.data,
                 });
             } else {
-                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
         this.setState({curtain: this.props.record.curtain})
@@ -91,20 +91,23 @@ class BulletinModifyDialog extends React.Component {
         this.setState({
             listloading: true,
         });
-        getArticleList(params).then((data) => {
-            if (data) {
-                const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total_count : 0;
-                pagination.onChange = this.handleArticleListChange;
-                pagination.size = "small";
-                pagination.simple = true;
-                this.setState({
-                    articledata: data.item,
-                    listloading: false,
-                    pagination,
-                });
-            } else {
-                message.error('获取文章列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+        getArticleList(params).then((res) => {
+            if (res && res.code == 200) {
+                const data = res.data
+                if (data) {
+                    const pagination = {...this.state.pagination};
+                    pagination.total = data ? data.total_count : 0;
+                    pagination.onChange = this.handleArticleListChange;
+                    pagination.size = "small";
+                    pagination.simple = true;
+                    this.setState({
+                        articledata: data.item,
+                        listloading: false,
+                        pagination,
+                    });
+                } else {
+                    message.error('获取文章列表失败：' + (data ? data.result + "-" + data.message : data), 3);
+                }
             }
         })
     }

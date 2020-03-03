@@ -69,28 +69,34 @@ class FootballLeagueMatchDetailManagement extends React.Component {
 
     fetch = () => {
         getLeagueMatchById(this.props.match.params.id).then(data => {
-            this.setState({
-                data: data,
-                teamListloading: true,
-                teamSwitch: data.showleagueteam,
-                playerSwitch: data.showleagueplayer
-            });
-            if (data && data.id) {
-                getLeagueTeam({leagueId: data.id}).then(res => {
-                    this.setState({teamList: res, teamListloading: false});
-                })
+            if(data && data.code == 200  && data.data){
+                this.setState({
+                    data: data.data,
+                    teamListloading: true,
+                    teamSwitch: data.data.showleagueteam,
+                    playerSwitch: data.data.showleagueplayer
+                });
+                if (data.data && data.data.id) {
+                    getLeagueTeam({leagueId: data.data.id}).then(res => {
+                        if (res && res.code == 200) {
+                            this.setState({teamList: res.data, teamListloading: false});
+                        }
+                    })
+                }
             }
         });
         this.setState({playerListLoading: true});
         getLeaguePlayer({leagueId: this.props.match.params.id}).then(data => {
-            if (data) {
-                this.setState({playerList: data, playerListLoading: false});
+            if (data && data.code == 200) {
+                this.setState({playerList: data.data, playerListLoading: false});
             } else {
                 this.setState({playerListLoading: false});
             }
         });
         getLeagueReport(this.props.match.params.id).then(data => {
-            this.setState({reportUrl: data.url});
+            if(data && data.code == 200){
+                this.setState({reportUrl: data.data.url});
+            }
         })
     }
     refresh = () => {
@@ -98,7 +104,9 @@ class FootballLeagueMatchDetailManagement extends React.Component {
     }
     refreshReport = () => {
         getLeagueReport(this.props.match.params.id).then(data => {
-            this.setState({reportUrl: data.url});
+            if(data && data.code == 200){
+                this.setState({reportUrl: data.data.url});
+            }
         })
     }
     onAddTeamClick = (e) => {
@@ -125,10 +133,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                         this.refresh();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -147,10 +155,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                         this.refresh();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -169,10 +177,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                         this.refresh();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -191,10 +199,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                         this.refresh();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -234,8 +242,9 @@ class FootballLeagueMatchDetailManagement extends React.Component {
     handleDeletePlayerOK = () => {
         this.state.currentPlayer &&
         delPlayerInLeague({
-            leagueId: this.state.currentPlayer.leaguematchid,
-            playerId: this.state.currentPlayer.playerid
+            leagueId: this.state.currentPlayer.leaguematchId,
+            teamId: this.state.currentPlayer.teamId,
+            playerId: this.state.currentPlayer.playerId
         }).then(data => {
             this.setState({deleteVisible: false, modifyPlayerVisible: false});
             if (data && data.code == 200) {
@@ -243,10 +252,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -262,10 +271,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.success(data.msg, 1);
+                    message.success(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -282,10 +291,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                         sortradiovalue: e.target.value,
                     });
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -297,10 +306,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                     message.success('修改成功', 1);
                     this.setState({teamSwitch: e});
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -312,10 +321,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                     message.success('修改成功', 1);
                     this.setState({playerSwitch: e});
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -335,15 +344,15 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                         loading={this.state.teamListloading}
                         renderItem={item => (<div className="cell-hover pa-s cursor-hand"
                                                   onClick={this.onTeamClick.bind(this, item)}>
-                            <Avatar size="large" src={item.team.headimg ? item.team.headimg : logo}/>
+                            <Avatar size="large" src={item.team.headImg ? item.team.headImg : logo}/>
                             <span className="ml-s">{item.team.name}</span>
                             <div className="pull-right pa-s">
                                 <span
-                                    className="pl-s pr-s">{item.matchtotal ? item.matchtotal : 0}</span>
+                                    className="pl-s pr-s">{item.matchTotal ? item.matchTotal : 0}</span>
                                 <span
-                                    className="pl-s pr-s">{`${item.matchwin ? item.matchwin : 0}/${item.matchdraw ? item.matchdraw : 0}/${item.matchlost ? item.matchlost : 0}`}</span>
+                                    className="pl-s pr-s">{`${item.matchWin ? item.matchWin : 0}/${item.matchDraw ? item.matchDraw : 0}/${item.matchLost ? item.matchLost : 0}`}</span>
                                 <span
-                                    className="pl-s pr-s">{`${item.totalgoal ? item.totalgoal : 0}/${item.totalgoallost ? item.totalgoallost : 0}`}</span>
+                                    className="pl-s pr-s">{`${item.totalGoal ? item.totalGoal : 0}/${item.totalGoalLost ? item.totalGoalLost : 0}`}</span>
                                 <span className="pl-s pr-s">{item.ranks ? item.ranks : 0}</span>
                             </div>
                         </div>)}
@@ -360,10 +369,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                     this.refresh();
                     message.success('生成成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('生成失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('生成失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -375,26 +384,26 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                     this.refresh();
                     message.success('生成成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('生成失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('生成失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
     genLeagueReport = () => {
         message.info("正在生成，请稍后", 10)
         genLeagueReport(this.state.data.id).then(data => {
-            if (data) {
-                if (data.id) {
+            if (data && data.code == 200) {
+                if (data.data && data.data.id) {
                     this.refreshReport();
                     message.destroy();
                     message.success('生成成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('生成失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('生成失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         })
     }
@@ -414,13 +423,13 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                 <div className="dark-white pa-s">
                     <div className="w-full center">
                         <Avatar size="large"
-                                src={this.state.data ? (this.state.data.headimg ? this.state.data.headimg : logo) : logo}/>
+                                src={this.state.data ? (this.state.data.headImg ? this.state.data.headImg : logo) : logo}/>
                     </div>
                     <div className="w-full center">
                         <span style={{fontSize: 18}}>{this.state.data ? this.state.data.name : "无联赛名"}</span>
                     </div>
                     <div className="w-full center">
-                        <span>{this.state.data ? `${this.state.data.datebegin} - ${this.state.data.dateend}` : ""}</span>
+                        <span>{this.state.data ? `${this.state.data.dateBegin} - ${this.state.data.dateEnd}` : ""}</span>
                     </div>
                     <div className="w-full center">
                         <Button type="primary" onClick={this.genLeagueReport}>一键生成海报图</Button>
@@ -493,11 +502,11 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                                                               onClick={this.onPlayerClick.bind(this, item)}>
                                         <Col span={8}>
                                             <Avatar size="large"
-                                                    src={item.player.headimg ? item.player.headimg : avatar}/>
+                                                    src={item.player.headImg ? item.player.headImg : avatar}/>
                                             <span className="ml-s">{item.player.name}</span>
                                         </Col>
                                         <Col span={8}>
-                                            <Avatar size="large" src={item.team.headimg ? item.team.headimg : logo}/>
+                                            <Avatar size="large" src={item.team.headImg ? item.team.headImg : logo}/>
                                             <span className="ml-s">{item.team.name}</span>
                                         </Col>
                                         <Col span={8}>

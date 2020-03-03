@@ -14,6 +14,7 @@ import FootBallLeagueMatchManagement from "../manage/Football/League/FootBallLea
 import FootBallLeagueMatchSeriesManagement from "../manage/Football/League/FootBallLeagueMatchSeriesManagement";
 import FootballLeagueMatchDetailManagement from "../manage/Football/League/FootballLeagueMatchDetailManagement";
 import RoleManagement from "../manage/Role/RoleManagement";
+import PermissionManagement from "../manage/Permission/PermissionManagement";
 import AreasManagement from "../manage/Areas/AreasManagement";
 import CommentManagement from "../manage/Comment/CommentManagement";
 import Dashboard from "../manage/Dashboard/Dashboard";
@@ -39,7 +40,8 @@ export default class CRouter extends Component {
             <Switch>
                 <Route exact path="/index" component={Dashboard}/>
                 <Route exact path="/user" component={UserManagement}/>
-                <Route exact path="/role" component={RoleManagement}/>
+                <Route exact path="/role/role" component={RoleManagement}/>
+                <Route exact path="/role/permission" component={PermissionManagement}/>
                 <Route exact path="/area" component={AreasManagement}/>
                 <Route exact path="/football/footballPlayer" component={FootBallPlayerManagement}/>
                 <Route exact path="/football/footballTeam" component={FootBallTeamManagement}/>

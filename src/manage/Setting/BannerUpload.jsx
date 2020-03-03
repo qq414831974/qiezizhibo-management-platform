@@ -4,7 +4,7 @@ import BreadcrumbCustom from '../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import {getAreasList, getConfig, setConfig, upload} from "../../axios";
+import {getAreasList, updateBanner, setBanner, upload} from "../../axios";
 import {Radio} from "antd/lib/index";
 
 const Option = Select.Option;
@@ -50,14 +50,17 @@ class BannerUpload extends React.Component {
         const url = this.props.data ? this.props.data.url : null;
         const province = this.props.data ? this.props.data.province : null;
         const areatype = this.props.data ? this.props.data.areatype : null;
-        setConfig({
+        let func = setBanner;
+        if (this.props.data && this.props.data.id) {
+            func = updateBanner;
+        }
+        func({
             id: this.props.data ? this.props.data.id : null,
-            description: this.props.index,
-            value: this.state.imgUrl ? this.state.imgUrl : img,
-            remark: this.state.url ? this.state.url : url,
+            position: this.props.index,
+            img: this.state.imgUrl ? this.state.imgUrl : img,
+            url: this.state.url ? this.state.url : url,
             province: this.state.province ? (this.state.province == "无" ? null : this.state.province) : province,
             areatype: this.state.areatype != null ? this.state.areatype : areatype,
-            code: "banner"
         }).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {

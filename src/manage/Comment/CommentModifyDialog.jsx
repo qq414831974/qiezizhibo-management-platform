@@ -45,13 +45,13 @@ class CommentModifyDialog extends React.Component {
     fetch = () => {
         this.setState({loading: true});
         getAllDefaultUser().then((data) => {
-            if (data && data.length >= 0) {
+            if (data && data.code ==200 && data.data) {
                 this.setState({
-                    data: data,
+                    data: data.data,
                     loading: false,
                 });
             } else {
-                message.error('获取预设用户失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取预设用户失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -63,7 +63,7 @@ class CommentModifyDialog extends React.Component {
             if (this.props.record.user && (this.props.record.user.userNo == item.userNo)) {
                 flag = false;
             }
-            dom.push(<Option value={item.userNo} key={"userno-" + item.userNo}>
+            dom.push(<Option value={item.userNo} key={"userNo-" + item.userNo}>
                 <div className="inline">
                     <Avatar className="inline-block" src={item.avatar}/>
                     <span className="inline-block ml-s mt-n mb-n">{item.name}</span>
@@ -72,7 +72,7 @@ class CommentModifyDialog extends React.Component {
         });
         if (this.props.record.user && flag) {
             const user = this.props.record.user;
-            dom.push(<Option value={user.userNo} key={"userno-" + user.userNo}>
+            dom.push(<Option value={user.userNo} key={"userNo-" + user.userNo}>
                 <div className="inline">
                     <Avatar className="inline-block" src={user.avatar}/>
                     <span className="inline-block ml-s mt-n mb-n">{user.name}</span>
@@ -89,11 +89,11 @@ class CommentModifyDialog extends React.Component {
             visible ?
                 <Form>
                     <FormItem {...formItemLayout} label="用户" className="bs-form-item-nowrap">
-                        {getFieldDecorator('userno', {
+                        {getFieldDecorator('userNo', {
                             initialValue: record.user ? record.user.userNo : null,
                         })(
                             <Select disabled={this.state.loading} size="large" style={{minWidth: 150}}>
-                                <Option value={null} key={"userno-" + 0}>匿名</Option>
+                                <Option value={null} key={"userNo-" + 0}>匿名</Option>
                                 {this.getUserSelectDom()}
                             </Select>
                         )}

@@ -1,22 +1,23 @@
 import React from 'react';
-import {Row, Col, Card} from 'antd';
+import { Row, Col, Card,Button } from 'antd';
+import RoleTable from './PermissionTable';
 import BreadcrumbCustom from '../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import CommentTable from "../Comment/CommentTable";
 
 
-class CommentManagement extends React.Component {
+
+class PermissionManagement extends React.Component {
     render() {
         return (
             <div className="gutter-example">
-                <BreadcrumbCustom first="评论管理"/>
+                <BreadcrumbCustom first="权限管理" />
                 <Row gutter={16}>
                     <Col className="gutter-row">
                         <div className="gutter-box">
                             <Card bordered={false}>
-                                <CommentTable matchId={this.props.match.params.id}/>
+                                <RoleTable/>
                             </Card>
                         </div>
                     </Col>
@@ -25,7 +26,6 @@ class CommentManagement extends React.Component {
         );
     }
 }
-
 const mapStateToProps = state => {
     const {auth = {data: {}}, responsive = {data: {}}} = state.httpData;
     return {auth, responsive};
@@ -34,4 +34,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CommentManagement);
+export default connect(mapStateToProps, mapDispatchToProps)(PermissionManagement);

@@ -5,6 +5,7 @@ import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 import echarts from 'echarts';
 import {getVisit} from "../../axios";
+import {message} from "antd";
 
 class EchartsViews extends React.Component {
     state = {
@@ -20,13 +21,15 @@ class EchartsViews extends React.Component {
         this.setState({
             loading: true,
         });
-        getVisit().then((data) => {
-            if (data) {
+        getVisit().then((res) => {
+            if (res && res.code == 200) {
                 this.setState({
-                    value: this.getValue(data),
-                    key: this.getKey(data),
+                    value: this.getValue(res.data),
+                    key: this.getKey(res.data),
                     loading: false,
                 });
+            }else{
+                message.error('获取访问数据失败：' + (res ? (res.code + ":" + res.message) : res), 3);
             }
         });
     }

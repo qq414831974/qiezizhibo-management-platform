@@ -13,7 +13,7 @@ import DocumentTitle from 'react-document-title';
 
 moment.locale('zh-cn');
 const {Content, Footer} = Layout;
-document.domain = "manage.qiezizhibo.com";
+// document.domain = "manage.qiezizhibo.com";
 
 class App extends Component {
     state = {
@@ -91,7 +91,7 @@ class App extends Component {
                                 <Routes auth={auth}/>
                             </Content>
                             <Footer style={{textAlign: 'center'}}>
-                                Qiezizhibo-Admin ©2018
+                                Qiezizhibo-Admin ©2020
                             </Footer>
                         </Layout>
                     }

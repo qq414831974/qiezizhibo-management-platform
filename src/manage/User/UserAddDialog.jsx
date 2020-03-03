@@ -43,20 +43,20 @@ class UserAddDialog extends React.Component {
     fetch = () => {
         this.setState({loading: true});
         getAllRoles({pageSize: 100, pageNum: 1,}).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200 && data.data.records) {
                 this.setState({
-                    data: data.list,
+                    data: data.data.records,
                     loading: false,
                 });
             } else {
-                message.error('获取权限信息失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取权限信息失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
     getRoleOption = () => {
         let dom = [];
         this.state.data && this.state.data.forEach((item, index) => {
-            dom.push(<Option value={item.roleCode} data={item} key={item.roleCode}>
+            dom.push(<Option value={item.id} data={item} key={item.roleCode}>
                 <Tooltip placement="rightTop" title={
                     this.getRoleTip(item)
                 }>
@@ -68,8 +68,8 @@ class UserAddDialog extends React.Component {
     }
     getRoleTip = (param) => {
         let dom = [];
-        param.menuList && param.menuList.forEach((item, index) => {
-            dom.push(<p key={item.roleCode + item.menuCode}>{item.name}</p>);
+        param.permissions && param.permissions.forEach((item, index) => {
+            dom.push(<p key={item.id + item.permissionCode}>{item.permissionName}</p>);
         });
         return <div>{dom}</div>;
     }
@@ -151,10 +151,22 @@ class UserAddDialog extends React.Component {
                         )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="权限" className="bs-form-item-nowrap">
-                        {getFieldDecorator('role.roleCode', {
+                        {getFieldDecorator('role', {
                             rules: [{required: true, message: '请选择权限!'}],
                         })(
-                            <Select onSelect={onRoleSelect} disabled={this.state.loading}>
+                            // <Select onSelect={onRoleSelect} disabled={this.state.loading}>
+                            //     {this.state.data ? getRoleOption() : null}
+                            // </Select>
+                            <Select
+                                showSearch
+                                placeholder="请选择"
+                                defaultActiveFirstOption={false}
+                                showArrow={false}
+                                filterOption={false}
+                                notFoundContent={null}
+                                mode="multiple"
+                                loading={this.state.loading}
+                            >
                                 {this.state.data ? getRoleOption() : null}
                             </Select>
                         )}

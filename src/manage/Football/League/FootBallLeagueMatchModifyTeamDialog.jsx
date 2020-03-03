@@ -42,18 +42,18 @@ class FootBallLeagueMatchModifyTeamDialog extends React.Component {
         this.setState({
             loading: true,
         });
-        getAllTeams({pageSize: 20, pageNum: pageNum, filter: {name: searchText}}).then((data) => {
-            if (data && data.list) {
+        getAllTeams({pageSize: 20, pageNum: pageNum, name: searchText}).then((data) => {
+            if (data && data.code == 200 && data.data.records) {
                 this.setState({
-                    data: pageNum == 1 ? (data ? data.list : []) :
-                        (data ? this.state.data.concat(data.list) : []),
+                    data: pageNum == 1 ? (data.data ? data.data.records : []) :
+                        (data.data ? this.state.data.concat(data.data.records) : []),
                     loading: false,
-                    pageNum: data.pageNum,
-                    pageSize: data.pageSize,
-                    pageTotal: data.total,
+                    pageNum: data.data.current,
+                    pageSize: data.data.size,
+                    pageTotal: data.data.total,
                 });
             } else {
-                message.error('获取队伍列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取队伍列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -101,34 +101,34 @@ class FootBallLeagueMatchModifyTeamDialog extends React.Component {
     }
     onInputChange = (type, e) => {
         switch (type) {
-            case 'matchwin':
-                this.setState({matchwin: e.target.value});
+            case 'matchWin':
+                this.setState({matchWin: e.target.value});
                 this.getRank(e.target.value, null, null);
                 break;
-            case 'matchlost':
-                this.setState({matchlost: e.target.value});
+            case 'matchLost':
+                this.setState({matchLost: e.target.value});
                 this.getRank(null, e.target.value, null);
                 break;
-            case 'matchdraw':
-                this.setState({matchdraw: e.target.value});
+            case 'matchDraw':
+                this.setState({matchDraw: e.target.value});
                 this.getRank(null, null, e.target.value);
                 break;
         }
     }
     getRank = (win, lost, draw) => {
         const {form} = this.props;
-        let matchwin = win;
-        let matchdraw = draw;
-        if (matchwin == null) {
-            matchwin = this.state.matchwin ? this.state.matchwin : form.getFieldValue("matchwin");
+        let matchWin = win;
+        let matchDraw = draw;
+        if (matchWin == null) {
+            matchWin = this.state.matchWin ? this.state.matchWin : form.getFieldValue("matchWin");
         }
-        if (matchdraw == null) {
-            matchdraw = this.state.matchdraw ? this.state.matchdraw : form.getFieldValue("matchdraw");
+        if (matchDraw == null) {
+            matchDraw = this.state.matchDraw ? this.state.matchDraw : form.getFieldValue("matchDraw");
         }
-        if (matchwin == null || matchdraw == null) {
+        if (matchWin == null || matchDraw == null) {
             return;
         }
-        const rank = matchwin * 3 + matchdraw * 1;
+        const rank = matchWin * 3 + matchDraw * 1;
         this.setState({rank: rank});
         form.setFieldsValue({rank: rank});
     }
@@ -159,45 +159,45 @@ class FootBallLeagueMatchModifyTeamDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} className="bs-form-item" label="总进球">
-                            {getFieldDecorator('totalgoal', {
-                                initialValue: this.props.record.totalgoal,
+                            {getFieldDecorator('totalGoal', {
+                                initialValue: this.props.record.totalGoal,
                             })(
                                 <Input placeholder="总进球"/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} className="bs-form-item" label="总失球">
-                            {getFieldDecorator('totalgoallost', {
-                                initialValue: this.props.record.totalgoallost,
+                            {getFieldDecorator('totalGoalLost', {
+                                initialValue: this.props.record.totalGoalLost,
                             })(
                                 <Input placeholder="总失球"/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} className="bs-form-item" label="总场次">
-                            {getFieldDecorator('matchtotal', {
-                                initialValue: this.props.record.matchtotal,
+                            {getFieldDecorator('matchTotal', {
+                                initialValue: this.props.record.matchTotal,
                             })(
                                 <Input placeholder="总场次"/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} className="bs-form-item" label="胜">
-                            {getFieldDecorator('matchwin', {
-                                initialValue: this.props.record.matchwin,
+                            {getFieldDecorator('matchWin', {
+                                initialValue: this.props.record.matchWin,
                             })(
-                                <Input placeholder="胜" onChange={this.onInputChange.bind(this, "matchwin")}/>
+                                <Input placeholder="胜" onChange={this.onInputChange.bind(this, "matchWin")}/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} className="bs-form-item" label="平">
-                            {getFieldDecorator('matchdraw', {
-                                initialValue: this.props.record.matchdraw,
+                            {getFieldDecorator('matchDraw', {
+                                initialValue: this.props.record.matchDraw,
                             })(
-                                <Input placeholder="平" onChange={this.onInputChange.bind(this, "matchdraw")}/>
+                                <Input placeholder="平" onChange={this.onInputChange.bind(this, "matchDraw")}/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} className="bs-form-item" label="负">
-                            {getFieldDecorator('matchlost', {
-                                initialValue: this.props.record.matchlost,
+                            {getFieldDecorator('matchLost', {
+                                initialValue: this.props.record.matchLost,
                             })(
-                                <Input placeholder="负" onChange={this.onInputChange.bind(this, "matchlost")}/>
+                                <Input placeholder="负" onChange={this.onInputChange.bind(this, "matchLost")}/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} className="bs-form-item" label="积分">
@@ -215,15 +215,15 @@ class FootBallLeagueMatchModifyTeamDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} style={{margin: 0}}>
-                            {getFieldDecorator('teamid', {
-                                initialValue: this.props.record.teamid,
+                            {getFieldDecorator('teamId', {
+                                initialValue: this.props.record.teamId,
                             })(
                                 <Input hidden={true}/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} style={{margin: 0}}>
-                            {getFieldDecorator('leaguematchid', {
-                                initialValue: this.props.record.leaguematchid,
+                            {getFieldDecorator('leaguematchId', {
+                                initialValue: this.props.record.leaguematchId,
                             })(
                                 <Input hidden={true}/>
                             )}

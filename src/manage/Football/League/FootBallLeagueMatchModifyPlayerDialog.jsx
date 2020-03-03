@@ -36,23 +36,23 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
 
     componentDidMount() {
         this.fetchTeam();
-        this.setState({currentTeam: this.props.record.teamid});
+        this.setState({currentTeam: this.props.record.teamId});
     }
 
     fetchTeam = () => {
         this.setState({
             loading: true,
         });
-        this.props.record && getTeamInLeague({leagueId: this.props.record.leaguematchid}).then((data) => {
-            if (data) {
+        this.props.record && getTeamInLeague(this.props.record.leaguematchId).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    data: data,
+                    data: data.data,
                     loading: false,
                     playerSelectDisable: false,
                 });
                 this.fetchPlayer();
             } else {
-                message.error('获取队伍列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取队伍列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -64,19 +64,19 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
             pageSize: 100,
             pageNum: 1,
         }).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 this.setState({
-                    playerdata: data ? data.list : "",
+                    playerdata: data.data ? data.data.records : "",
                     playerloading: false,
                 });
             } else {
-                message.error('获取队员列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取队员列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
     onTeamChange = (e) => {
         this.setState({currentTeam: e, playerSelectDisable: false});
-        this.props.form.setFieldsValue({playerid: null})
+        this.props.form.setFieldsValue({playerId: null})
     }
     onPlayerFocus = () => {
         this.fetchPlayer();
@@ -89,7 +89,7 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
         const options = this.state.data.map(d => <Option style={{height: 50}} key={d.id} value={d.id}>
             <Tooltip title={d.remark}>
                 <div>
-                    <Avatar src={d.headimg}/>
+                    <Avatar src={d.headImg}/>
                     <span className="ml-s">{d.name}</span>
                 </div>
             </Tooltip>
@@ -97,8 +97,8 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
         const options_player = this.state.playerdata.map(d => <Option style={{height: 50}} key={d.id} value={d.id}>
             <Tooltip title={d.remark}>
                 <div>
-                    <Avatar src={d.headimg}/>
-                    <span className="ml-s">{`${d.name}(${d.shirtnum}号)`}</span>
+                    <Avatar src={d.headImg}/>
+                    <span className="ml-s">{`${d.name}(${d.shirtNum}号)`}</span>
                 </div>
             </Tooltip>
         </Option>);
@@ -107,9 +107,9 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
                 <div>
                     <Form>
                         <FormItem {...formItemLayout} label="队伍" className="bs-form-item">
-                            {getFieldDecorator('teamid', {
+                            {getFieldDecorator('teamId', {
                                 rules: [{required: true, message: '请选择!'}],
-                                initialValue: this.props.record.teamid
+                                initialValue: this.props.record.teamId
                             })(
                                 <Select
                                     showSearch
@@ -126,9 +126,9 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="球员" className="bs-form-item">
-                            {getFieldDecorator('playerid', {
+                            {getFieldDecorator('playerId', {
                                 rules: [{required: true, message: '请选择!'}],
-                                initialValue: this.props.record.playerid
+                                initialValue: this.props.record.playerId
                             })(
                                 <Select
                                     showSearch
@@ -153,15 +153,15 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="黄牌" className="bs-form-item">
-                            {getFieldDecorator('yellowcard', {
-                                initialValue: this.props.record.yellowcard
+                            {getFieldDecorator('yellowCard', {
+                                initialValue: this.props.record.yellowCard
                             })(
                                 <InputNumber placeholder="黄牌"/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="红牌" className="bs-form-item">
-                            {getFieldDecorator('redcard', {
-                                initialValue: this.props.record.redcard
+                            {getFieldDecorator('redCard', {
+                                initialValue: this.props.record.redCard
                             })(
                                 <InputNumber placeholder="红牌"/>
                             )}
@@ -188,8 +188,8 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="射正" className="bs-form-item">
-                            {getFieldDecorator('shootright', {
-                                initialValue: this.props.record.shootright
+                            {getFieldDecorator('shootRight', {
+                                initialValue: this.props.record.shootRight
                             })(
                                 <InputNumber placeholder="射正"/>
                             )}
@@ -237,8 +237,8 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem style={{margin: 0}}>
-                            {getFieldDecorator('leaguematchid', {
-                                initialValue: this.props.record.leaguematchid,
+                            {getFieldDecorator('leaguematchId', {
+                                initialValue: this.props.record.leaguematchId,
                             })(
                                 <Input hidden={true}/>
                             )}

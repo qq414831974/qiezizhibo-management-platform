@@ -23,13 +23,13 @@ class AreasTable extends React.Component {
     fetch = () => {
         this.setState({loading: true});
         getAreasList().then((data) => {
-            if (data) {
+            if (data && data.code == 200) {
                 this.setState({
                     loading: false,
-                    data: data,
+                    data: data.data,
                 });
             } else {
-                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取地区列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -37,17 +37,17 @@ class AreasTable extends React.Component {
         this.fetch();
     }
     deleteArea = () => {
-        delAreaById(this.state.record.id).then((data) => {
+        delAreaById({id: this.state.record.id}).then((data) => {
             this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
@@ -77,7 +77,7 @@ class AreasTable extends React.Component {
                         message.success('添加成功', 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -98,12 +98,6 @@ class AreasTable extends React.Component {
         const isMobile = this.props.responsive.data.isMobile;
 
         const columns = [{
-            title: 'id',
-            key: 'id',
-            dataIndex: 'id',
-            width: '10%',
-            align: 'center',
-        }, {
             title: '省份',
             dataIndex: 'province',
             key: 'province',

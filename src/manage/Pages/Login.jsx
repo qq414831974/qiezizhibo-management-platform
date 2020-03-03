@@ -4,11 +4,11 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {fetchData, receiveData} from '../../action/index';
 import logo from '../../static/logo.png';
-import {login, prelogin} from "../../axios/index";
+import {login, getAuthUserDetail, getUserInfo} from "../../axios/index";
 import {message} from "antd/lib/index";
 import moment from 'moment'
 import 'moment/locale/zh-cn';
-import {getUser, setToken, setUser, removeUser} from "../../utils/tools";
+import {getUser, setToken, setUser, setRole, getRole, removeToken, removeUser, removeRole} from "../../utils/tools";
 import DocumentTitle from 'react-document-title';
 
 moment.locale('zh-cn');
@@ -21,44 +21,50 @@ class Login extends React.Component {
     };
 
     componentWillMount() {
-        const {receiveData} = this.props;
-        receiveData(null, 'auth');
         var meta = document.getElementsByTagName('meta');
         meta["viewport"].setAttribute('content', "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0");
     }
 
-    componentWillReceiveProps(nextProps) {
-        const {auth: nextAuth = {}} = nextProps;
-        const {history} = this.props;
-        // 判断是否登陆
-        if (nextAuth.data) {
-            setUser(nextAuth.data);
-            if (nextAuth.data&&nextAuth.data.role&&nextAuth.data.role.roleCode=='role-e2063edfcb024e0dbc78fc592d2bcf46') {
-                // history.push('/anchor');
-                window.location = "https://manage.qiezizhibo.com/anchor/";
-            } else {
-                history.push('/index');
-            }
+    toHome = () => {
+        const {history} = this.props
+        const roles = getRole();
+        if (roles && roles.includes("")) {
+            window.location = "https://manage.qiezizhibo.com/anchor/";
+        } else {
+            history.push('/index');
         }
     }
 
+    getUserInfo = (remember) => {
+        getAuthUserDetail().then(userAuth => {
+            if (userAuth && userAuth.code == 200 && userAuth.data.user) {
+                const authData = userAuth.data.user;
+                getUserInfo({id: authData.username, type: "userName"}).then(userData => {
+                    if (userData && userData.code == 200) {
+                        setUser({rememberMe: remember, ...userData.data})
+                        setRole(userAuth.data.authorities)
+                        this.toHome();
+                    } else {
+                        message.error('获取用户信息失败：' + (userData ? userData.code + ":" + userData.message : userData), 3);
+                    }
+                })
+            } else {
+                message.error('获取用户信息失败：' + (userAuth ? userAuth.code + ":" + userAuth.message : userAuth), 3);
+            }
+        })
+    }
+
     handleSubmit = (e) => {
-        const {receiveData} = this.props;
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 login(values).then((logindata) => {
                     this.setState({loginLoading: true})
                     if (logindata && logindata.code == 200) {
-                        if (values.rememberMe) {
-                            setUser(logindata.data);
-                        } else {
-                            removeUser();
-                        }
-                        setToken(logindata.msg);
-                        receiveData(logindata.data, 'auth');
+                        setToken(logindata.data);
+                        this.getUserInfo(values.rememberMe);
                     } else {
-                        message.error('登陆失败：' + (logindata ? logindata.code + ":" + logindata.msg : logindata), 3);
+                        message.error('登陆失败：' + (logindata ? logindata.code + ":" + logindata.message : logindata), 3);
                     }
                     this.setState({loginLoading: false})
                 });

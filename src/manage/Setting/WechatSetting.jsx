@@ -5,8 +5,6 @@ import BannerUpload from './BannerUpload';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import {getConfig, setConfig, getScoreboard, setScoreboard, deleteScoreboard, upload, getAreasList} from "../../axios";
-import ScoreBoard from './ScoreBoard';
 
 class WechatSetting extends React.Component {
     state = {}
@@ -16,32 +14,32 @@ class WechatSetting extends React.Component {
     }
 
     fetch = () => {
-        getConfig().then((data) => {
-            if (data) {
-                this.setState({hotloader: data.config});
-            } else {
-                message.error('获取系统配置失败：' + (data ? data.result + "-" + data.msg : data), 3);
-            }
-        });
+        // getConfig().then((data) => {
+        //     if (data) {
+        //         this.setState({hotloader: data.config});
+        //     } else {
+        //         message.error('获取系统配置失败：' + (data ? data.result + "-" + data.msg : data), 3);
+        //     }
+        // });
     }
     onInputChange = (e) => {
         this.setState({hotloader: e.target.value});
     }
     onWxSubmitClick = () => {
-        setConfig({
-            value: this.state.hotloader,
-            code: "hotloader"
-        }).then((data) => {
-            if (data && data.code == 200) {
-                if (data.data) {
-                    message.success(`微信配置保存成功`, 1);
-                } else {
-                    message.warn(data.msg, 1);
-                }
-            } else {
-                message.error(`微信配置保存失败` + (data ? data.code + ":" + data.msg : data), 3);
-            }
-        });
+        // setConfig({
+        //     value: this.state.hotloader,
+        //     code: "hotloader"
+        // }).then((data) => {
+        //     if (data && data.code == 200) {
+        //         if (data.data) {
+        //             message.success(`微信配置保存成功`, 1);
+        //         } else {
+        //             message.warn(data.msg, 1);
+        //         }
+        //     } else {
+        //         message.error(`微信配置保存失败` + (data ? data.code + ":" + data.msg : data), 3);
+        //     }
+        // });
     }
     refresh = () => {
         this.fetch();

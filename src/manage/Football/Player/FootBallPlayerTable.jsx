@@ -3,7 +3,7 @@ import {Table, Input, Button, Icon, Modal, Tag, Tooltip} from 'antd';
 import {getAllPlayers} from '../../../axios/index';
 import {mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
-import {delPlayerByIds, updatePlayerById, createPlayer, delPlayerById} from "../../../axios";
+import {delPlayerByIds, updatePlayerById, createPlayer} from "../../../axios";
 import {Form, message, notification} from "antd/lib/index";
 import FootBallPlayerAddDialog from "../Player/FootBallPlayerAddDialog"
 import FootBallPlayerModifyDialog from "../Player/FootBallPlayerModifiyDialog"
@@ -52,17 +52,18 @@ class FootBallPlayerTable extends React.Component {
     fetch = (params = {}) => {
         this.setState({loading: true});
         getAllPlayers(params).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 this.setState({
                     loading: false,
-                    data: data ? data.list : "",
+                    data: data.data ? data.data.records : "",
                     pagination,
                     selectedRowKeys: [],
                 });
             } else {
-                message.error('获取球员列表失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('获取球员列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -73,36 +74,36 @@ class FootBallPlayerTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     deleteMulti = () => {
-        delPlayerByIds(this.state.selectedRowKeys).then((data) => {
+        delPlayerByIds({id: this.state.selectedRowKeys}).then((data) => {
             this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
     delete = () => {
-        delPlayerById(this.state.record.id).then((data) => {
+        delPlayerByIds({id: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     };
@@ -119,7 +120,7 @@ class FootBallPlayerTable extends React.Component {
     onSearch = () => {
         const {searchText} = this.state;
         const pager = {...this.state.pagination};
-        pager.filters = mergeJSON({name: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
         pager.current = 1;
         this.setState({
             filterDropdownVisible: false,
@@ -131,7 +132,7 @@ class FootBallPlayerTable extends React.Component {
             pageNum: 1,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     handleTableChange = (pagination, filters, sorter) => {
@@ -139,7 +140,7 @@ class FootBallPlayerTable extends React.Component {
         pager.current = pagination.current;
         pager.sortField = sorter.field;
         pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
-        pager.filters = mergeJSON({name: this.state.searchText}, filters);
+        pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
         });
@@ -148,8 +149,23 @@ class FootBallPlayerTable extends React.Component {
             pageNum: pager.current,
             sortField: pager.sortField,
             sortOrder: pager.sortOrder,
-            filter: pager.filters,
+            ...pager.filters,
         });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["name"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
     showPlayerAddDialog = () => {
         this.setState({dialogAddVisible: true});
@@ -176,9 +192,9 @@ class FootBallPlayerTable extends React.Component {
                 return;
             }
             values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["careertime"] = values["careertime"] ? values["careertime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["retiretime"] = values["retiretime"] ? values["retiretime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deletetime"] = values["deletetime"] ? values["deletetime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["careerTime"] = values["careerTime"] ? values["careerTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["retireTime"] = values["retireTime"] ? values["retireTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             createPlayer(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -186,7 +202,7 @@ class FootBallPlayerTable extends React.Component {
                         message.success('添加成功', 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -200,19 +216,19 @@ class FootBallPlayerTable extends React.Component {
                 return;
             }
             values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["careertime"] = values["careertime"] ? values["careertime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["retiretime"] = values["retiretime"] ? values["retiretime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deletetime"] = values["deletetime"] ? values["deletetime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["careerTime"] = values["careerTime"] ? values["careerTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["retireTime"] = values["retireTime"] ? values["retireTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             updatePlayerById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -287,14 +303,13 @@ class FootBallPlayerTable extends React.Component {
 
         const columns = [{
             title: '名字',
-            sorter: true,
             align: 'center',
             dataIndex: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
                         ref={ele => this.searchInput = ele}
-                        placeholder="Search name"
+                        placeholder="搜索"
                         value={this.state.searchText}
                         onChange={this.onInputChange}
                         onPressEnter={this.onSearch}
@@ -311,22 +326,15 @@ class FootBallPlayerTable extends React.Component {
             },
             width: '30%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headimg ? record.headimg : defultAvatar}/>
+                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
                 </div>;
             },
         }, {
             title: '擅长位置',
             dataIndex: 'position',
             align: 'center',
-            filters: [
-                {text: '教练', value: 'co'},
-                {text: '门将', value: 'gk'},
-                {text: '后卫', value: 'b'},
-                {text: '中场', value: 'm'},
-                {text: '前锋', value: 'f'},
-            ],
             render: function (text, record, index) {
                 return getPosition(record);
             },
@@ -379,14 +387,13 @@ class FootBallPlayerTable extends React.Component {
         ];
         const columns_moblie = [{
             title: '名字',
-            sorter: true,
             align: 'center',
             dataIndex: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
                         ref={ele => this.searchInput = ele}
-                        placeholder="Search name"
+                        placeholder="搜索"
                         value={this.state.searchText}
                         onChange={this.onInputChange}
                         onPressEnter={this.onSearch}
@@ -403,9 +410,9 @@ class FootBallPlayerTable extends React.Component {
             },
             width: '100%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headimg ? record.headimg : defultAvatar}/>
+                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
                 </div>;
             },
         },

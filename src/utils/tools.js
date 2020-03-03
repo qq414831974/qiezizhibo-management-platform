@@ -28,21 +28,16 @@ export const flashChecker = () => {
 export const getToken = () => {
     const tokenStr = localStorage.getItem('token')
     if (tokenStr == null) {
-        return null;
+        return {};
     }
-    const tokenAndTime = JSON.parse(tokenStr);
-    const token = tokenAndTime.token;
-    const time = tokenAndTime.time;
-    if (moment().subtract(1, "days").isAfter(moment(time))) {
-        return -1;
-    }
+    const token = JSON.parse(tokenStr);
     return token;
 }
 export const setToken = (token) => {
     if (token == null) {
         return
     }
-    localStorage.setItem('token', JSON.stringify({token: token, time: moment()}));
+    localStorage.setItem('token', JSON.stringify(token));
 }
 export const removeToken = () => {
     localStorage.removeItem('token');
@@ -63,4 +58,21 @@ export const setUser = (user) => {
 }
 export const removeUser = () => {
     localStorage.removeItem('user');
+}
+export const getRole = () => {
+    const role = localStorage.getItem('role')
+    if (role == null) {
+        return null;
+    }
+    return JSON.parse(role);
+}
+
+export const setRole = (role) => {
+    if (role == null) {
+        return;
+    }
+    localStorage.setItem('role', JSON.stringify(role));
+}
+export const removeRole = () => {
+    localStorage.removeItem('role');
 }

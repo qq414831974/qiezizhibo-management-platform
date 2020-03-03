@@ -90,7 +90,7 @@ class FootBallMatchModifyDialog extends React.Component {
             hostTeam: this.props.record.hostteam,
             guestTeam: this.props.record.guestteam
         });
-        this.setState({currentLeague: this.props.record.leaguematch})
+        this.setState({currentLeague: this.props.record.league})
     };
 
     fetch = (param) => {
@@ -101,11 +101,13 @@ class FootBallMatchModifyDialog extends React.Component {
         });
         if (param || this.state.league) {
             const league = param || this.state.league
-            getTeamInLeague({leagueId: league.id}).then(res => {
-                this.setState({
-                    data: res,
-                    teamloading: false
-                });
+            getTeamInLeague(league.id).then(res => {
+                if (res && res.code == 200) {
+                    this.setState({
+                        data: res.data,
+                        teamloading: false
+                    });
+                }
             })
         } else {
             getAllTeams({
@@ -114,13 +116,13 @@ class FootBallMatchModifyDialog extends React.Component {
                 sortField: "id",
                 sortOrder: "desc"
             }).then((data) => {
-                if (data && data.list) {
+                if (data && data.code == 200) {
                     this.setState({
-                        data: data ? data.list : "",
+                        data: data.data ? data.data.records : "",
                         teamloading: false,
                     });
                 } else {
-                    message.error('获取队伍列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                    message.error('获取队伍列表失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
             });
         }
@@ -128,16 +130,16 @@ class FootBallMatchModifyDialog extends React.Component {
             pageSize: 300,
             pageNum: 1,
         }).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 this.setState({
-                    leaguedata: data ? data.list : "",
+                    leaguedata: data.data ? data.data.records : "",
                     leagueloading: false,
                 });
             } else {
-                message.error('获取联赛列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取联赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
-        this.getLiveInfo(this.props.record.activityid ? this.props.record.activityid : this.props.record.activityold)
+        this.getLiveInfo(this.props.record.activityId ? this.props.record.activityId : this.props.record.activityOld)
     }
     getLiveInfoList = (params) => {
         this.setState({
@@ -156,7 +158,7 @@ class FootBallMatchModifyDialog extends React.Component {
                     pagination,
                 });
             } else {
-                message.error('获取直播列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取直播列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -245,7 +247,7 @@ class FootBallMatchModifyDialog extends React.Component {
         this.state.data.forEach((item, index) => {
             dom.push(<Option value={item.id} data={item} key={"team" + item.id}>{<Tooltip title={item.remark}>
                 <div className="inline-p"><Avatar
-                    src={item.headimg}/><p
+                    src={item.headImg}/><p
                     className="ml-s mt-n mb-n">{item.name}</p></div>
             </Tooltip>}</Option>)
         });
@@ -259,7 +261,7 @@ class FootBallMatchModifyDialog extends React.Component {
             className="ml-s mt-n mb-n">无联赛</p>}</Option>);
         this.state.leaguedata.forEach((item, index) => {
             dom.push(<Option value={item.id} data={item} key={"league" + item.id}>{<div className="inline-p"><Avatar
-                src={item.headimg}/><p
+                src={item.headImg}/><p
                 className="ml-s mt-n mb-n">{item.name}</p></div>}</Option>)
         });
         return dom;
@@ -280,8 +282,8 @@ class FootBallMatchModifyDialog extends React.Component {
     onLivelistClick = (form, item) => {
         const playUrl = `${item.pullDomain}/${item.app}/${item.stream}.m3u8`;
         form.setFieldsValue({
-            activityid: item.id,
-            playpath: playUrl,
+            activityId: item.id,
+            playPath: playUrl,
         })
         this.setState({pullloading: true});
         this.getActivityIngest(item.id, () => {
@@ -403,13 +405,13 @@ class FootBallMatchModifyDialog extends React.Component {
         this.fetch();
     }
     handlePullClick = () => {
-        if (this.props.form.getFieldValue("activityid") == null) {
+        if (this.props.form.getFieldValue("activityId") == null) {
             message.warn('请选择直播间后再拉流', 3);
             return;
         }
         this.setState({pullloading: true});
         if (this.state.pullId != null) {
-            putActivityIngest(this.props.form.getFieldValue("activityid"), {
+            putActivityIngest(this.props.form.getFieldValue("activityId"), {
                 ingestId: this.state.pullId,
                 address: this.state.pullInput,
                 status: "active",
@@ -418,14 +420,14 @@ class FootBallMatchModifyDialog extends React.Component {
                 if (data && data.result) {
                     message.success("拉流成功", 3)
                 } else {
-                    message.error('拉流失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                    message.error('拉流失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
-                this.getActivityIngest(this.props.form.getFieldValue("activityid"), () => {
+                this.getActivityIngest(this.props.form.getFieldValue("activityId"), () => {
                     this.setState({pullloading: false});
                 });
             });
         } else {
-            postActivityIngest(this.props.form.getFieldValue("activityid"), {
+            postActivityIngest(this.props.form.getFieldValue("activityId"), {
                 address: this.state.pullInput,
                 status: "active",
                 type: "pull"
@@ -433,9 +435,9 @@ class FootBallMatchModifyDialog extends React.Component {
                 if (data && data.result) {
                     message.success("拉流成功", 3)
                 } else {
-                    message.error('拉流失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                    message.error('拉流失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
-                this.getActivityIngest(this.props.form.getFieldValue("activityid"), () => {
+                this.getActivityIngest(this.props.form.getFieldValue("activityId"), () => {
                     this.setState({pullloading: false});
                 });
             });
@@ -458,13 +460,13 @@ class FootBallMatchModifyDialog extends React.Component {
         const {form} = this.props;
         this.setState({activityChecked: e.target.checked})
         if (e.target.checked) {
-            form.setFieldsValue({activityid: null, activityold: form.getFieldValue("activityid")})
+            form.setFieldsValue({activityId: null, activityOld: form.getFieldValue("activityId")})
         } else {
-            form.setFieldsValue({activityid: form.getFieldValue("activityold"), activityold: null})
+            form.setFieldsValue({activityId: form.getFieldValue("activityOld"), activityOld: null})
         }
     }
     getPlaceSelecter = () => {
-        const league = this.state.league || (this.props.record ? this.props.record.leaguematch : null)
+        const league = this.state.league || (this.props.record ? this.props.record.league : null)
         let dom = []
         if (league && league.place) {
             league.place.forEach((item, index) => {
@@ -568,9 +570,9 @@ class FootBallMatchModifyDialog extends React.Component {
                     <Form>
                         <div className="center w-full mb-m">
                             <FormItem {...formItemLayout} className="bs-form-item">
-                                {getFieldDecorator('leaguematchid', {
+                                {getFieldDecorator('leaguematchId', {
                                     // rules: [{required: true, message: '请选择联赛!'}],
-                                    initialValue: record.leaguematch ? record.leaguematch.id : null,
+                                    initialValue: record.league ? record.league.id : null,
                                 })(
                                     <Select size="large" style={{minWidth: 300}} onSelect={onLeagueSelect}
                                             disabled={this.state.leagueloading}>
@@ -585,7 +587,7 @@ class FootBallMatchModifyDialog extends React.Component {
                             <Col span={8}>
                                 <div className="center">
                                     <FormItem {...formItemLayout} className="bs-form-item">
-                                        {getFieldDecorator('hostteamid', {
+                                        {getFieldDecorator('hostTeamId', {
                                             // rules: [{required: true, message: '请选择主队!'}],
                                             initialValue: record.hostteam ? record.hostteam.id : null,
                                         })(
@@ -603,9 +605,9 @@ class FootBallMatchModifyDialog extends React.Component {
                             <Col span={8}>
                                 <div className="center">
                                     {isMobile ? null : <FormItem className="bs-form-item">
-                                        {getFieldDecorator('starttime', {
+                                        {getFieldDecorator('startTime', {
                                             rules: [{required: true, message: '请选择开始时间!'}],
-                                            initialValue: moment(record.starttime),
+                                            initialValue: moment(record.startTime),
                                         })(
                                             <DatePicker showTime
                                                         format='YYYY-MM-DD HH:mm'/>
@@ -629,7 +631,7 @@ class FootBallMatchModifyDialog extends React.Component {
                             <Col span={8}>
                                 <div className="center">
                                     <FormItem {...formItemLayout} className="bs-form-item">
-                                        {getFieldDecorator('guestteamid', {
+                                        {getFieldDecorator('guestTeamId', {
                                             // rules: [{required: true, message: '请选择客队!'}],
                                             initialValue: record.guestteam ? record.guestteam.id : null,
                                         })(
@@ -647,9 +649,9 @@ class FootBallMatchModifyDialog extends React.Component {
                         </Row>
                         {isMobile ? <div className="center">
                             <FormItem className="bs-form-item">
-                                {getFieldDecorator('starttime', {
+                                {getFieldDecorator('startTime', {
                                     rules: [{required: true, message: '请选择开始时间!'}],
-                                    initialValue: moment(record.starttime),
+                                    initialValue: moment(record.startTime),
                                 })(
                                     <DatePicker showTime
                                                 format={'YYYY-MM-DD HH:mm'}/>
@@ -672,7 +674,7 @@ class FootBallMatchModifyDialog extends React.Component {
                             <Col span={8}>
                                 <div className="center">
                                     <img className="round-img"
-                                         src={this.state.hostTeam ? this.state.hostTeam.headimg : defultAvatar}/>
+                                         src={this.state.hostTeam ? this.state.hostTeam.headImg : defultAvatar}/>
                                 </div>
                                 <div className="center w-full mt-m">
                                     <p style={{fontSize: 22}}>{this.state.hostTeam ? this.state.hostTeam.name : ""}</p>
@@ -694,10 +696,10 @@ class FootBallMatchModifyDialog extends React.Component {
                                     <img style={{height: 90, width: 90}} src={vs}/>
                                 </div>
                                 <div className="center w-full">
-                                    <p>{form.getFieldValue('starttime') ? form.getFieldValue('starttime').format('MM-DD HH:mm') : ""}</p>
+                                    <p>{form.getFieldValue('startTime') ? form.getFieldValue('startTime').format('MM-DD HH:mm') : ""}</p>
                                 </div>
                                 <div className="center w-full">
-                                    <p>{form.getFieldValue('starttime') ? "星期" + day[form.getFieldValue('starttime').format('d')] : ""}</p>
+                                    <p>{form.getFieldValue('startTime') ? "星期" + day[form.getFieldValue('startTime').format('d')] : ""}</p>
                                 </div>
                                 <div className="center w-full">
                                     <p className="mb-n" style={{fontWeight: "bold"}}>分组</p>
@@ -757,7 +759,7 @@ class FootBallMatchModifyDialog extends React.Component {
                             <Col span={8}>
                                 <div className="center">
                                     <img className="round-img"
-                                         src={this.state.guestTeam ? this.state.guestTeam.headimg : defultAvatar}/>
+                                         src={this.state.guestTeam ? this.state.guestTeam.headImg : defultAvatar}/>
                                 </div>
                                 <div className="center w-full mt-m">
                                     <p style={{fontSize: 22}}>{this.state.guestTeam ? this.state.guestTeam.name : ""}</p>
@@ -803,8 +805,8 @@ class FootBallMatchModifyDialog extends React.Component {
                         </div>
                         <div className="center w-full">
                             <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('playpath', {
-                                    initialValue: record.playpath,
+                                {getFieldDecorator('playPath', {
+                                    initialValue: record.playPath,
                                 })(
                                     <Input hidden={true}/>
                                 )}
@@ -812,8 +814,8 @@ class FootBallMatchModifyDialog extends React.Component {
                         </div>
                         <div className="center w-full">
                             <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('activityid', {
-                                    initialValue: record.activityid,
+                                {getFieldDecorator('activityId', {
+                                    initialValue: record.activityId,
                                 })(
                                     <Input hidden={true}/>
                                 )}
@@ -821,8 +823,8 @@ class FootBallMatchModifyDialog extends React.Component {
                         </div>
                         <div className="center w-full">
                             <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('activityold', {
-                                    initialValue: record.activityold,
+                                {getFieldDecorator('activityOld', {
+                                    initialValue: record.activityOld,
                                 })(
                                     <Input hidden={true}/>
                                 )}
@@ -841,7 +843,7 @@ class FootBallMatchModifyDialog extends React.Component {
                             <p className="mt-m" style={{fontSize: 22}}>直播间</p>
                             <span>是否关闭：</span>
                             <Checkbox
-                                checked={this.state.activityChecked ? this.state.activityChecked : (form.getFieldValue("activityold") != null)}
+                                checked={this.state.activityChecked ? this.state.activityChecked : (form.getFieldValue("activityOld") != null)}
                                 onChange={this.onActivityCheckedChange}/>
                         </div>
                         <div className="center w-full">
@@ -877,8 +879,8 @@ class FootBallMatchModifyDialog extends React.Component {
                         {/*</div>*/}
                         {/*<div className="center w-full">*/}
                         {/*<FormItem style={{margin: 0}}>*/}
-                        {/*{getFieldDecorator('playpath', {*/}
-                        {/*initialValue: record.playpath,*/}
+                        {/*{getFieldDecorator('playPath', {*/}
+                        {/*initialValue: record.playPath,*/}
                         {/*})(*/}
                         {/*<Input style={{minWidth: 300, textAlign: "center"}}/>*/}
                         {/*)}*/}
@@ -946,8 +948,8 @@ class FootBallMatchModifyDialog extends React.Component {
                             </FormItem>
                             <span className="ml-s mr-s"></span>
                             <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('onlineexpendmin', {
-                                    initialValue: record.onlineexpendmin,
+                                {getFieldDecorator('onlineExpendMin', {
+                                    initialValue: record.onlineExpendMin,
                                 })(
                                     <Input addonBefore="最小" style={{width: 120, textAlign: "center"}}
                                            placeholder="最小值"/>
@@ -955,8 +957,8 @@ class FootBallMatchModifyDialog extends React.Component {
                             </FormItem>
                             <span className="ml-s mr-s">-</span>
                             <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('onlineexpendmax', {
-                                    initialValue: record.onlineexpendmax,
+                                {getFieldDecorator('onlineExpendMax', {
+                                    initialValue: record.onlineExpendMax,
                                 })(
                                     <Input addonBefore="最大" style={{width: 120, textAlign: "center"}}
                                            placeholder="最大值"/>

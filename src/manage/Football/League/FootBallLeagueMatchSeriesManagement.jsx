@@ -7,7 +7,7 @@ import {
     removeLeagueIntoSeries,
     getNoSeriesLeague,
     createLeagueMatch, updateLeagueMatchById,
-    getLeagueMatchById, delLeagueMatchById,
+    getLeagueMatchById, delLeagueMatchByIds,
 } from "../../../axios";
 import {parseTimeStringYMD} from "../../../utils";
 import copy from "copy-to-clipboard/index";
@@ -37,16 +37,20 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
 
     fetch = () => {
         this.setState({loading: true})
-        getLeagueInfoBySeriesId(this.props.match.params.id).then(data => {
-            this.setState({
-                loading: false,
-                data: data,
-            });
+        getLeagueInfoBySeriesId({pageSize: 100, pageNum: 1, seriesId: this.props.match.params.id}).then(data => {
+            if (data && data.code == 200) {
+                this.setState({
+                    loading: false,
+                    data: data.data.records,
+                });
+            }
         })
         getLeagueMatchById(this.props.match.params.id).then(data => {
-            this.setState({
-                leagueData: data,
-            });
+            if (data && data.code == 200) {
+                this.setState({
+                    leagueData: data.data,
+                });
+            }
         })
     }
     onNameClick = (record, e) => {
@@ -80,21 +84,21 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             if (err) {
                 return;
             }
-            values["datebegin"] = values["datebegin"] ? values["datebegin"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["dateend"] = values["dateend"] ? values["dateend"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createtime"] = values["createtime"] ? values["createtime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updatetime"] = values["updatetime"] ? values["updatetime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deletetime"] = values["deletetime"] ? values["deletetime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["dateBegin"] = values["dateBegin"] ? values["dateBegin"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["dateEnd"] = values["dateEnd"] ? values["dateEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             createLeagueMatch(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.fetch();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -107,21 +111,21 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             if (err) {
                 return;
             }
-            values["datebegin"] = values["datebegin"] ? values["datebegin"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["dateend"] = values["dateend"] ? values["dateend"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createtime"] = values["createtime"] ? values["createtime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updatetime"] = values["updatetime"] ? values["updatetime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deletetime"] = values["deletetime"] ? values["deletetime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["dateBegin"] = values["dateBegin"] ? values["dateBegin"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["dateEnd"] = values["dateEnd"] ? values["dateEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             updateLeagueMatchById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.fetch();
                         message.success('修改成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -140,10 +144,10 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                         this.fetch();
                         message.success('添加成功', 1);
                     } else {
-                        message.warn(data.msg, 1);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
             });
             form.resetFields();
@@ -151,17 +155,17 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
         });
     }
     deleteRecord = () => {
-        delLeagueMatchById(this.state.record.id).then((data) => {
+        delLeagueMatchByIds({id: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.fetch();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -173,10 +177,10 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                     this.fetch();
                     message.success('删除成功', 1);
                 } else {
-                    message.warn(data.msg, 1);
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.code + ":" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -216,9 +220,9 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             dataIndex: 'name',
             width: '30%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headimg ? record.headimg : defultAvatar}/>
+                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
                 </div>;
             },
         }, {
@@ -232,10 +236,10 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
         }, {
             title: '时间',
             align: 'center',
-            dataIndex: 'datebegin',
+            dataIndex: 'dateBegin',
             width: '20%',
             render: function (text, record, index) {
-                return <p>{(record.datebegin ? parseTimeStringYMD(record.datebegin) : "-") + "~" + (record.dateend ? parseTimeStringYMD(record.dateend) : "-")}</p>
+                return <p>{(record.dateBegin ? parseTimeStringYMD(record.dateBegin) : "-") + "~" + (record.dateEnd ? parseTimeStringYMD(record.dateEnd) : "-")}</p>
             }
         }, {
             title: '类型',
@@ -248,10 +252,10 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
         }, {
             title: '联系电话',
             align: 'center',
-            dataIndex: 'phonenumber',
+            dataIndex: 'phoneNumber',
             width: '15%',
             render: function (text, record, index) {
-                return <p>{record.phonenumber ? record.phonenumber : "-"}</p>
+                return <p>{record.phoneNumber ? record.phoneNumber : "-"}</p>
             }
         },
             {
@@ -278,9 +282,9 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             dataIndex: 'name',
             width: '100%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headimg ? record.headimg : defultAvatar}/>
+                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
                 </div>;
             },
         }
@@ -296,9 +300,9 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                                     <div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
                                         <span>系列赛：</span>
                                         <Avatar
-                                            src={this.state.leagueData.headimg ? this.state.leagueData.headimg : defultAvatar}/>
+                                            src={this.state.leagueData.headImg ? this.state.leagueData.headImg : defultAvatar}/>
                                         <span
-                                            className="ml-s">{this.state.leagueData.name}{this.state.leagueData.englishname ? "(" + this.state.leagueData.englishname + ")" : ""}</span>
+                                            className="ml-s">{this.state.leagueData.name}{this.state.leagueData.englishName ? "(" + this.state.leagueData.englishName + ")" : ""}</span>
                                     </div>
                                 </div>
                                 <Table columns={isMobile ? columns_mobile : columns}
