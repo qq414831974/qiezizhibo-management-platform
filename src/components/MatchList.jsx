@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Row, Col, Input, Icon, Avatar, message, List, Modal, Radio, Button} from 'antd';
 import IconText from './IconText';
 import defultAvatar from '../static/avatar.jpg';
-import {parseTimeStringWithOutYear, mergeJSON} from "../utils";
+import {parseTimeStringWithOutYear} from "../utils";
 import {getAllMatchs, updateMatchScoreStatusById} from '../axios/index';
 
 const status = {
@@ -34,7 +34,7 @@ class MatchList extends Component {
         this.fetch({
             pageSize: this.state.pagination.pageSize,
             pageNum: 1,
-            filter: {isActivity: true}
+            isActivity: true
         });
         if (this.timerID) {
             clearInterval(this.timerID);
@@ -58,39 +58,39 @@ class MatchList extends Component {
     fetch = (params) => {
         this.setState({searchLoading: true});
         getAllMatchs(params).then((data) => {
-            if (data && data.list) {
+            if (data && data.code == 200) {
                 let pagination = {...this.state.pagination};
-                pagination.total = data.total;
-                pagination.current = data.pageNum;
-                pagination.pageSize = data.pageSize;
+                pagination.total = data.data.total;
+                pagination.current = data.data.current;
+                pagination.pageSize = data.data.size;
                 pagination.onChange = this.handleListChange;
                 pagination.simple = true;
                 this.setState({
-                    searchData: data.list,
+                    searchData: data.data ? data.data.records : [],
                     searchLoading: false,
                     pagination,
                 });
             } else {
-                message.error('获取比赛列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
     refresh = () => {
         const pager = {...this.state.pagination};
+        pager.filters = this.getTableFilters(pager);
         this.fetch({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     onSearch = () => {
-        const {searchText} = this.state;
         const pager = {...this.state.pagination};
-        pager.filters = mergeJSON({name: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
         this.fetch({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            filter: pager.filters,
+            ...pager.filters,
         });
     }
     handleListChange = (page, pageSize) => {
@@ -98,21 +98,36 @@ class MatchList extends Component {
         const pager = {...this.state.pagination};
         pager.current = page;
         pager.pageSize = pageSize;
-        pager.filters = mergeJSON({name: searchText}, this.state.pagination.filters);
+        pager.filters = this.getTableFilters(pager);
         this.setState({
             pagination: pager,
         });
         this.fetch({
             filter: pager.filters,
             pageNum: pager.current,
-            pageSize: pager.pageSize,
+            ...pager.filters,
         });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["name"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
     onSearchChange = (e) => {
         this.setState({searchText: e.target.value});
     }
     onRecordClick = (record, e) => {
-        const matchType = record ? (record.type ? eval(record.type) : []) : [];
+        const matchType = record ? (record.type ? record.type : []) : [];
         this.setState({
             record: record,
             statusDialogRadio: record.status,
@@ -126,17 +141,17 @@ class MatchList extends Component {
         const history = this.props.history;
         history.push(`/${record.id}`);
     };
-    onStatusDialogRaidoChange = (e) =>{
+    onStatusDialogRaidoChange = (e) => {
         this.setState({statusDialogRadio: e.target.value});
 
     }
-    onStatusDialogScoreChange = (e) =>{
+    onStatusDialogScoreChange = (e) => {
         this.setState({statusDialogScore: e.target.value});
     }
     onStatusDialogPenaltyScoreChange = (e) => {
         this.setState({statusDialogPenaltyScore: e.target.value});
     }
-    handleMatchStatusConfirm = () =>{
+    handleMatchStatusConfirm = () => {
         updateMatchScoreStatusById({
             id: this.state.record.id,
             status: this.state.statusDialogRadio,
@@ -149,7 +164,7 @@ class MatchList extends Component {
                     message.success('修改成功', 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
         this.setState({dialogStatusVisible: false});
@@ -160,6 +175,7 @@ class MatchList extends Component {
     handleMatchStatusCancel = () => {
         this.setState({dialogStatusVisible: false});
     };
+
     render() {
         const {responsive} = this.props;
         return (
@@ -196,7 +212,7 @@ class MatchList extends Component {
                                   key={item.id}
                                   onClick={this.onRecordClick.bind(this, item)}
                                   actions={[
-                                      <IconText type="calendar" text={parseTimeStringWithOutYear(item.starttime)}/>,
+                                      <IconText type="calendar" text={parseTimeStringWithOutYear(item.startTime)}/>,
                                       <IconText type="pushpin" text={item.place}/>,
                                       <IconText type="video-camera"
                                                 text={item.status ? (item.status === -1 ? "未开" : status[item.status].text) : "未开"}
@@ -219,7 +235,7 @@ class MatchList extends Component {
                                           <Col span={3}>
                                               <div className="center">
                                                   <Avatar
-                                                      src={item.hostteam.headimg ? item.hostteam.headimg : defultAvatar}
+                                                      src={item.hostteam.headImg ? item.hostteam.headImg : defultAvatar}
                                                   />
                                               </div>
                                           </Col>
@@ -240,7 +256,7 @@ class MatchList extends Component {
                                           <Col span={3}>
                                               <div className="center">
                                                   <Avatar
-                                                      src={item.guestteam.headimg ? item.guestteam.headimg : defultAvatar}
+                                                      src={item.guestteam.headImg ? item.guestteam.headImg : defultAvatar}
                                                   />
                                               </div>
                                           </Col>

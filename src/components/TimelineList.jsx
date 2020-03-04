@@ -144,45 +144,45 @@ class TimelineList extends Component {
     }
 
     fetch = () => {
-        getMatchById(this.props.matchid).then((data) => {
-            if (data) {
-                const matchType = data ? (data.type? eval(data.type) : []) : [];
-                if(matchType.indexOf(TIME_LINE)< 0){
+        getMatchById(this.props.matchId).then((data) => {
+            if (data && data.code == 200 && data.data) {
+                const matchType = data.data ? (data.data.type ? data.data.type : []) : [];
+                if (matchType.indexOf(TIME_LINE) < 0) {
                     message.warn("当前比赛无时间轴菜单");
                 }
                 this.setState({
-                    data: data,
+                    data: data.data,
                 });
-                this.getPlayer(data.hostteam.id);
-                this.getPlayer(data.guestteam.id);
+                this.getPlayer(data.data.hostteam.id);
+                this.getPlayer(data.data.guestteam.id);
                 this.getTimeline();
                 this.getTime();
             } else {
-                message.error('获取比赛失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     };
     getTime = () => {
-        getMatchTime(this.props.matchid).then((data) => {
-            if (data) {
-                this.setState({status: data});
+        getMatchTime(this.props.matchId).then((data) => {
+            if (data && data.code == 200) {
+                this.setState({status: data.data});
             } else {
-                message.error('获取比赛时间失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛时间失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     };
     getTimeline = () => {
-        getTimelineByMatchId({id: this.props.matchid}).then((data) => {
-            if (data) {
+        getTimelineByMatchId({matchId: this.props.matchId}).then((data) => {
+            if (data && data.code == 200) {
                 let hostPass = 0;
                 let hostPoss = 50;
                 let guestPass = 0;
                 let guestPoss = 50;
-                data && data.forEach((item, index) => {
-                    if (item.eventtype === CHUANKONG) {
+                data.data && data.data.forEach((item, index) => {
+                    if (item.eventType === CHUANKONG) {
                         const passAndPoss = JSON.parse(item.remark);
-                        const teamid = item.teamid;
-                        if (teamid === this.state.data.hostteam.id) {
+                        const teamId = item.teamId;
+                        if (teamId === this.state.data.hostteam.id) {
                             hostPass = passAndPoss.pass;
                             hostPoss = passAndPoss.possession;
                         } else {
@@ -194,19 +194,19 @@ class TimelineList extends Component {
                 let hostPoint = 0;
                 let guestPoint = 0;
                 if (this.state.data.hostteam) {
-                    data && data.forEach((item, index) => {
-                        const isHost = this.state.data.hostteam.id === item.teamid;
-                        if (item.eventtype === 1 || item.eventtype === 22) {
+                    data.data && data.data.forEach((item, index) => {
+                        const isHost = this.state.data.hostteam.id === item.teamId;
+                        if (item.eventType === 1 || item.eventType === 22) {
                             if (isHost) {
-                                if(item.eventtype == 22){
+                                if (item.eventType == 22) {
                                     guestPoint = guestPoint + 1;
-                                }else{
+                                } else {
                                     hostPoint = hostPoint + 1;
                                 }
                             } else {
-                                if(item.eventtype == 22){
+                                if (item.eventType == 22) {
                                     hostPoint = hostPoint + 1;
-                                }else{
+                                } else {
                                     guestPoint = guestPoint + 1;
                                 }
                             }
@@ -216,23 +216,23 @@ class TimelineList extends Component {
                 this.setState({
                     hostPoint: hostPoint,
                     guestPoint: guestPoint,
-                    timelineData: data,
+                    timelineData: data.data,
                     hostPass: hostPass,
                     hostPoss: hostPoss,
                     guestPass: guestPass,
                     guestPoss: guestPoss,
                 });
             } else {
-                message.error('获取时间轴失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取时间轴失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     };
     getPlayer = (teamId) => {
         getPlayersByTeamId(teamId, {pageSize: 100, pageNum: 1,}).then((data) => {
-            if (data && data.list) {
-                this.getPlayerInfo(data ? data.list : "");
+            if (data && data.code == 200) {
+                this.getPlayerInfo(data.data ? data.data.records : "");
             } else {
-                message.error('获取队员列表失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取队员列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     };
@@ -272,33 +272,33 @@ class TimelineList extends Component {
                 return 0;
             });
             data.forEach((item, index) => {
-                if (item.eventtype !== CHUANKONG) {
-                    const des = eventType[item.eventtype].text;
-                    const hidden = eventType[item.eventtype].hidden;
-                    const isChange = item.eventtype === 10;
+                if (item.eventType !== CHUANKONG) {
+                    const des = eventType[item.eventType].text;
+                    const hidden = eventType[item.eventType].hidden;
+                    const isChange = item.eventType === 10;
                     const dot = <div>
                         <div className="w-full center">
-                            <img className="qz-live-round-img-xxs-hover" alt={eventType[item.eventtype].text}
+                            <img className="qz-live-round-img-xxs-hover" alt={eventType[item.eventType].text}
                                  onClick={onDotClick.bind(this, item)}
-                                 src={eventType[item.eventtype].icon}
+                                 src={eventType[item.eventType].icon}
                             />
                         </div>
-                        <span className="w-full center" style={{color:"#2e3e4e"}}>{des}</span>
+                        <span className="w-full center" style={{color: "#2e3e4e"}}>{des}</span>
                     </div>;
-                    const isHost = this.state.data.hostteam ? (this.state.data.hostteam.id === item.teamid) : false;
+                    const isHost = this.state.data.hostteam ? (this.state.data.hostteam.id === item.teamId) : false;
                     const dis = isHost ? "qz-live-timeline-left" : "qz-live-timeline-right";
-                    const avatar = this.state.playerInfo[item.playerid] ? this.state.playerInfo[item.playerid].headimg : defultAvatar;
-                    let name = this.state.playerInfo[item.playerid] ? this.state.playerInfo[item.playerid].name : defultAvatar;
+                    const avatar = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].headImg : defultAvatar;
+                    let name = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].name : defultAvatar;
                     let changeDom = [];
                     if (isChange) {
                         changeDom.push(<div className="inline-block center">
-                            <img className="qz-live-round-img-xxs ml-s mr-s" alt="换人" src={substitution_arrow} />
+                            <img className="qz-live-round-img-xxs ml-s mr-s" alt="换人" src={substitution_arrow}/>
                         </div>);
                         changeDom.push(<div className="inline-block">
                             <div>
                                 <div className="center">
                                     <Avatar className="center" size="small"
-                                            src={this.state.playerInfo[item.remark] ? this.state.playerInfo[item.remark].headimg : defultAvatar}
+                                            src={this.state.playerInfo[item.remark] ? this.state.playerInfo[item.remark].headImg : defultAvatar}
                                     />
                                 </div>
                                 <div className="center">
@@ -310,7 +310,7 @@ class TimelineList extends Component {
                         </div>);
                     }
                     let line = <Timeline.Item dot={dot} className={dis} key={item.id}>
-                        {hidden ? <div style={{height: 36}} /> :
+                        {hidden ? <div style={{height: 36}}/> :
                             <Tooltip title={item.text}>
                                 <div style={{height: 38}} className="center pr-s pr-s inline-flex-important">
                                     <div className="inline-block">
@@ -323,7 +323,7 @@ class TimelineList extends Component {
                                     {/*</div>*/}
                                     <div className="inline-block">
                                         <div className="center">
-                                            <Avatar size="small" src={avatar} />
+                                            <Avatar size="small" src={avatar}/>
                                         </div>
                                         <div className="center">
                                             <span className="center">{name}</span>
@@ -336,12 +336,12 @@ class TimelineList extends Component {
                     </Timeline.Item>;
                     if (isHost) {
                         line = <Timeline.Item dot={dot} className={dis} key={item.id}>
-                            {hidden ? <div style={{height: 36}} /> :
+                            {hidden ? <div style={{height: 36}}/> :
                                 <Tooltip title={item.text} hidden={hidden}>
                                     <div style={{height: 38}} className="center pl-s pr-s inline-flex-important">
                                         <div className="inline-block">
                                             <div className="center">
-                                                <Avatar size="small" src={avatar} />
+                                                <Avatar size="small" src={avatar}/>
                                             </div>
                                             <div className="center">
                                                 <span className="center">{name}</span>
@@ -367,7 +367,7 @@ class TimelineList extends Component {
         return dom;
     };
     onDotClick = (item, e) => {
-        const hidden = eventType[item.eventtype].hidden;
+        const hidden = eventType[item.eventType].hidden;
         if (hidden) {
             this.setState({
                 drawEventModifyVisible: true,
@@ -459,7 +459,9 @@ class TimelineList extends Component {
         });
         let dom = [];
         doms.forEach((item, index) => {
-            dom.push(<Row key={`row:${index}`} gutter={2}><div className="center">{item}</div></Row>)
+            dom.push(<Row key={`row:${index}`} gutter={2}>
+                <div className="center">{item}</div>
+            </Row>)
         });
         return <div>
             <p className="w-full mb-n center"
@@ -505,7 +507,7 @@ class TimelineList extends Component {
                         <div className="center">
                             <img className="qz-live-round-img"
                                  alt="主队"
-                                 src={this.state.data.hostteam ? this.state.data.hostteam.headimg : defultAvatar}
+                                 src={this.state.data.hostteam ? this.state.data.hostteam.headImg : defultAvatar}
                             />
                         </div>
                         <div className="center w-full mt-m">
@@ -516,7 +518,7 @@ class TimelineList extends Component {
                     </Col>
                     <Col span={8}>
                         <div className="center w-full">
-                            <img style={{height: 90, width: 90}} alt="VS" src={vs} />
+                            <img style={{height: 90, width: 90}} alt="VS" src={vs}/>
                         </div>
                         <div className="center w-full">
                             <p style={{fontSize: 22}}
@@ -538,7 +540,7 @@ class TimelineList extends Component {
                         <div className="center">
                             <img className="qz-live-round-img"
                                  alt="客队"
-                                 src={this.state.data.guestteam ? this.state.data.guestteam.headimg : defultAvatar}
+                                 src={this.state.data.guestteam ? this.state.data.guestteam.headImg : defultAvatar}
                             />
                         </div>
                         <div className="center w-full mt-m">
@@ -555,7 +557,7 @@ class TimelineList extends Component {
                     <span className="anticon"
                           style={{left: (responsive.data.isMobile ? "0px" : "58px")}}
                     >{this.state.hostPoss}%</span>
-                    <Progress percent={this.state.hostPoss} showInfo={false} />
+                    <Progress percent={this.state.hostPoss} showInfo={false}/>
                     <span className="anticon"
                           style={{right: (responsive.data.isMobile ? "0px" : "58px")}}
                     >{this.state.guestPoss}%</span>
@@ -567,7 +569,7 @@ class TimelineList extends Component {
                     <Timeline.Item className="qz-live-timeline-left"
                                    dot={<Button icon="plus" shape="circle" size="small"
                                                 onClick={onTimelineAddClick}
-                                        />}
+                                   />}
                     />
                 </Timeline>
                 {getTimeOption()}
@@ -582,7 +584,7 @@ class TimelineList extends Component {
                 >
                     <FootBallMatchScoreAddDialog visible={this.state.drawVisible}
                                                  onHeightChange={onDrawHeightChange}
-                                                 matchid={this.props.matchid}
+                                                 matchId={this.props.matchId}
                                                  data={this.state.data}
                                                  onClose={onDrawClose}
                                                  onSuccess={refreshTimeLine}
@@ -600,7 +602,7 @@ class TimelineList extends Component {
                 >
                     <FootBallMatchScoreModifyDialog visible={this.state.drawModifyVisible}
                                                     onHeightChange={onDrawHeightChange}
-                                                    matchid={this.props.matchid}
+                                                    matchId={this.props.matchId}
                                                     data={this.state.data}
                                                     record={this.state.record}
                                                     onClose={onModifyDrawClose}
@@ -617,7 +619,7 @@ class TimelineList extends Component {
                     height={this.state.drawEventHeight}
                 >
                     <FootBallMatchScoreTimeEventAddDialog visible={this.state.drawEventAddVisible}
-                                                          matchid={this.props.matchid}
+                                                          matchId={this.props.matchId}
                                                           data={this.state.data}
                                                           onClose={onEventAddDrawClose}
                                                           onSuccess={refreshTimeLine}
@@ -636,7 +638,7 @@ class TimelineList extends Component {
                     height={this.state.drawEventHeight}
                 >
                     <FootBallMatchScoreTimeEventModifyDialog visible={this.state.drawEventModifyVisible}
-                                                             matchid={this.props.matchid}
+                                                             matchId={this.props.matchId}
                                                              data={this.state.data}
                                                              record={this.state.record}
                                                              onClose={onEventModifyDrawClose}
@@ -654,7 +656,7 @@ class TimelineList extends Component {
                     height={300}
                 >
                     <FootBallMatchScorePassDialog visible={this.state.drawPassVisible}
-                                                  matchid={this.props.matchid}
+                                                  matchId={this.props.matchId}
                                                   data={this.state.data}
                                                   onClose={onPassDrawClose}
                                                   onSuccess={refreshTimeLine}

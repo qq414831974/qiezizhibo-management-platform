@@ -225,7 +225,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                 />
                     <p
                         className="ml-s"
-                    >{item.name + "(" + item.shirtnNum + "号)"}</p></div>}</Option>)
+                    >{item.name + "(" + item.shirtNum + "号)"}</p></div>}</Option>)
             });
         }
         return dom;
@@ -336,7 +336,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                                         style={{opacity: 0.8, width: "20px", height: "20px"}}
                                         src={item.status === 1 ? shirt : shirt2}
                                     />
-                                    <p style={item.status === 1 ? shirtStyle : shirtStyle2}>{item.shirtnNum}</p>
+                                    <p style={item.status === 1 ? shirtStyle : shirtStyle2}>{item.shirtNum}</p>
                                 </div>
                                 <img className="qz-live-round-img-s" alt="头像"
                                      src={item.headImg ? item.headImg : defultAvatar}/>
@@ -460,10 +460,10 @@ class FootBallMatchScoreModifyDialog extends React.Component {
     submit = () => {
         const params = {
             id: this.state.timelineId,
-            matchid: this.props.data.id,
-            teamid: this.state.team.id,
-            playerid: this.state.player.id,
-            eventtype: this.state.event.key,
+            matchId: this.props.data.id,
+            teamId: this.state.team.id,
+            playerId: this.state.player.id,
+            eventType: this.state.event.key,
             minute: this.state.minute,
             remark: this.state.remark,
             text: this.state.text,
@@ -682,7 +682,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
         const onDelete = this.onDelete;
         const onDeleteCancel = this.onDeleteCancel;
         let clazzName = this.state.current >= 1 ? "qz-live-steps-content-large" : "qz-live-steps-content";
-        const currentEvent = this.props.record.eventtype;
+        const currentEvent = this.props.record.eventType;
         if (this.state.current === 2 && !this.state.hidden) {
             clazzName = "qz-live-steps-content-large-more";
         }

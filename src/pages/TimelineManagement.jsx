@@ -13,7 +13,7 @@ class TimelineManagement extends React.Component {
         return (
             <div className="gutter-box">
                 <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false}>
-                    <TimelineList matchid={this.props.match.params.id} />
+                    <TimelineList matchId={this.props.match.params.id} />
                 </Card>
             </div>
         );

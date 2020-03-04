@@ -273,7 +273,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                                         alt={item.status === 1 ? "首发" : "队员"}
                                         style={{opacity: 0.8, width: "20px", height: "20px"}}
                                         src={item.status === 1 ? shirt : shirt2}/>
-                                    <p style={item.status === 1 ? shirtStyle : shirtStyle2}>{item.shirtnNum}</p>
+                                    <p style={item.status === 1 ? shirtStyle : shirtStyle2}>{item.shirtNum}</p>
                                 </div>
                                 <img className="qz-live-round-img-s" alt="头像" src={item.headImg ? item.headImg : defultAvatar}/>
                                 <p className="mb-n">{item.name}</p>
