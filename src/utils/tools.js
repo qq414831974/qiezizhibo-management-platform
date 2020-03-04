@@ -3,6 +3,45 @@ import 'moment/locale/zh-cn';
 
 moment.locale('zh-cn');
 
+export const flashChecker = () => {
+    var hasFlash = 0;　　　　 //是否安装了flash
+    var flashVersion = 0;　　 //flash版本
+
+    if (document.all) {
+        return null;
+    } else {
+        if (navigator.plugins && navigator.plugins.length > 0) {
+            var swf = navigator.plugins["Shockwave Flash"];
+            if (swf) {
+                hasFlash = 1;
+                var words = swf.description.split(" ");
+                for (var i = 0; i < words.length; ++i) {
+                    if (isNaN(parseInt(words[i]))) continue;
+                    flashVersion = parseInt(words[i]);
+                }
+            }
+        }
+    }
+    return {f: hasFlash, v: flashVersion};
+}
+
+export const getToken = () => {
+    const tokenStr = localStorage.getItem('token')
+    if (tokenStr == null) {
+        return {};
+    }
+    const token = JSON.parse(tokenStr);
+    return token;
+}
+export const setToken = (token) => {
+    if (token == null) {
+        return
+    }
+    localStorage.setItem('token', JSON.stringify(token));
+}
+export const removeToken = () => {
+    localStorage.removeItem('token');
+}
 export const getUser = () => {
     const user = localStorage.getItem('user')
     if (user == null) {
@@ -20,56 +59,20 @@ export const setUser = (user) => {
 export const removeUser = () => {
     localStorage.removeItem('user');
 }
-export const getToken = () => {
-    const tokenStr = localStorage.getItem('token')
-    if (tokenStr == null) {
+export const getRole = () => {
+    const role = localStorage.getItem('role')
+    if (role == null) {
         return null;
     }
-    const tokenAndTime = JSON.parse(tokenStr);
-    const token = tokenAndTime.token;
-    const time = tokenAndTime.time;
-    if (moment().subtract(1, "days").isAfter(moment(time))) {
-        return -1;
-    }
-    return token;
+    return JSON.parse(role);
 }
-export const setToken = (token) => {
-    if (token == null) {
-        return
+
+export const setRole = (role) => {
+    if (role == null) {
+        return;
     }
-    localStorage.setItem('token', JSON.stringify({token: token, time: moment()}));
+    localStorage.setItem('role', JSON.stringify(role));
 }
-export const removeToken = () => {
-    localStorage.removeItem('token');
+export const removeRole = () => {
+    localStorage.removeItem('role');
 }
-export const parseTimeString = (timeStr) => {
-    const format = (str) => {
-        return str > 9 ? str : '0' + str;
-    }
-    const datetime = new Date(timeStr);
-    const year = datetime.getFullYear();
-    const mon = format(datetime.getMonth() + 1);
-    const day = format(datetime.getDate());
-    const hour = format(datetime.getHours());
-    const min = format(datetime.getMinutes());
-    const dateStr = year + '-' + mon + '-' + day + ' ' + hour + ':' + min;
-    return dateStr;
-}
-export const parseTimeStringWithOutYear = (timeStr) => {
-    const format = (str) => {
-        return str > 9 ? str : '0' + str;
-    }
-    const datetime = new Date(timeStr);
-    const mon = format(datetime.getMonth() + 1);
-    const day = format(datetime.getDate());
-    const hour = format(datetime.getHours());
-    const min = format(datetime.getMinutes());
-    const dateStr = mon + '-' + day + ' ' + hour + ':' + min;
-    return dateStr;
-}
-export const mergeJSON = (minor, main) => {
-    for (var key in minor) {
-        main[key] = minor[key];
-    }
-    return main;
-};

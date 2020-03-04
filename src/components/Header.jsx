@@ -3,7 +3,7 @@ import {connect} from 'react-redux';
 import {withRouter} from "react-router-dom";
 import {Layout, Menu, Dropdown} from 'antd';
 import avatar from '../static/avatar.jpg';
-import {loginout} from '../axios/index';
+import {removeRole, removeUser, removeToken} from '../utils/tools';
 
 class Header extends Component {
     state = {}
@@ -17,10 +17,13 @@ class Header extends Component {
     }
 
     logout = () => {
-        loginout().then((data) => {
-            // localStorage.removeItem('user');
-            this.props.history.push('/manage/login')
-        });
+        // loginout().then((data) => {
+        // localStorage.removeItem('user');
+        removeRole();
+        removeUser();
+        removeToken();
+        this.props.history.push('/manage/login')
+        // });
     };
 
     render() {
@@ -35,8 +38,8 @@ class Header extends Component {
             <Layout.Header className="qz-live-header" style={{width: responsive.data.clientWidth}}>
                 <Dropdown overlay={menu} trigger={['click']}>
                     <span className="qz-live-header-avatar">
-                        <img src={userAvatar} alt="头像" />
-                        <i className="on bottom b-white" />
+                        <img src={userAvatar} alt="头像"/>
+                        <i className="on bottom b-white"/>
                     </span>
                 </Dropdown>
                 <style>{`
@@ -44,7 +47,7 @@ class Header extends Component {
                     ".ant-layout-header{ padding: 10px 20px; }"
                     :
                     ".ant-layout-header{ padding: 10px 50px; }"
-                    }
+                }
                 `}</style>
             </Layout.Header>
         );

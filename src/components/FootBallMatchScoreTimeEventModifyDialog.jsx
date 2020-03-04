@@ -3,7 +3,7 @@ import {receiveData} from "../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Avatar, Button, message, Input, DatePicker, Modal} from 'antd';
-import {deleteTimelineById, updateTimeline} from "../axios";
+import {deleteTimelineByIds, updateTimeline} from "../axios";
 import yellowcard from '../static/event/yellowcard.svg';
 import redcard from '../static/event/redcard.svg';
 import offside from '../static/event/offside.svg';
@@ -74,7 +74,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
             return;
         }
         const currentEvent = this.props.record;
-        if (currentEvent.eventtype === 16) {
+        if (currentEvent.eventType == 16) {
             this.props.onHeightChange(360);
         } else {
             this.props.onHeightChange(300);
@@ -83,14 +83,16 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
 
     updateTimeline = (param) => {
         updateTimeline(param).then((data) => {
-            if (data && data.code === 200) {
+            if (data && data.code == 200) {
                 if (data.data) {
                     message.success("修改成功");
                     this.props.onSuccess();
                     this.props.onClose();
+                } else {
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -99,8 +101,8 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
         const currentEvent = this.props.record;
         const params = {
             id: currentEvent.id,
-            matchid: this.props.data.id,
-            eventtype: this.props.record.eventtype,
+            matchId: this.props.data.id,
+            eventType: this.props.record.eventType,
             minute: this.state.minute ? this.state.minute : currentEvent.minute,
             remark: this.state.remark ? this.state.remark : currentEvent.remark,
             text: this.state.text ? this.state.text : currentEvent.text,
@@ -112,7 +114,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
     }
     getEventDetail = () => {
         const {record} = this.props;
-        const currentEvent = eventType[record.eventtype];
+        const currentEvent = eventType[record.eventType];
         if (currentEvent == null) {
             return null;
         }
@@ -120,7 +122,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
             0: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             defaultValue={moment(record.remark)}
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
@@ -130,7 +132,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
             14: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             defaultValue={moment(record.remark)}
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
@@ -140,7 +142,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
             15: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             defaultValue={moment(record.remark)}
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
@@ -157,7 +159,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
             11: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             defaultValue={moment(record.remark)}
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
@@ -167,7 +169,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
             12: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             defaultValue={moment(record.remark)}
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
@@ -183,7 +185,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
                 />
             </div>,
         };
-        currentEvent.dom = doms[record.eventtype];
+        currentEvent.dom = doms[record.eventType];
         return <div>
             <div>
                 <Avatar src={currentEvent.icon} />
@@ -191,7 +193,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
             <div className="w-full">
                 <span style={{fontSize: 14}}>{currentEvent.text}</span>
             </div>
-            {record.eventtype === 16 &&
+            {record.eventType === 16 &&
             <div className="pt-s">
                 <Input defaultValue={this.state.minute ? this.state.minute : record.minute}
                        onChange={this.onTimeChange}
@@ -235,16 +237,16 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
     }
     onDelete = () => {
         const id = this.props.record.id;
-        deleteTimelineById(id).then((data) => {
+        deleteTimelineByIds({id: [id]}).then((data) => {
             this.setState({deleteVisible: false});
-            if (data && data.code === 200) {
+            if (data && data.code == 200) {
                 if (data.data) {
                     message.success("删除成功");
                     this.props.onSuccess();
                     this.props.onClose();
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -253,7 +255,7 @@ class FootBallMatchScoreTimeEventModifyDialog extends React.Component {
         const getEventDetail = this.getEventDetail;
         const onDelete = this.onDelete;
         const onDeleteCancel = this.onDeleteCancel;
-        const currentEvent = this.props.record.eventtype;
+        const currentEvent = this.props.record.eventType;
 
         const isMobile = this.props.responsive.data.isMobile;
 

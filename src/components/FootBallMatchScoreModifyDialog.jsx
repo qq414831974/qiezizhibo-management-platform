@@ -3,7 +3,7 @@ import {receiveData} from "../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Avatar, Button, Row, Col, Icon, Spin, Collapse, message, Input, Select, Popconfirm} from 'antd';
-import {getMatchPlayersByTeamId, updateTimeline, deleteTimelineById} from "../axios";
+import {getMatchPlayersByTeamId, updateTimeline, deleteTimelineByIds} from "../axios";
 import defultAvatar from '../static/avatar.jpg';
 import shirt from '../static/event/shirt.png';
 import shirt2 from '../static/event/shirt2.png';
@@ -110,7 +110,7 @@ const event = [
     {key: 20, text: "解围", icon: clearance, show: 2},
     {key: 22, text: "乌龙球", icon: own_goal, show: 2},
     {key: 25, text: "进球(点球大战)", icon: penalty, show: 2},
-];
+]
 
 class FootBallMatchScoreModifyDialog extends React.Component {
     state = {
@@ -133,39 +133,39 @@ class FootBallMatchScoreModifyDialog extends React.Component {
             if (this.check1 && this.check2) {
                 this.initDraw();
             }
-        };
+        }
         const callback2 = () => {
             this.check2 = true;
             if (this.check1 && this.check2) {
                 this.initDraw();
             }
-        };
-        this.fetchTeamPlayer(this.props.matchid, this.props.data.hostteam.id, HOSTTEAM, callback1);
-        this.fetchTeamPlayer(this.props.matchid, this.props.data.guestteam.id, GUESTTEAM, callback2);
+        }
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.hostteam.id, HOSTTEAM, callback1);
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.guestteam.id, GUESTTEAM, callback2);
     }
 
     initDraw = () => {
         let team = this.props.data.guestteam;
-        let playerId = this.props.record.playerid;
+        let playerId = this.props.record.playerId;
         let player = null;
         let eventData = null;
-        if (this.props.record.teamid === this.props.data.hostteam.id) {
+        if (this.props.record.teamId == this.props.data.hostteam.id) {
             team = this.props.data.hostteam;
             this.state.hostTeamPlayer.forEach((item, index) => {
-                if (item.id === playerId) {
+                if (item.id == playerId) {
                     player = item;
                 }
             });
         } else {
             team = this.props.data.guestteam;
             this.state.guestTeamPlayer.forEach((item, index) => {
-                if (item.id === playerId) {
+                if (item.id == playerId) {
                     player = item;
                 }
             });
         }
         event.forEach((item, index) => {
-            if (item.key === this.props.record.eventtype) {
+            if (item.key == this.props.record.eventType) {
                 eventData = item;
             }
         });
@@ -180,34 +180,36 @@ class FootBallMatchScoreModifyDialog extends React.Component {
             timelineId: this.props.record.id,
             currentChecked: true,
         });
-    };
+    }
     fetchTeamPlayer = (matchId, teamId, type, callback) => {
-        getMatchPlayersByTeamId(matchId, teamId).then((data) => {
-            if (data) {
-                if (type === HOSTTEAM) {
-                    this.setState({hostTeamPlayer: data})
+        getMatchPlayersByTeamId(null, teamId).then((data) => {
+            if (data && data.code == 200) {
+                if (type == HOSTTEAM) {
+                    this.setState({hostTeamPlayer: data.data ? data.data.records : []})
                 } else {
-                    this.setState({guestTeamPlayer: data})
+                    this.setState({guestTeamPlayer: data.data ? data.data.records : []})
                 }
                 callback();
             } else {
-                message.error('获取比赛队伍队员失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛队伍队员失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
-    };
+    }
     updateTimeline = (param) => {
         updateTimeline(param).then((data) => {
-            if (data && data.code === 200) {
+            if (data && data.code == 200) {
                 if (data.data) {
                     message.success("修改成功", 1);
                     this.props.onSuccess();
                     this.props.onClose();
+                } else {
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
-    };
+    }
     getTeamOption = () => {
         let dom = [];
         let teamPlayerData = [];
@@ -219,11 +221,11 @@ class FootBallMatchScoreModifyDialog extends React.Component {
             }
             teamPlayerData.forEach((item, index) => {
                 dom.push(<Option value={item.id + ""} key={item.id} data={item.id}>{<div className="inline-p"><Avatar
-                    src={item.headimg}
+                    src={item.headImg}
                 />
                     <p
                         className="ml-s"
-                    >{item.name + "(" + item.shirtnum + "号)"}</p></div>}</Option>)
+                    >{item.name + "(" + item.shirtnNum + "号)"}</p></div>}</Option>)
             });
         }
         return dom;
@@ -334,10 +336,10 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                                         style={{opacity: 0.8, width: "20px", height: "20px"}}
                                         src={item.status === 1 ? shirt : shirt2}
                                     />
-                                    <p style={item.status === 1 ? shirtStyle : shirtStyle2}>{item.shirtnum}</p>
+                                    <p style={item.status === 1 ? shirtStyle : shirtStyle2}>{item.shirtnNum}</p>
                                 </div>
                                 <img className="qz-live-round-img-s" alt="头像"
-                                     src={item.headimg ? item.headimg : defultAvatar}/>
+                                     src={item.headImg ? item.headImg : defultAvatar}/>
                                 <p className="mb-n">{item.name}</p>
                             </div>
                         </div>
@@ -574,7 +576,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
             19: null,
             20: null,
             22: null,
-            24:<div className="pt-m center">
+            24: <div className="pt-m center">
                 <div
                     onClick={onEventDetailSelect.bind(this, 0)}
                     className={currentEvent.key === 24 && this.state.remark === 0 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
@@ -657,7 +659,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
     };
     onDelete = () => {
         const id = this.state.timelineId;
-        deleteTimelineById(id).then((data) => {
+        deleteTimelineByIds({id: [id]}).then((data) => {
             if (data && data.code === 200) {
                 if (data.data) {
                     message.success("删除成功");
@@ -693,7 +695,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                             className={this.state.team && (data.hostteam.id === this.state.team.id) ? "qz-live-step-item-hover qz-live-step-item-selected" : "qz-live-step-item-hover"}
                             onClick={onTeamSelect.bind(this, true)}
                         >
-                            <img className="qz-live-round-img mt-s" alt="主队" src={data.hostteam.headimg}/>
+                            <img className="qz-live-round-img mt-s" alt="主队" src={data.hostteam.headImg}/>
                             <p style={{fontSize: 16}} className="w-full">{data.hostteam.name}</p>
                         </div>
                     </Col>
@@ -702,7 +704,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                             className={this.state.team && (data.guestteam.id === this.state.team.id) ? "qz-live-step-item-hover qz-live-step-item-selected" : "qz-live-step-item-hover"}
                             onClick={onTeamSelect.bind(this, false)}
                         >
-                            <img className="qz-live-round-img mt-s" alt="客队" src={data.guestteam.headimg}/>
+                            <img className="qz-live-round-img mt-s" alt="客队" src={data.guestteam.headImg}/>
                             <p style={{fontSize: 16}} className="w-full">{data.guestteam.name}</p>
                         </div>
                     </Col>

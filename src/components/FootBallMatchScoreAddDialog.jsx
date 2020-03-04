@@ -88,7 +88,7 @@ const event = [
     {key: 20, text: "解围", icon: clearance, show: 2},
     {key: 22, text: "乌龙球", icon: own_goal, show: 2},
     {key: 25, text: "进球(点球大战)", icon: penalty, show: 2},
-];
+]
 
 class FootBallMatchScoreAddDialog extends React.Component {
     state = {
@@ -111,44 +111,46 @@ class FootBallMatchScoreAddDialog extends React.Component {
             if (this.check1 && this.check2) {
                 this.setState({loading: false});
             }
-        };
+        }
         const callback2 = () => {
             this.check2 = true;
             if (this.check1 && this.check2) {
                 this.setState({loading: false});
             }
-        };
-        this.fetchTeamPlayer(this.props.matchid, this.props.data.hostteam.id, HOSTTEAM, callback1);
-        this.fetchTeamPlayer(this.props.matchid, this.props.data.guestteam.id, GUESTTEAM, callback2);
+        }
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.hostteam.id, HOSTTEAM, callback1);
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.guestteam.id, GUESTTEAM, callback2);
     }
 
     fetchTeamPlayer = (matchId, teamId, type, callback) => {
-        getMatchPlayersByTeamId(matchId, teamId).then((data) => {
-            if (data) {
-                if (type === HOSTTEAM) {
-                    this.setState({hostTeamPlayer: data})
+        getMatchPlayersByTeamId(null, teamId).then((data) => {
+            if (data && data.code == 200) {
+                if (type == HOSTTEAM) {
+                    this.setState({hostTeamPlayer: data.data ? data.data.records : []})
                 } else {
-                    this.setState({guestTeamPlayer: data})
+                    this.setState({guestTeamPlayer: data.data ? data.data.records : []})
                 }
                 callback();
             } else {
-                message.error('获取比赛队伍队员失败：' + (data ? data.result + "-" + data.msg : data), 3);
+                message.error('获取比赛队伍队员失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
-    };
+    }
     addTimeline = (param) => {
         addTimeline(param).then((data) => {
-            if (data && data.code === 200) {
+            if (data && data.code == 200) {
                 if (data.data) {
                     message.success("添加成功", 1);
                     this.props.onSuccess();
                     this.props.onClose();
+                } else {
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('修改失败：' + (data ? data.result + "-" + data.msg + "-" + data.data : data), 3);
+                message.error('修改失败：' + (data ? data.result + "-" + data.message + "-" + data.data : data), 3);
             }
         });
-    };
+    }
     getTeamOption = () => {
         let dom = [];
         let teamPlayerData = [];
@@ -160,35 +162,33 @@ class FootBallMatchScoreAddDialog extends React.Component {
             }
             teamPlayerData.forEach((item, index) => {
                 dom.push(<Option value={item.id + ""} data={item.id}>{<div className="inline-p"><Avatar
-                    src={item.headimg}
-                />
+                    src={item.headImg}/>
                     <p
-                        className="ml-s"
-                    >{item.name + "(" + item.shirtnum + "号)"}</p></div>}</Option>)
+                        className="ml-s">{item.name + "(" + item.shirtNum + "号)"}</p></div>}</Option>)
             });
         }
         return dom;
-    };
+    }
 
     next() {
         const current = this.state.current + 1;
         let currentChecked = false;
-        if (current === 0 && this.state.team != null) {
+        if (current == 0 && this.state.team != null) {
             currentChecked = true;
         }
-        if (current === 1 && this.state.player != null) {
+        if (current == 1 && this.state.player != null) {
             currentChecked = true;
         }
-        if (current === 2 && this.state.event != null) {
+        if (current == 2 && this.state.event != null) {
             currentChecked = true;
         }
         this.setState({current: current, currentChecked: currentChecked});
-        if (current === 1) {
+        if (current == 1) {
             this.props.onHeightChange(380);
-        } else if (current === 2) {
+        } else if (current == 2) {
             let hidden = this.state.hidden;
             if (this.state.event) {
-                if (this.state.event.show === 2) {
+                if (this.state.event.show == 2) {
                     this.setState({hidden: false});
                     hidden = false;
                 }
@@ -198,7 +198,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
             } else {
                 this.props.onHeightChange(500);
             }
-        } else if (current === 3) {
+        } else if (current == 3) {
             this.props.onHeightChange(400);
         } else {
             this.props.onHeightChange(270);
@@ -208,22 +208,22 @@ class FootBallMatchScoreAddDialog extends React.Component {
     prev() {
         const current = this.state.current - 1;
         let currentChecked = false;
-        if (current === 0 && this.state.team != null) {
+        if (current == 0 && this.state.team != null) {
             currentChecked = true;
         }
-        if (current === 1 && this.state.player != null) {
+        if (current == 1 && this.state.player != null) {
             currentChecked = true;
         }
-        if (current === 2 && this.state.event != null) {
+        if (current == 2 && this.state.event != null) {
             currentChecked = true;
         }
         this.setState({current: current, currentChecked: currentChecked});
-        if (current === 1) {
+        if (current == 1) {
             this.props.onHeightChange(380);
-        } else if (current === 2) {
+        } else if (current == 2) {
             let hidden = this.state.hidden;
             if (this.state.event) {
-                if (this.state.event.show === 2) {
+                if (this.state.event.show == 2) {
                     this.setState({hidden: false});
                     hidden = false;
                 }
@@ -233,7 +233,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
             } else {
                 this.props.onHeightChange(500);
             }
-        } else if (current === 3) {
+        } else if (current == 3) {
             this.props.onHeightChange(400);
         } else {
             this.props.onHeightChange(270);
@@ -243,11 +243,11 @@ class FootBallMatchScoreAddDialog extends React.Component {
     onTeamSelect = (isHostTeam, e) => {
         this.setState({team: isHostTeam ? this.props.data.hostteam : this.props.data.guestteam, currentChecked: true});
         this.next();
-    };
+    }
     onPlayerSelect = (player, e) => {
         this.setState({player: player, currentChecked: true});
         this.next();
-    };
+    }
     getTeamPlayerList = () => {
         let doms = [];
         let teamPlayerData = null;
@@ -266,19 +266,16 @@ class FootBallMatchScoreAddDialog extends React.Component {
                     <Col key={item.id}
                          span={(Math.floor(24 / (teamPlayerData.length > 6 ? 6 : teamPlayerData.length)))}>
                         <div onClick={onPlayerSelect.bind(this, item)}
-                             className={this.state.player === item ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                        >
+                             className={this.state.player === item ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                             <div style={{width: "58px", position: "relative"}}>
                                 <div className="center" style={{position: "absolute", right: 0}}>
                                     <img
                                         alt={item.status === 1 ? "首发" : "队员"}
                                         style={{opacity: 0.8, width: "20px", height: "20px"}}
-                                        src={item.status === 1 ? shirt : shirt2}
-                                    />
-                                    <p style={item.status === 1 ? shirtStyle : shirtStyle2}>{item.shirtnum}</p>
+                                        src={item.status === 1 ? shirt : shirt2}/>
+                                    <p style={item.status === 1 ? shirtStyle : shirtStyle2}>{item.shirtnNum}</p>
                                 </div>
-                                <img className="qz-live-round-img-s" alt="头像"
-                                     src={item.headimg ? item.headimg : defultAvatar}/>
+                                <img className="qz-live-round-img-s" alt="头像" src={item.headImg ? item.headImg : defultAvatar}/>
                                 <p className="mb-n">{item.name}</p>
                             </div>
                         </div>
@@ -311,15 +308,13 @@ class FootBallMatchScoreAddDialog extends React.Component {
         let indes = 0;
         let index_hidden = 0;
         event.forEach((item, index) => {
-            if (item.show === 1) {
+            if (item.show == 1) {
                 let row = Math.floor(indes / rowSize);
                 let dom_div = (<Col key={item.key} span={Math.floor(24 / rowSize)}>
                     <div onClick={onEventSelect.bind(this, item)}
-                         className={this.state.event === item ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                    >
+                         className={this.state.event === item ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                         <div style={{width: "78px", position: "relative"}}>
-                            <img className="qz-live-round-img-m" alt={item.text}
-                                 src={item.icon ? item.icon : defultAvatar}/>
+                            <img className="qz-live-round-img-m" alt={item.text} src={item.icon ? item.icon : defultAvatar}/>
                             <p className="mb-n">{item.text}</p>
                         </div>
                     </div>
@@ -327,17 +322,15 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 if (!doms[row]) {
                     doms[row] = [];
                 }
-                doms[row].push(dom_div);
+                doms[row].push(dom_div)
                 indes = indes + 1;
-            } else if (item.show === 2) {
+            } else if (item.show == 2) {
                 let row = Math.floor(index_hidden / rowSize);
                 let dom_div = (<Col key={item.key} span={Math.floor(24 / rowSize)}>
                     <div onClick={onEventSelect.bind(this, item)}
-                         className={this.state.event === item ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                    >
+                         className={this.state.event === item ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                         <div style={{width: "78px", position: "relative"}}>
-                            <img className="qz-live-round-img-m" alt={item.text}
-                                 src={item.icon ? item.icon : defultAvatar}/>
+                            <img className="qz-live-round-img-m" alt={item.text} src={item.icon ? item.icon : defultAvatar}/>
                             <p className="mb-n">{item.text}</p>
                         </div>
                     </div>
@@ -345,7 +338,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 if (!doms_hidden[row]) {
                     doms_hidden[row] = [];
                 }
-                doms_hidden[row].push(dom_div);
+                doms_hidden[row].push(dom_div)
                 index_hidden = index_hidden + 1;
             }
         });
@@ -372,42 +365,41 @@ class FootBallMatchScoreAddDialog extends React.Component {
                     </div>
                 }
                        forceRender
-                       key="1"
-                >
+                       key="1">
                     {dom_hidden}
                 </Panel>
             </Collapse>
         </div>;
-    };
+    }
     onEventSelect = (item, e) => {
-        if (item !== this.state.event) {
+        if (item != this.state.event) {
             this.setState({event: item, currentChecked: true, remark: null, text: null, minute: null});
         } else {
             this.setState({event: item, currentChecked: true});
         }
         this.next();
-    };
+    }
     onHiddenChange = (e) => {
-        if (e.length !== 0) {
+        if (e.length != 0) {
             this.setState({hidden: false});
             this.props.onHeightChange(500);
         } else {
             this.setState({hidden: true});
             this.props.onHeightChange(350);
         }
-    };
+    }
     submit = () => {
         const params = {
-            matchid: this.props.data.id,
-            teamid: this.state.team.id,
-            playerid: this.state.player.id,
-            eventtype: this.state.event.key,
+            matchId: this.props.data.id,
+            teamId: this.state.team.id,
+            playerId: this.state.player.id,
+            eventType: this.state.event.key,
             minute: this.state.minute ? this.state.minute : (eventType[this.state.event.key]["minute"] ? eventType[this.state.event.key]["minute"] : this.props.minute),
             remark: this.state.event.key === 25 ? "1" : this.state.remark,
             text: this.state.text,
-        };
+        }
         this.addTimeline(params);
-    };
+    }
     getEventDetail = () => {
         const currentEvent = this.state.event;
         const onEventDetailSelect = this.onEventDetailSelect;
@@ -421,8 +413,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 </div>
                 <div className="center mt-s">
                     <Select size="large" style={{minWidth: 150}}
-                            onSelect={this.onEventPlayerSelect}
-                    >{this.getTeamOption()}</Select>
+                            onSelect={this.onEventPlayerSelect}>{this.getTeamOption()}</Select>
                 </div>
             </div>,
             7: null,
@@ -433,15 +424,13 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 </div>
                 <div className="center mt-s">
                     <Select size="large" style={{minWidth: 150}}
-                            onSelect={this.onEventPlayerSelect}
-                    >{this.getTeamOption()}</Select>
+                            onSelect={this.onEventPlayerSelect}>{this.getTeamOption()}</Select>
                 </div>
             </div>,
             2: <div className="pt-m center">
                 <div
                     onClick={onEventDetailSelect.bind(this, 3)}
-                    className={currentEvent.key === 2 && this.state.remark === 3 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                >
+                    className={currentEvent.key === 2 && this.state.remark === 3 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                     <div style={{width: "78px", position: "relative"}}>
                         <img className="qz-live-round-img-m" alt="射偏" src={shoot_out}/>
                         <p className="mb-n">射偏</p>
@@ -449,8 +438,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 </div>
                 <div
                     onClick={onEventDetailSelect.bind(this, 2)}
-                    className={currentEvent.key === 2 && this.state.remark === 2 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                >
+                    className={currentEvent.key === 2 && this.state.remark === 2 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                     <div style={{width: "78px", position: "relative"}}>
                         <img className="qz-live-round-img-m" alt="射在门框" src={shoot_door}/>
                         <p className="mb-n">射在门框</p>
@@ -458,8 +446,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 </div>
                 <div
                     onClick={onEventDetailSelect.bind(this, 1)}
-                    className={currentEvent.key === 2 && this.state.remark === 1 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                >
+                    className={currentEvent.key === 2 && this.state.remark === 1 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                     <div style={{width: "78px", position: "relative"}}>
                         <img className="qz-live-round-img-m" alt="射门被拦截" src={save}/>
                         <p className="mb-n">射门被拦截</p>
@@ -470,8 +457,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
             4: <div className="pt-m center">
                 <div
                     onClick={onEventDetailSelect.bind(this, 0)}
-                    className={currentEvent.key === 4 && this.state.remark === 0 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                >
+                    className={currentEvent.key === 4 && this.state.remark === 0 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                     <div style={{width: "78px", position: "relative"}}>
                         <img className="qz-live-round-img-m" alt="失败" src={tackle_failed}/>
                         <p className="mb-n">失败</p>
@@ -479,8 +465,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 </div>
                 <div
                     onClick={onEventDetailSelect.bind(this, 1)}
-                    className={currentEvent.key === 4 && this.state.remark === 1 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                >
+                    className={currentEvent.key === 4 && this.state.remark === 1 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                     <div style={{width: "78px", position: "relative"}}>
                         <img className="qz-live-round-img-m" alt="成功" src={tackle}/>
                         <p className="mb-n">成功</p>
@@ -494,8 +479,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
             18: <div className="pt-m center">
                 <div
                     onClick={onEventDetailSelect.bind(this, 0)}
-                    className={currentEvent.key === 18 && this.state.remark === 3 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                >
+                    className={currentEvent.key === 18 && this.state.remark === 3 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                     <div style={{width: "78px", position: "relative"}}>
                         <img className="qz-live-round-img-m" alt="失败" src={cross_failed}/>
                         <p className="mb-n">失败</p>
@@ -503,8 +487,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                 </div>
                 <div
                     onClick={onEventDetailSelect.bind(this, 1)}
-                    className={currentEvent.key === 18 && this.state.remark === 2 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}
-                >
+                    className={currentEvent.key === 18 && this.state.remark === 2 ? "qz-live-step-item-hover qz-live-step-item-selected center" : "qz-live-step-item-hover center"}>
                     <div style={{width: "78px", position: "relative"}}>
                         <img className="qz-live-round-img-m" alt="成功" src={cross_success}/>
                         <p className="mb-n">成功</p>
@@ -549,8 +532,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                            onChange={this.onTimeChange}
                            style={{width: 130}}
                            addonBefore="在"
-                           addonAfter="分钟"
-                    />}
+                           addonAfter="分钟"/>}
             </div>
             {currentEvent.dom}
             <div className="center pt-s">
@@ -558,24 +540,23 @@ class FootBallMatchScoreAddDialog extends React.Component {
             </div>
             <div className="center w-full pl-l pr-l pt-s">
                 <Input.TextArea rows={2} style={{maxWidth: "350px"}} onChange={this.onTextChange} className="center"
-                                placeholder="请输入描述文字不(不超过50字)"
-                />
+                                placeholder="请输入描述文字不(不超过50字)"/>
             </div>
         </div>
-    };
+    }
     onEventPlayerSelect = (e, op) => {
         this.setState({
             remark: op.props.data,
         });
-    };
+    }
     onEventDetailSelect = (value, e) => {
         this.setState({
             remark: value,
         });
-    };
+    }
     onTimeChange = (e) => {
-        const value = e.target.value;
-        e.target.value = e.target.value.replace(/[^\d]/g, '');
+        const value = e.target.value
+        e.target.value = e.target.value.replace(/[^\d]/g, '')
         if (value > 999) {
             alert("数值过大");
             e.target.value = null;
@@ -584,12 +565,12 @@ class FootBallMatchScoreAddDialog extends React.Component {
         this.setState({
             minute: Number.parseInt(value),
         });
-    };
+    }
     onTextChange = (e) => {
         this.setState({
             text: e.target.value,
         });
-    };
+    }
 
     render() {
         const {data} = this.props;
@@ -609,18 +590,16 @@ class FootBallMatchScoreAddDialog extends React.Component {
                     <Col span={12}>
                         <div
                             className={this.state.team && (data.hostteam.id === this.state.team.id) ? "qz-live-step-item-hover qz-live-step-item-selected" : "qz-live-step-item-hover"}
-                            onClick={onTeamSelect.bind(this, true)}
-                        >
-                            <img className="qz-live-round-img mt-s" alt="主队" src={data.hostteam.headimg}/>
+                            onClick={onTeamSelect.bind(this, true)}>
+                            <img className="qz-live-round-img mt-s" alt="主队" src={data.hostteam.headImg}/>
                             <p style={{fontSize: 16}} className="w-full">{data.hostteam.name}</p>
                         </div>
                     </Col>
                     <Col span={12}>
                         <div
                             className={this.state.team && (data.guestteam.id === this.state.team.id) ? "qz-live-step-item-hover qz-live-step-item-selected" : "qz-live-step-item-hover"}
-                            onClick={onTeamSelect.bind(this, false)}
-                        >
-                            <img className="qz-live-round-img mt-s" alt="客队" src={data.guestteam.headimg}/>
+                            onClick={onTeamSelect.bind(this, false)}>
+                            <img className="qz-live-round-img mt-s" alt="客队" src={data.guestteam.headImg}/>
                             <p style={{fontSize: 16}} className="w-full">{data.guestteam.name}</p>
                         </div>
                     </Col>
@@ -638,15 +617,13 @@ class FootBallMatchScoreAddDialog extends React.Component {
             </div>
             : <div className="qz-live-steps-div">
                 <div
-                    className={clazzName}
-                >{steps[current].content}</div>
+                    className={clazzName}>{steps[current].content}</div>
                 <div className="qz-live-steps-action center">
                     {
                         current > 0
                         && (
                             <Button icon="arrow-left" size="large" shape="circle"
-                                    onClick={() => this.prev()}
-                            />
+                                    onClick={() => this.prev()}/>
                         )
                     }
                     {
@@ -654,8 +631,7 @@ class FootBallMatchScoreAddDialog extends React.Component {
                         &&
                         <Button disabled={!currentChecked} type="primary" icon="arrow-right" size="large" shape="circle"
                                 className={current === 0 ? "" : "ml-m"}
-                                onClick={() => this.next()}
-                        />
+                                onClick={() => this.next()}/>
                     }
                     {
                         current === steps.length - 1

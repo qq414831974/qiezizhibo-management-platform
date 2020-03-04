@@ -25,7 +25,7 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
             return;
         }
         const currentEvent = this.props.event;
-        if (currentEvent.key === 16) {
+        if (currentEvent.key == 16) {
             this.props.onHeightChange(360);
         } else {
             this.props.onHeightChange(300);
@@ -34,14 +34,16 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
 
     addTimeline = (param) => {
         addTimeline(param).then((data) => {
-            if (data && data.code === 200) {
+            if (data && data.code == 200) {
                 if (data.data) {
                     message.success("添加成功", 1);
                     this.props.onSuccess();
                     this.props.onClose();
+                }else{
+                    message.warn(data.message, 1);
                 }
             } else {
-                message.error('添加失败：' + (data ? data.result + "-" + data.msg + "-" + data.data : data), 3);
+                message.error('添加失败：' + (data ? data.result + "-" + data.message + "-" + data.data : data), 3);
             }
         });
     }
@@ -50,7 +52,6 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
         const currentEvent = this.props.event;
         const key = currentEvent.key;
         const halfDuration = this.props.data.duration != null && this.props.data.duration > 0 ? this.props.data.duration / 2 : 45;
-
         const eventData = {
             0: {text: "比赛开始", icon: start, show: 0, minute: 0},
             14: {text: "中场", icon: half_time, show: 0, minute: halfDuration},
@@ -62,8 +63,8 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
             16: {text: "暂停", icon: pause, show: 0, minute: this.props.minute},
         }
         const params = {
-            matchid: this.props.data.id,
-            eventtype: this.props.event.key,
+            matchId: this.props.data.id,
+            eventType: this.props.event.key,
             minute: this.state.minute ? this.state.minute : eventData[key].minute,
             remark: this.state.remark,
             text: this.state.text,
@@ -82,7 +83,7 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
             0: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
                             }}
@@ -91,7 +92,7 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
             14: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
                             }}
@@ -100,7 +101,7 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
             15: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
                             }}
@@ -116,7 +117,7 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
             11: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
                             }}
@@ -125,7 +126,7 @@ class FootBallMatchScoreTimeEventAddDialog extends React.Component {
             12: <div>
                 <span className="mr-s">开始于:</span>
                 <DatePicker showTime
-                            format="YYYY-MM-DD HH:mm:ss"
+                            format="YYYY/MM/DD HH:mm:ss"
                             onChange={(value, dateString) => {
                                 this.setRemark(dateString);
                             }}

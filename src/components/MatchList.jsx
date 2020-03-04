@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {Row, Col, Input, Icon, Avatar, message, List, Modal, Radio, Button} from 'antd';
 import IconText from './IconText';
 import defultAvatar from '../static/avatar.jpg';
-import {parseTimeStringWithOutYear, mergeJSON} from "../utils/tools";
+import {parseTimeStringWithOutYear, mergeJSON} from "../utils";
 import {getAllMatchs, updateMatchScoreStatusById} from '../axios/index';
 
 const status = {
