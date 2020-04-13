@@ -212,7 +212,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                     const file = e.file;
                                     if (file.response) {
                                         form.setFieldsValue({
-                                            headimg: file.response
+                                            headimg: file.response.data
                                         })
                                     }
                                 }
@@ -444,7 +444,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                         const file = e.file;
                                         if (file.response) {
                                             form.setFieldsValue({
-                                                poster: file.response
+                                                poster: file.response.data
                                             })
                                         }
                                         handlePosterChange(e);

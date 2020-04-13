@@ -79,7 +79,7 @@ class FootBallTeamModifyDialog extends React.Component {
                                     const file = e.file;
                                     if (file.response) {
                                         form.setFieldsValue({
-                                            headImg: file.response
+                                            headImg: file.response.data
                                         })
                                     }
                                 }

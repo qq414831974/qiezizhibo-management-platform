@@ -270,7 +270,7 @@ class BulletinModifyDialog extends React.Component {
                                             const file = e.file;
                                             if (file.response) {
                                                 form.setFieldsValue({
-                                                    content: file.response
+                                                    content: file.response.data
                                                 })
                                             }
                                             handlePosterChange(e);
