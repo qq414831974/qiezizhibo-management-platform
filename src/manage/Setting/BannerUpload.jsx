@@ -32,7 +32,7 @@ class BannerUpload extends React.Component {
         }
         if (info.file.status === 'done') {
             this.setState({
-                imgUrl: info.file.response,
+                imgUrl: info.file.response.data,
             });
         }
     }

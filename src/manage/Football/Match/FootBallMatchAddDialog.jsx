@@ -921,7 +921,7 @@ class FootBallMatchAddDialog extends React.Component {
                                         const file = e.file;
                                         if (file.response) {
                                             form.setFieldsValue({
-                                                poster: file.response
+                                                poster: file.response.data
                                             })
                                         }
                                         handleAvatarChange(e);

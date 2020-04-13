@@ -108,7 +108,7 @@ class UserAddDialog extends React.Component {
                                 const file = e.file;
                                 if (file.response) {
                                     form.setFieldsValue({
-                                        avatar: file.response
+                                        avatar: file.response.data
                                     })
                                 }
                             }

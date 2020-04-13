@@ -72,11 +72,11 @@ class ScoreBoard extends React.Component {
             const file = info.file;
             if (file.response) {
                 if(type=="scoreBoard"){
-                    this.setState({scoreBoard: file.response})
+                    this.setState({scoreBoard: file.response.data})
                 }else if(type=="hostShirt"){
-                    this.setState({hostShirt: file.response})
+                    this.setState({hostShirt: file.response.data})
                 }else if(type=="guestShirt") {
-                    this.setState({guestShirt: file.response})
+                    this.setState({guestShirt: file.response.data})
                 }
             }
         }
