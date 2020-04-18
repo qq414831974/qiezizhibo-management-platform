@@ -28,7 +28,14 @@ class Login extends React.Component {
     toHome = () => {
         const {history} = this.props
         const roles = getRole();
-        if (roles && roles.includes("role-e2063edfcb024e0dbc78fc592d2bcf46")) {
+        console.log(roles)
+        let isAnchor = false;
+        roles.forEach((item, index) => {
+            if (item.authority == "role-e2063edfcb024e0dbc78fc592d2bcf46") {
+                isAnchor = true;
+            }
+        });
+        if (roles && isAnchor) {
             window.location = "https://manage.qiezizhibo.com/anchor/";
         } else {
             history.push('/index');
