@@ -352,6 +352,13 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                 <Input placeholder='请输入赞助商'/>
                             )}
                         </FormItem>
+                        <FormItem style={{margin: 0}}>
+                            {getFieldDecorator('country', {
+                                initialValue: record.country,
+                            })(
+                                <Input hidden={true}/>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="地区" className="bs-form-item">
                             <Col span={11}>
                                 <FormItem>
