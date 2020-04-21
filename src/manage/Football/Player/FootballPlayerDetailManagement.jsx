@@ -205,7 +205,7 @@ class FootballPlayerDetailManagement extends React.Component {
             }]
         }
         const ModifyMediaDialog = Form.create()(FootBallPlayerModifyMediaDialog);
-        const title = this.state.match ? `${this.state.match.hostteam.name} VS ${this.state.match.guestteam.name} ${this.state.player ? this.state.player.name : ""}进球` : "";
+        const title = this.state.match ? `${this.state.match.hostteam?this.state.match.hostteam.name:""} VS ${this.state.match.guestteam?this.state.match.guestteam.name:""} ${this.state.player ? this.state.player.name : ""}进球` : "";
         return (
             <div>
                 <BreadcrumbCustom first={<Link to={'/football/footballPlayer'}>球员管理</Link>} second="详细设置"/>

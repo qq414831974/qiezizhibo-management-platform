@@ -95,7 +95,9 @@ class FootballLeagueMatchDetailManagement extends React.Component {
         });
         getLeagueReport(this.props.match.params.id).then(data => {
             if(data && data.code == 200){
+                if(data.data){
                 this.setState({reportUrl: data.data.url});
+            }
             }
         })
     }
