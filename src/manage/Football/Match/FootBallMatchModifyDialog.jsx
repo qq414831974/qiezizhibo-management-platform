@@ -300,6 +300,10 @@ class FootBallMatchModifyDialog extends React.Component {
             activityId: item.id,
             playPath: playUrl,
         })
+        this.setState({
+            livecreatepopvisible: false,
+            currentLiveData: item,
+        });
     }
     onCreateLiveStartChange = (date, dateString) => {
         this.setState({
