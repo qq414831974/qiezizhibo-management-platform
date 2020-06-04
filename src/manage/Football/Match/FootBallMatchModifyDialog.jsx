@@ -148,7 +148,7 @@ class FootBallMatchModifyDialog extends React.Component {
         this.setState({
             listloading: true,
         });
-        getActivityInfoList({areatype: 2, ...params}).then((data) => {
+        getActivityInfoList({areatype: 2, sortField: "createAt", sortOrder: "desc", ...params}).then((data) => {
             if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
