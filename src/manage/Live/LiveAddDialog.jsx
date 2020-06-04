@@ -72,6 +72,13 @@ class LiveAddDialog extends React.Component {
                                             format={'YYYY/MM/DD HH:mm:ss'}/>
                             )}
                         </FormItem>
+                        <FormItem style={{margin:0}}>
+                            {getFieldDecorator('areatype', {
+                                initialValue: 2,
+                            })(
+                                <Input hidden={true} />
+                            )}
+                        </FormItem>
                     </Form>
                 </div>
                 :

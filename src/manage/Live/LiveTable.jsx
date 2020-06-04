@@ -35,17 +35,17 @@ class LiveTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
-        getActivityInfoList(params).then((data) => {
+        getActivityInfoList({areatype: 2, ...params}).then((data) => {
             if (data && data.code == 200) {
-            const pagination = {...this.state.pagination};
+                const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
                 pagination.current = data.data ? data.data.current : 1;
-            this.setState({
-                loading: false,
+                this.setState({
+                    loading: false,
                     data: data.data ? data.data.records : "",
-                pagination,
-                selectedRowKeys: [],
-            });
+                    pagination,
+                    selectedRowKeys: [],
+                });
             } else {
                 message.error('获取直播列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
@@ -148,7 +148,7 @@ class LiveTable extends React.Component {
                     pager.filters[param] = filters[param][0];
                 }
             }
-    }
+        }
         return pager.filters;
     }
     showLiveAddDialog = () => {
@@ -182,7 +182,7 @@ class LiveTable extends React.Component {
             createActivity(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
-                    this.refresh();
+                        this.refresh();
                         message.success('添加成功', 1);
                     } else {
                         message.warn(data.message, 1);
@@ -216,7 +216,7 @@ class LiveTable extends React.Component {
                 } else {
                     message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
-        });
+            });
             form.resetFields();
             this.setState({dialogModifyVisible: false});
         });
@@ -267,6 +267,7 @@ class LiveTable extends React.Component {
         save_link.download = name;
         this.fake_click(save_link);
     }
+
     render() {
         const onNameClick = this.onNameClick;
         const {selectedRowKeys} = this.state;
@@ -349,7 +350,7 @@ class LiveTable extends React.Component {
             title: '正在推流',
             align: 'center',
             render: function (text, record, index) {
-                return <p>{record.status==1 ? "是" : "否"}</p>;
+                return <p>{record.status == 1 ? "是" : "否"}</p>;
             },
             width: '10%',
         }, {
@@ -398,7 +399,7 @@ class LiveTable extends React.Component {
                     <span className="ml-s cursor-hand"
                           onClick={onNameClick.bind(this, record)}>{record.name}</span>
                 </div>;
-        },
+            },
         },
         ];
         return <div><Table columns={isMobile ? columns_moblie : columns}
