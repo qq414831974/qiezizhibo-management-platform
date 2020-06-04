@@ -1,54 +1,54 @@
 import React from 'react';
-import {Table, Button, message, Form, Modal, Tooltip, Input, Icon} from 'antd';
-import {getActivityInfoList} from '../../axios/index';
-import {mergeJSON} from '../../utils/index';
-import copy from 'copy-to-clipboard';
-import {createActivity, modifyActivityFakeInfo, modifyActivityInfo} from "../../axios";
+import {Table, Input, Button, Icon, Modal, Upload, Spin, Tooltip} from 'antd';
+import {Avatar} from 'antd';
+import {getActivityInfoList, delLiveByIds, modifyActivityInfo, createActivity} from "../../axios";
+import {Form, message, notification} from "antd/lib/index";
+import LiveAddDialog from "../Live/LiveAddDialog"
+import LiveModifyDialog from "../Live/LiveModifyDialog"
 import {parseTimeString} from "../../utils";
-import {receiveData} from "../../action";
-import {bindActionCreators} from "redux";
-import {connect} from "react-redux";
-import LiveSimpleForm from "./LiveSimpleForm";
-import LiveAddDialog from "./LiveAddDialog";
 import {Link} from 'react-router-dom';
+import {bindActionCreators} from "redux";
+import {receiveData} from "../../action";
+import {connect} from "react-redux";
+import copy from "copy-to-clipboard/index";
 
-
-class UserTable extends React.Component {
+class LiveTable extends React.Component {
     state = {
         data: [],
         pagination: {pageSize: 10, filters: {}},
         loading: false,
+        filterDropdownVisible: false,
+        searchText: '',
         filtered: false,
-        dialogModifyVisible: false,
-        record: {},
         selectedRowKeys: [],
+        dialogModifyVisible: false,
+        dialogAddVisible: false,
+        record: {},
     };
 
     componentDidMount() {
-        const pager = {...this.state.pagination};
-        pager.filters = this.getTableFilters(pager, {status: ["enabled"]});
-        this.setState({
-            pagination: pager,
-        });
         this.fetch({
             pageSize: this.state.pagination.pageSize,
             pageNum: 1,
-            ...pager.filters,
         });
     };
 
     fetch = (params = {}) => {
         this.setState({loading: true});
         getActivityInfoList(params).then((data) => {
-            const pagination = {...this.state.pagination};
-            pagination.total = data ? data.pager.total : 0;
-            pagination.current = data ? data.pager.page : 0;
-            this.setState({
-                loading: false,
-                data: data ? data.items : "",
-                pagination,
-                selectedRowKeys: [],
-            });
+            if (data && data.code == 200) {
+                const pagination = {...this.state.pagination};
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
+                this.setState({
+                    loading: false,
+                    data: data.data ? data.data.records : "",
+                    pagination,
+                    selectedRowKeys: [],
+                });
+            } else {
+                message.error('获取直播列表失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
         });
     }
     refresh = () => {
@@ -56,16 +56,74 @@ class UserTable extends React.Component {
         this.fetch({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            // sortField: pager.sortField,
-            // sortOrder: pager.sortOrder,
+            sortField: pager.sortField,
+            sortOrder: pager.sortOrder,
+            ...pager.filters,
+        });
+    }
+    delete = () => {
+        delLiveByIds({id: [this.state.record.id]}).then((data) => {
+            this.setState({deleteVisible: false, dialogModifyVisible: false});
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.refresh();
+                    message.success('删除成功', 1);
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        });
+    };
+    deleteMulti = () => {
+        delLiveByIds({id: this.state.selectedRowKeys}).then((data) => {
+            this.setState({deleteVisible: false, dialogModifyVisible: false});
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.refresh();
+                    message.success('删除成功', 1);
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        });
+    };
+    onNameClick = (record, e) => {
+        this.setState({record: record});
+        this.showLiveModifyDialog();
+    };
+    onSelectChange = (selectedRowKeys) => {
+        this.setState({selectedRowKeys});
+    }
+    onInputChange = (e) => {
+        this.setState({searchText: e.target.value});
+    }
+    onSearch = () => {
+        const {searchText} = this.state;
+        const pager = {...this.state.pagination};
+        pager.filters = this.getTableFilters(pager);
+        pager.current = 1;
+        this.setState({
+            filterDropdownVisible: false,
+            filtered: !!searchText,
+            pagination: pager,
+        });
+        this.fetch({
+            pageSize: pager.pageSize,
+            pageNum: 1,
+            sortField: pager.sortField,
+            sortOrder: pager.sortOrder,
             ...pager.filters,
         });
     }
     handleTableChange = (pagination, filters, sorter) => {
         const pager = {...this.state.pagination};
         pager.current = pagination.current;
-        // pager.sortField = sorter.field;
-        // pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
+        pager.sortField = sorter.field;
+        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
         pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
@@ -73,122 +131,112 @@ class UserTable extends React.Component {
         this.fetch({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            // sortField: pager.sortField,
-            // sortOrder: pager.sortOrder,
+            sortField: pager.sortField,
+            sortOrder: pager.sortOrder,
             ...pager.filters,
         });
     }
-    saveLiveSimpleRef = (form) => {
-        this.formSimple = form;
-    };
-    saveLiveAddDialogRef = (form) => {
-        this.formAdd = form;
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["name"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
     }
-    showModifyDialog = () => {
-        this.setState({dialogModifyVisible: true});
-    };
-    showAddDialog = () => {
+    showLiveAddDialog = () => {
         this.setState({dialogAddVisible: true});
     };
-    handleModifyCancel = () => {
+    showLiveModifyDialog = () => {
+        this.setState({dialogModifyVisible: true});
+    };
+    handleLiveAddCancel = () => {
+        this.setState({dialogAddVisible: false});
+    };
+    handleLiveModifyCancel = () => {
         this.setState({dialogModifyVisible: false});
     };
-    handleAddDialogCancel = () => {
-        this.setState({dialogAddVisible: false});
-    }
-    handleModifyCreate = () => {
-        const form = this.formSimple;
-        form.validateFields((err, values) => {
-            if (err) {
-                return;
-            }
-            const callback1 = () => {
-                this.check1 = true;
-                if (this.check1 && this.check2) {
-                    this.refresh();
-                    this.check1 = false;
-                    this.check2 = false;
-                }
-            }
-            const callback2 = () => {
-                this.check2 = true;
-                if (this.check1 && this.check2) {
-                    this.refresh();
-                    this.check1 = false;
-                    this.check2 = false;
-                }
-            }
-            const baseData = {};
-            baseData.endedAt = values.endedAt;
-            baseData.startedAt = values.startedAt;
-            baseData.name = values.name;
-            modifyActivityInfo(values.id, baseData).then(((data) => {
-                callback1();
-                if (data) {
-                    if (data.result) {
-                        message.success('修改成功', 1);
-                    } else {
-                        message.error('修改失败：' + (data ? data.name + "-" + data.message : data), 3);
-                    }
-                } else {
-                    message.error('修改失败：' + (data ? data.name + "-" + data.message : data), 3);
-                }
-            }));
-            const fakeData = {}
-            fakeData.enabled = values.isFakeEnabled;
-            fakeData.fake = {};
-            fakeData.fake.baseCount = values.fake.baseCount;
-            fakeData.fake.increaseMin = values.fake.increaseMin;
-            fakeData.fake.increaseMax = values.fake.increaseMax;
-            modifyActivityFakeInfo(values.id, fakeData).then(((data) => {
-                callback2();
-                if (data) {
-                    if (data.result) {
-                        message.success('修改人数放大成功', 1);
-                    } else {
-                        message.error('修改人数放大失败：' + (data ? data.name + "-" + data.message : data), 3);
-                    }
-                } else {
-                    message.error('修改人数放大失败：' + (data ? data.name + "-" + data.message : data), 3);
-                }
-            }));
-            form.resetFields();
-            this.setState({dialogModifyVisible: false});
-        });
+    saveLiveDialogRef = (form) => {
+        this.formAdd = form;
     };
-    handleAddDialogCreate = () => {
+    saveLiveModifyDialogRef = (form) => {
+        this.formModify = form;
+    };
+    handleLiveAddCreate = () => {
         const form = this.formAdd;
         form.validateFields((err, values) => {
             if (err) {
                 return;
             }
-            values["endedAt"] = values["endedAt"].format('YYYY-MM-DD HH:mm:ss').toString();
-            values["startedAt"] = values["startedAt"].format('YYYY-MM-DD HH:mm:ss').toString();
-            createActivity(values).then(((data) => {
-                if (data) {
-                    if (data.id) {
-                        message.success('添加成功', 1);
-                        form.resetFields();
+            values["startedAt"] = values["startedAt"] ? values["startedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["endedAt"] = values["endedAt"] ? values["endedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createdAt"] = values["createdAt"] ? values["createdAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+
+            createActivity(values).then((data) => {
+                if (data && data.code == 200) {
+                    if (data.data) {
                         this.refresh();
+                        message.success('添加成功', 1);
                     } else {
-                        message.error('添加失败：' + (data ? data.name + "-" + data.message : data), 3);
+                        message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('添加失败：' + (data ? data.name + "-" + data.message : data), 3);
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
-            }));
+            });
+            form.resetFields();
             this.setState({dialogAddVisible: false});
         });
-    }
-    handleDetailClick = () => {
-
     };
-    onRecordClick = (record, e) => {
-        this.setState({record: record});
-        this.showModifyDialog();
+    handleLiveModifyCreate = () => {
+        const form = this.formModify;
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            values["startedAt"] = values["startedAt"] ? values["startedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["endedAt"] = values["endedAt"] ? values["endedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createdAt"] = values["createdAt"] ? values["createdAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+
+            modifyActivityInfo(values).then((data) => {
+                if (data && data.code == 200) {
+                    if (data.data) {
+                        this.refresh();
+                        message.success('修改成功', 1);
+                    } else {
+                        message.warn(data.message, 1);
+                    }
+                } else {
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
+                }
+            });
+            form.resetFields();
+            this.setState({dialogModifyVisible: false});
+        });
+    };
+    handleDelete = () => {
+        this.setState({
+            deleteVisible: true,
+            handleDeleteOK: this.delete,
+            deleteCols: 1,
+        });
     }
-    onSelectChange = (selectedRowKeys) => {
-        this.setState({selectedRowKeys});
+    handleDeleteMulti = () => {
+        this.setState({
+            deleteVisible: true,
+            handleDeleteOK: this.deleteMulti,
+            deleteCols: this.state.selectedRowKeys ? this.state.selectedRowKeys.length : 0,
+        })
+    }
+    handleDeleteCancel = () => {
+        this.setState({deleteVisible: false});
     }
     handleExportMulti = () => {
         const selectedRowKeys = this.state.selectedRowKeys;
@@ -196,8 +244,7 @@ class UserTable extends React.Component {
         selectedRowKeys.forEach(selectedItem => {
             this.state.data && this.state.data.forEach(item => {
                 if (selectedItem == item.id) {
-                    const stream = item.stream;
-                    const streamUrl = `rtmp://${item.pushDomain}/${item.app}/${stream}`;
+                    const streamUrl = item.pushStreamUrl;
                     content = content + `${item.name}\r\n${streamUrl}\r\n\r\n`;
                 }
             });
@@ -220,48 +267,15 @@ class UserTable extends React.Component {
         save_link.download = name;
         this.fake_click(save_link);
     }
-    onInputChange = (e) => {
-        this.setState({searchText: e.target.value});
-    }
-    onSearch = () => {
-        const {searchText} = this.state;
-        const pager = {...this.state.pagination};
-        pager.filters = this.getTableFilters(pager);
-        pager.current = 1;
-        this.setState({
-            filterDropdownVisible: false,
-            filtered: !!searchText,
-            pagination: pager,
-        });
-        this.fetch({
-            pageSize: pager.pageSize,
-            pageNum: 1,
-            // sortField: pager.sortField,
-            // sortOrder: pager.sortOrder,
-            ...pager.filters,
-        });
-    }
-    getTableFilters = (pager, filters) => {
-        const {searchText} = this.state;
-        pager.filters = {};
-        if (searchText != null && searchText != '') {
-            pager.filters["name"] = searchText;
-        }
-        if (filters) {
-            for (let param in filters) {
-                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
-                    pager.filters[param] = filters[param][0];
-                }
-            }
-        }
-        return pager.filters;
-    }
-
     render() {
-        const onRecordClick = this.onRecordClick;
-        const LiveSimple = Form.create()(LiveSimpleForm);
-        const LiveAddSimple = Form.create()(LiveAddDialog);
+        const onNameClick = this.onNameClick;
         const {selectedRowKeys} = this.state;
+
+        const AddDialog = Form.create()(LiveAddDialog);
+        const ModifyDialog = Form.create()(LiveModifyDialog);
+
+        const isMobile = this.props.responsive.data.isMobile;
+
         const rowSelection = {
             selectedRowKeys,
             onChange: this.onSelectChange,
@@ -275,8 +289,10 @@ class UserTable extends React.Component {
             }],
             onSelection: this.onSelection,
         };
+
         const columns = [{
-            title: '名称',
+            title: '直播名',
+            align: 'center',
             dataIndex: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
@@ -297,40 +313,23 @@ class UserTable extends React.Component {
                     filterDropdownVisible: visible,
                 }, () => this.searchInput && this.searchInput.focus());
             },
-            align: 'center',
-            width: '45%',
+            width: '40%',
             render: function (text, record, index) {
-                var type = "enabled";
-                var name = record.name;
-                switch (record.status) {
-                    case "enabled" :
-                        type = "play-circle";
-                        break;
-                    case "disabled" :
-                        type = "close";
-                        break;
-                    case "forbidden" :
-                        type = "warning";
-                        break;
-                    case "deleted" :
-                        type = "delete";
-                        break;
-                }
-                return <p className="cursor-hand" onClick={onRecordClick.bind(this, record)}>
-                    <u>{record.name}</u>
-                </p>;
+                return <div className="center">
+                    <span className="ml-s cursor-hand"
+                          onClick={onNameClick.bind(this, record)}>{record.name}</span>
+                </div>;
             },
         }, {
             title: '直播时间',
             align: 'center',
             key: 'status',
-            filters: [
-                {text: '可用', value: 'enabled'},
-                {text: '已结束', value: 'disabled'},
-                {text: '已禁用', value: 'forbidden'},
-                // {text: '已删除', value: 'deleted'},
-            ],
-            filterMultiple: false,
+            // filters: [
+            //     {text: '可用', value: 0},
+            //     {text: '已结束', value: 1},
+            //     {text: '已禁用', value: 2},
+            // ],
+            // filterMultiple: false,
             render: function (text, record, index) {
                 return <p>{parseTimeString(record.startedAt)}~{parseTimeString(record.endedAt)}</p>;
             },
@@ -339,68 +338,94 @@ class UserTable extends React.Component {
             title: '推流码链接',
             align: 'center',
             render: function (text, record, index) {
-                const stream = record.stream;
-                const streamUrl = `rtmp://${record.pushDomain}/${record.app}/${stream}`;
-                return <p className="cursor-hand" onClick={() => {
-                    copy(streamUrl);
+                const url = record.pushStreamUrl;
+                return <span className="cursor-hand" onClick={() => {
+                    copy(url);
                     message.success('推流链接已复制到剪贴板');
-                }}>{stream}</p>;
+                }}>{url}</span>;
             },
-            width: '10%',
+            width: '20%',
         }, {
             title: '正在推流',
             align: 'center',
             render: function (text, record, index) {
-                return <p>{record.isPushing ? "是" : "否"}</p>;
+                return <p>{record.status==1 ? "是" : "否"}</p>;
             },
             width: '10%',
         }, {
-            title: '人数放大',
+            title: '观看地址',
             align: 'center',
-            render: function (text, record, index) {
-                return <p>{record.isFakeEnabled ? "是" : "否"}</p>;
-            },
             width: '10%',
-        }, {
-            title: <span>id</span>,
-            align: 'center',
-            width: '5%',
             render: function (text, record, index) {
+                const pullStreamUrls = record.pullStreamUrls;
+                let urlString = "";
+                for (let pullStreamUrlsKey in pullStreamUrls) {
+                    urlString = urlString + `\n${pullStreamUrlsKey}:${pullStreamUrls[pullStreamUrlsKey]}`
+                }
                 return <p className="cursor-hand" onClick={() => {
-                    copy(`https://shangzhibo.tv/watch/${record.id}`);
+                    copy(urlString);
                     message.success('观看地址已复制到剪贴板');
-                }}>{record.id ? `${record.id}` : "-"}</p>
+                }}>点击复制</p>
             }
         },
-            // {
-            //     title: '',
-            //     key: '操作',
-            //     width: 50,
-            //     fixed: 'right',
-            //     render: function (text, record, index) {
-            //         return <span><UserDropDownMenu record={record} onComplete={onComplete}/></span>
-            //     },
-            // }
         ];
-        return <div><Table columns={columns}
+        const columns_moblie = [{
+            title: '直播名',
+            align: 'center',
+            dataIndex: 'name',
+            filterDropdown: (
+                <div className="custom-filter-dropdown">
+                    <Input
+                        ref={ele => this.searchInput = ele}
+                        placeholder="搜索"
+                        value={this.state.searchText}
+                        onChange={this.onInputChange}
+                        onPressEnter={this.onSearch}
+                    />
+                    <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                </div>
+            ),
+            filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,
+            filterDropdownVisible: this.state.filterDropdownVisible,
+            onFilterDropdownVisibleChange: (visible) => {
+                this.setState({
+                    filterDropdownVisible: visible,
+                }, () => this.searchInput && this.searchInput.focus());
+            },
+            width: '100%',
+            render: function (text, record, index) {
+                return <div className="center">
+                    <span className="ml-s cursor-hand"
+                          onClick={onNameClick.bind(this, record)}>{record.name}</span>
+                </div>;
+            },
+        },
+        ];
+        return <div><Table columns={isMobile ? columns_moblie : columns}
                            rowKey={record => record.id}
-                           rowSelection={rowSelection}
+                           rowSelection={isMobile ? null : rowSelection}
                            dataSource={this.state.data}
                            pagination={this.state.pagination}
                            loading={this.state.loading}
                            onChange={this.handleTableChange}
-                           size="small"
                            bordered
+                           size="small"
                            title={() =>
                                <div>
                                    <Tooltip title="添加">
-                                       <Button type="primary" shape="circle" icon="plus" onClick={this.showAddDialog}/>
+                                       <Button type="primary" shape="circle" icon="plus"
+                                               onClick={this.showLiveAddDialog}/>
                                    </Tooltip>
                                    <Tooltip title="导出推流码">
                                        <Button type="primary" shape="circle" icon="export"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
                                                onClick={this.handleExportMulti}>{selectedRowKeys.length}
                                        </Button>
+                                   </Tooltip>
+                                   <Tooltip title="删除">
+                                       <Button type="danger" shape="circle" icon="delete"
+                                               hidden={this.state.selectedRowKeys.length > 0 ? false : true}
+                                               onClick={this.handleDeleteMulti}>{selectedRowKeys.length}</Button>
                                    </Tooltip>
                                    <Tooltip title="刷新">
                                        <Button type="primary" shape="circle" icon="reload" className="pull-right"
@@ -409,43 +434,57 @@ class UserTable extends React.Component {
                                    </Tooltip>
                                </div>
                            }
-                           scroll={{x: 1000}}
         />
             <Modal
-                width={1000}
-                visible={this.state.dialogModifyVisible}
-                title={<div className={'inline-p'}><p>{this.state.record.name}</p></div>}
+                width={600}
+                visible={this.state.dialogAddVisible}
+                title="添加直播"
                 okText="确定"
-                onCancel={this.handleModifyCancel}
+                onCancel={this.handleLiveAddCancel}
                 destroyOnClose="true"
+                onOk={this.handleLiveAddCreate}
+            >
+                <AddDialog
+                    visible={this.state.dialogAddVisible}
+                    ref={this.saveLiveDialogRef}/>
+            </Modal>
+
+            <Modal
+                width={600}
+                visible={this.state.dialogModifyVisible}
+                title="编辑直播"
+                okText="确定"
+                onCancel={this.handleLiveModifyCancel}
+                destroyOnClose="true"
+                onOk={this.handleLiveModifyCreate}
                 footer={[
-                    <Button key="more" type="primary" className="pull-left"
-                            onClick={this.handleDetailClick}>
+                    <Button key="more" type="primary" className="pull-left">
                         <Link to={
                             "/live/" + this.state.record.id
                         }>详细设置</Link>
                     </Button>,
-                    <Button key="back" onClick={this.handleModifyCancel}>取消</Button>,
-                    <Button key="submit" type="primary" onClick={this.handleModifyCreate}>
+                    <Button key="delete" type="danger" className="pull-left"
+                            onClick={this.handleDelete}>删除</Button>,
+                    <Button key="back" onClick={this.handleLiveModifyCancel}>取消</Button>,
+                    <Button key="submit" type="primary" onClick={this.handleLiveModifyCreate}>
                         确定
                     </Button>
                 ]}
             >
-                <LiveSimple visible={this.state.dialogModifyVisible} record={this.state.record}
-                            ref={this.saveLiveSimpleRef}/>
-                {this.state.record.createdAt ?
-                    <p className={'pull-right'}>创建时间：{parseTimeString(this.state.record.createdAt)}</p> : ""}
+                <ModifyDialog
+                    visible={this.state.dialogModifyVisible}
+                    ref={this.saveLiveModifyDialogRef}
+                    record={this.state.record}/>
             </Modal>
             <Modal
-                title="添加直播间"
-                visible={this.state.dialogAddVisible}
-                footer={[
-                    <Button key="back" onClick={this.handleAddDialogCancel}>取消</Button>,
-                    <Button key="submit" type="primary" onClick={this.handleAddDialogCreate}>确定</Button>,
-                ]}
-                onCancel={this.handleAddDialogCancel}>
-                <LiveAddSimple visible={this.state.dialogAddVisible}
-                               ref={this.saveLiveAddDialogRef}/>
+                className={isMobile ? "top-n" : ""}
+                title="确认删除"
+                visible={this.state.deleteVisible}
+                onOk={this.state.handleDeleteOK}
+                onCancel={this.handleDeleteCancel}
+                zIndex={1001}
+            >
+                <p className="mb-n" style={{fontSize: 14}}>是否确认删除{this.state.deleteCols}条数据？</p>
             </Modal>
         </div>
     }
@@ -459,4 +498,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserTable);
+export default connect(mapStateToProps, mapDispatchToProps)(LiveTable);
