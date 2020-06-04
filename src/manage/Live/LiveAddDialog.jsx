@@ -51,12 +51,12 @@ class LiveAddDialog extends React.Component {
                                 rules: [{required: true, message: '请选择时间!'}],
                                 onChange(e) {
                                     form.setFieldsValue({
-                                        startedAt: e ? e.format('YYYY-MM-DD HH:mm:ss') : null,
+                                        startedAt: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
                                     })
                                 }
                             })(
                                 <DatePicker showTime
-                                            format={'YYYY-MM-DD HH:mm:ss'}/>
+                                            format={'YYYY/MM/DD HH:mm:ss'}/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="结束时间" className="bs-form-item">
@@ -64,12 +64,12 @@ class LiveAddDialog extends React.Component {
                                 rules: [{required: true, message: '请选择时间!'}],
                                 onChange(e) {
                                     form.setFieldsValue({
-                                        endedAt: e ? e.format('YYYY-MM-DD HH:mm:ss') : null,
+                                        endedAt: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
                                     })
                                 }
                             })(
                                 <DatePicker showTime
-                                            format={'YYYY-MM-DD HH:mm:ss'}/>
+                                            format={'YYYY/MM/DD HH:mm:ss'}/>
                             )}
                         </FormItem>
                     </Form>

@@ -1,18 +1,17 @@
 import React from 'react';
-import {Table, Input, Button, Icon, Modal, Upload, Spin, Tooltip} from 'antd';
-import {Avatar} from 'antd';
-import {getActivityInfoList, delLiveByIds, modifyActivityInfo, createActivity} from "../../axios";
-import {Form, message, notification} from "antd/lib/index";
-import LiveAddDialog from "../Live/LiveAddDialog"
-import LiveModifyDialog from "../Live/LiveModifyDialog"
-import {parseTimeString} from "../../utils";
-import {Link} from 'react-router-dom';
-import {bindActionCreators} from "redux";
+import {Table, Input, Button, Icon, Modal, Tooltip, Tag, Radio} from 'antd';
+import {getPermissionList} from '../../axios/index';
+import {mergeJSON} from '../../utils/index';
+import {delPermissionByIds, updatePermissionById, createPermission} from "../../axios";
+import {Form, message} from "antd/lib/index";
+import PermissionAddDialog from './PermissionAddDialog';
+import PermissionModifyDialog from './PermissionModifyDialog';
 import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import copy from "copy-to-clipboard/index";
+import {bindActionCreators} from "redux";
 
-class LiveTable extends React.Component {
+
+class PermissionTable extends React.Component {
     state = {
         data: [],
         pagination: {pageSize: 10, filters: {}},
@@ -24,6 +23,7 @@ class LiveTable extends React.Component {
         dialogModifyVisible: false,
         dialogAddVisible: false,
         record: {},
+        nameRadioValue: "permissionName",
     };
 
     componentDidMount() {
@@ -35,19 +35,19 @@ class LiveTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
-        getActivityInfoList(params).then((data) => {
-            if (data && data.code == 200) {
-            const pagination = {...this.state.pagination};
+        getPermissionList(params).then((data) => {
+            if (data && data.code == 200 && data.data.records) {
+                const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
                 pagination.current = data.data ? data.data.current : 1;
-            this.setState({
-                loading: false,
+                this.setState({
+                    loading: false,
                     data: data.data ? data.data.records : "",
-                pagination,
-                selectedRowKeys: [],
-            });
+                    pagination,
+                    selectedRowKeys: [],
+                });
             } else {
-                message.error('获取直播列表失败：' + (data ? data.code + ":" + data.message : data), 3);
+                message.error('获取权限列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
@@ -60,9 +60,10 @@ class LiveTable extends React.Component {
             sortOrder: pager.sortOrder,
             ...pager.filters,
         });
+        this.setState({selectedRowKeys: []});
     }
-    delete = () => {
-        delLiveByIds({id: [this.state.record.id]}).then((data) => {
+    deletePermission = () => {
+        delPermissionByIds({id: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -76,9 +77,9 @@ class LiveTable extends React.Component {
             }
         });
     };
-    deleteMulti = () => {
-        delLiveByIds({id: this.state.selectedRowKeys}).then((data) => {
-            this.setState({deleteVisible: false, dialogModifyVisible: false});
+    deletePermissions = () => {
+        delPermissionByIds({id: this.state.selectedRowKeys}).then((data) => {
+            this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
@@ -91,13 +92,6 @@ class LiveTable extends React.Component {
             }
         });
     };
-    onNameClick = (record, e) => {
-        this.setState({record: record});
-        this.showLiveModifyDialog();
-    };
-    onSelectChange = (selectedRowKeys) => {
-        this.setState({selectedRowKeys});
-    }
     onInputChange = (e) => {
         this.setState({searchText: e.target.value});
     }
@@ -119,6 +113,13 @@ class LiveTable extends React.Component {
             ...pager.filters,
         });
     }
+    onSelectChange = (selectedRowKeys) => {
+        this.setState({selectedRowKeys});
+    }
+    onNameClick = (record, e) => {
+        this.setState({record: record});
+        this.showPermissionModifyDialog();
+    }
     handleTableChange = (pagination, filters, sorter) => {
         const pager = {...this.state.pagination};
         pager.current = pagination.current;
@@ -139,8 +140,8 @@ class LiveTable extends React.Component {
     getTableFilters = (pager, filters) => {
         const {searchText} = this.state;
         pager.filters = {};
-        if (searchText != null && searchText != '') {
-            pager.filters["name"] = searchText;
+        if (this.state.nameRadioValue && searchText != null && searchText != '') {
+            pager.filters[this.state.nameRadioValue] = searchText;
         }
         if (filters) {
             for (let param in filters) {
@@ -148,44 +149,40 @@ class LiveTable extends React.Component {
                     pager.filters[param] = filters[param][0];
                 }
             }
-    }
+        }
         return pager.filters;
     }
-    showLiveAddDialog = () => {
+    savePermissionAddDialogRef = (form) => {
+        this.formAdd = form;
+    }
+    savePermissionModifyDialogRef = (form) => {
+        this.formModify = form;
+    }
+    showPermissionAddDialog = () => {
         this.setState({dialogAddVisible: true});
     };
-    showLiveModifyDialog = () => {
+    showPermissionModifyDialog = () => {
         this.setState({dialogModifyVisible: true});
     };
-    handleLiveAddCancel = () => {
+    handlePermissionAddCancel = () => {
         this.setState({dialogAddVisible: false});
     };
-    handleLiveModifyCancel = () => {
+    handlePermissionModifyCancel = () => {
         this.setState({dialogModifyVisible: false});
     };
-    saveLiveDialogRef = (form) => {
-        this.formAdd = form;
-    };
-    saveLiveModifyDialogRef = (form) => {
-        this.formModify = form;
-    };
-    handleLiveAddCreate = () => {
+    handlePermissionAddCreate = () => {
         const form = this.formAdd;
+        const packingValues = this.packingValues;
         form.validateFields((err, values) => {
             if (err) {
                 return;
             }
-            values["startedAt"] = values["startedAt"] ? values["startedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["endedAt"] = values["endedAt"] ? values["endedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createdAt"] = values["createdAt"] ? values["createdAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-
-            createActivity(values).then((data) => {
+            packingValues(values);
+            createPermission(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
-                    this.refresh();
+                        this.refresh();
                         message.success('添加成功', 1);
-                    } else {
-                        message.warn(data.message, 1);
                     }
                 } else {
                     message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
@@ -195,84 +192,66 @@ class LiveTable extends React.Component {
             this.setState({dialogAddVisible: false});
         });
     };
-    handleLiveModifyCreate = () => {
+    handlePermissionModifyCreate = () => {
         const form = this.formModify;
+        const packingValues = this.packingValues;
         form.validateFields((err, values) => {
             if (err) {
                 return;
             }
-            values["startedAt"] = values["startedAt"] ? values["startedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["endedAt"] = values["endedAt"] ? values["endedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createdAt"] = values["createdAt"] ? values["createdAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-
-            modifyActivityInfo(values).then((data) => {
+            packingValues(values);
+            updatePermissionById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
                         message.success('修改成功', 1);
-                    } else {
-                        message.warn(data.message, 1);
                     }
                 } else {
                     message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
                 }
-        });
+            });
             form.resetFields();
             this.setState({dialogModifyVisible: false});
         });
     };
-    handleDelete = () => {
+    handlePermissionDelete = () => {
         this.setState({
             deleteVisible: true,
-            handleDeleteOK: this.delete,
+            handleDeleteOK: this.deletePermission,
             deleteCols: 1,
         });
     }
-    handleDeleteMulti = () => {
+    handlePermissionsDelete = () => {
         this.setState({
             deleteVisible: true,
-            handleDeleteOK: this.deleteMulti,
+            handleDeleteOK: this.deletePermissions,
             deleteCols: this.state.selectedRowKeys ? this.state.selectedRowKeys.length : 0,
         })
     }
     handleDeleteCancel = () => {
         this.setState({deleteVisible: false});
     }
-    handleExportMulti = () => {
-        const selectedRowKeys = this.state.selectedRowKeys;
-        let content = "";
-        selectedRowKeys.forEach(selectedItem => {
-            this.state.data && this.state.data.forEach(item => {
-                if (selectedItem == item.id) {
-                    const streamUrl = item.pushStreamUrl;
-                    content = content + `${item.name}\r\n${streamUrl}\r\n\r\n`;
-                }
-            });
+    packingValues = (values) => {
+        const menuList = values.permissions;
+        const list = [];
+        if (menuList) {
+            menuList.forEach((item, index) => {
+                list.push({id: item})
+            })
+            values.permissions = list;
+        }
+    }
+    onNameDropDownRadioChange = (e) => {
+        this.setState({
+            nameRadioValue: e.target.value,
         });
-        this.download("推流码导出.txt", content);
-    }
-    fake_click = (obj) => {
-        const ev = document.createEvent("MouseEvents");
-        ev.initMouseEvent(
-            "click", true, false, window, 0, 0, 0, 0, 0
-            , false, false, false, false, 0, null
-        );
-        obj.dispatchEvent(ev);
-    }
-    download = (name, data) => {
-        const urlObject = window.URL || window.webkitURL || window;
-        const downloadData = new Blob([data]);
-        const save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
-        save_link.href = urlObject.createObjectURL(downloadData);
-        save_link.download = name;
-        this.fake_click(save_link);
     }
     render() {
         const onNameClick = this.onNameClick;
         const {selectedRowKeys} = this.state;
 
-        const AddDialog = Form.create()(LiveAddDialog);
-        const ModifyDialog = Form.create()(LiveModifyDialog);
+        const AddDialog = Form.create()(PermissionAddDialog);
+        const ModifyDialog = Form.create()(PermissionModifyDialog);
 
         const isMobile = this.props.responsive.data.isMobile;
 
@@ -291,19 +270,26 @@ class LiveTable extends React.Component {
         };
 
         const columns = [{
-            title: '直播名',
-            align: 'center',
-            dataIndex: 'name',
+            title: '名字',
+            key: 'permissionName',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
-                    <Input
-                        ref={ele => this.searchInput = ele}
-                        placeholder="搜索"
-                        value={this.state.searchText}
-                        onChange={this.onInputChange}
-                        onPressEnter={this.onSearch}
-                    />
-                    <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    <div>
+                        <Input
+                            ref={ele => this.searchInput = ele}
+                            placeholder="搜索"
+                            value={this.state.searchText}
+                            onChange={this.onInputChange}
+                            onPressEnter={this.onSearch}
+                        />
+                        <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    </div>
+                    <div className="custom-filter-dropdown-radio">
+                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.nameRadioValue}>
+                            <Radio value={"permissionName"}>按名称</Radio>
+                            <Radio value={"url"}>按url</Radio>
+                        </Radio.Group>
+                    </div>
                 </div>
             ),
             filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,
@@ -313,66 +299,40 @@ class LiveTable extends React.Component {
                     filterDropdownVisible: visible,
                 }, () => this.searchInput && this.searchInput.focus());
             },
-            width: '40%',
+            width: '20%',
+            align: 'center',
             render: function (text, record, index) {
-                return <div className="center">
-                    <span className="ml-s cursor-hand"
-                          onClick={onNameClick.bind(this, record)}>{record.name}</span>
+                return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.permissionName}</a>;
+            },
+        },{
+            title: 'url / 方法',
+            key: 'url',
+            align: 'left',
+            render: function (text, record, index) {
+                return <div>
+                    <span className="mr-s">{`${record.url}`}</span>
+                    <Tag>{`${record.method}`}</Tag>
                 </div>;
             },
-        }, {
-            title: '直播时间',
+        },{
+            title: '描述',
+            dataIndex: 'descritpion',
+            key: 'descritpion',
             align: 'center',
-            key: 'status',
-            // filters: [
-            //     {text: '可用', value: 0},
-            //     {text: '已结束', value: 1},
-            //     {text: '已禁用', value: 2},
-            // ],
-            // filterMultiple: false,
-            render: function (text, record, index) {
-                return <p>{parseTimeString(record.startedAt)}~{parseTimeString(record.endedAt)}</p>;
-            },
-            width: '20%',
-        }, {
-            title: '推流码链接',
-            align: 'center',
-            render: function (text, record, index) {
-                const url = record.pushStreamUrl;
-                return <span className="cursor-hand" onClick={() => {
-                    copy(url);
-                    message.success('推流链接已复制到剪贴板');
-                }}>{url}</span>;
-            },
-            width: '20%',
-        }, {
-            title: '正在推流',
-            align: 'center',
-            render: function (text, record, index) {
-                return <p>{record.status==1 ? "是" : "否"}</p>;
-            },
-            width: '10%',
-        }, {
-            title: '观看地址',
-            align: 'center',
-            width: '10%',
-            render: function (text, record, index) {
-                const pullStreamUrls = record.pullStreamUrls;
-                let urlString = "";
-                for (let pullStreamUrlsKey in pullStreamUrls) {
-                    urlString = urlString + `\n${pullStreamUrlsKey}:${pullStreamUrls[pullStreamUrlsKey]}`
-                }
-                return <p className="cursor-hand" onClick={() => {
-                    copy(urlString);
-                    message.success('观看地址已复制到剪贴板');
-                }}>点击复制</p>
-            }
-        },
+        }
+            // {
+            //     title: '',
+            //     key: '操作',
+            //     width: 50,
+            //     fixed: 'right',
+            //     render: function (text, record, index) {
+            //         return <span><UserDropDownMenu record={record} onComplete={onComplete}/></span>
+            //     },
+            // }
         ];
         const columns_moblie = [{
-            title: '直播名',
-            align: 'center',
-            dataIndex: 'name',
+            title: '名字',
+            key: 'permissionName',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
@@ -393,12 +353,10 @@ class LiveTable extends React.Component {
                 }, () => this.searchInput && this.searchInput.focus());
             },
             width: '100%',
+            align: 'center',
             render: function (text, record, index) {
-                return <div className="center">
-                    <span className="ml-s cursor-hand"
-                          onClick={onNameClick.bind(this, record)}>{record.name}</span>
-                </div>;
-        },
+                return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.roleName}</a>;
+            },
         },
         ];
         return <div><Table columns={isMobile ? columns_moblie : columns}
@@ -409,23 +367,16 @@ class LiveTable extends React.Component {
                            loading={this.state.loading}
                            onChange={this.handleTableChange}
                            bordered
-                           size="small"
                            title={() =>
                                <div>
                                    <Tooltip title="添加">
                                        <Button type="primary" shape="circle" icon="plus"
-                                               onClick={this.showLiveAddDialog}/>
-                                   </Tooltip>
-                                   <Tooltip title="导出推流码">
-                                       <Button type="primary" shape="circle" icon="export"
-                                               hidden={this.state.selectedRowKeys.length > 0 ? false : true}
-                                               onClick={this.handleExportMulti}>{selectedRowKeys.length}
-                                       </Button>
+                                               onClick={this.showPermissionAddDialog}/>
                                    </Tooltip>
                                    <Tooltip title="删除">
                                        <Button type="danger" shape="circle" icon="delete"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
-                                               onClick={this.handleDeleteMulti}>{selectedRowKeys.length}</Button>
+                                               onClick={this.handlePermissionsDelete}>{selectedRowKeys.length}</Button>
                                    </Tooltip>
                                    <Tooltip title="刷新">
                                        <Button type="primary" shape="circle" icon="reload" className="pull-right"
@@ -436,45 +387,30 @@ class LiveTable extends React.Component {
                            }
         />
             <Modal
-                width={600}
+                className={isMobile ? "top-n" : ""}
+                title="添加权限"
                 visible={this.state.dialogAddVisible}
-                title="添加直播"
-                okText="确定"
-                onCancel={this.handleLiveAddCancel}
-                destroyOnClose="true"
-                onOk={this.handleLiveAddCreate}
-            >
-                <AddDialog
-                    visible={this.state.dialogAddVisible}
-                    ref={this.saveLiveDialogRef}/>
-            </Modal>
-
-            <Modal
-                width={600}
-                visible={this.state.dialogModifyVisible}
-                title="编辑直播"
-                okText="确定"
-                onCancel={this.handleLiveModifyCancel}
-                destroyOnClose="true"
-                onOk={this.handleLiveModifyCreate}
                 footer={[
-                    <Button key="more" type="primary" className="pull-left">
-                        <Link to={
-                            "/live/" + this.state.record.id
-                        }>详细设置</Link>
-                    </Button>,
-                    <Button key="delete" type="danger" className="pull-left"
-                            onClick={this.handleDelete}>删除</Button>,
-                    <Button key="back" onClick={this.handleLiveModifyCancel}>取消</Button>,
-                    <Button key="submit" type="primary" onClick={this.handleLiveModifyCreate}>
-                        确定
-                    </Button>
+                    <Button key="back" onClick={this.handlePermissionAddCancel}>取消</Button>,
+                    <Button key="submit" type="primary" onClick={this.handlePermissionAddCreate}>确定</Button>,
                 ]}
-            >
-                <ModifyDialog
-                    visible={this.state.dialogModifyVisible}
-                    ref={this.saveLiveModifyDialogRef}
-                    record={this.state.record}/>
+                onCancel={this.handlePermissionAddCancel}>
+                <AddDialog visible={this.state.dialogAddVisible}
+                           ref={this.savePermissionAddDialogRef}/>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="修改权限"
+                visible={this.state.dialogModifyVisible}
+                footer={[
+                    <Button key="delete" type="danger" className="pull-left"
+                            onClick={this.handlePermissionDelete}>删除</Button>,
+                    <Button key="back" onClick={this.handlePermissionModifyCancel}>取消</Button>,
+                    <Button key="submit" type="primary" onClick={this.handlePermissionModifyCreate}>确定</Button>,
+                ]}
+                onCancel={this.handlePermissionModifyCancel}>
+                <ModifyDialog visible={this.state.dialogModifyVisible} record={this.state.record}
+                              ref={this.savePermissionModifyDialogRef}/>
             </Modal>
             <Modal
                 className={isMobile ? "top-n" : ""}
@@ -498,4 +434,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(LiveTable);
+export default connect(mapStateToProps, mapDispatchToProps)(PermissionTable);

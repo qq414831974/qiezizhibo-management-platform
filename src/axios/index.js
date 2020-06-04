@@ -83,37 +83,19 @@ export const getActivityInfo = (id) => get({url: `${config.live_service}/activit
     }).catch(function (error) {
         console.log(error)
     });
-export const getActivityInfoList = (params) => get({url: `${config.live_service}/activity?name=qsn-&&${unpack(params)}`})
+export const delLiveByIds = (params) => del({url: `${config.live_service}/activity?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const getActivityInfoList = (params) => get({url: `${config.live_service}/activity?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const modifyActivityInfo = (id, params) => put({url: `${config.live_service}/activity/${id}`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const modifyActivityFakeInfo = (id, params) => put({
-    url: `${config.live_service}/activity/${id}/fake`,
-    data: params
-})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getActivityDetailInfo = (id) => get({url: `${config.live_service}/activity/${id}/template`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const modifyActivityDetailInfo = (id, params) => put({
-    url: `${config.live_service}/activity/${id}/template`,
-    data: params
-})
+export const modifyActivityInfo = (params) => put({url: `${config.live_service}/activity`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -143,6 +125,15 @@ export const putActivityIngest = (id, params) => put({
     }).catch(function (error) {
         console.log(error)
     });
+export const deleteActivityIngest = (id) => del({
+    url: `${config.live_service}/activity/${id}/ingest`
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+
 export const getAllPlayers = (params) => get({url: `${config.football_service}/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
@@ -376,14 +367,8 @@ export const updateFormation = (params) => put({url: `${config.football_service}
     });
 
 
-export const preUpload = (filename, filesize) => get({url: `${config.live_service}/activity/preupload?filename=${filename}${filesize ? ('&filesize=' + filesize) : ''}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const createMedia = (id, params) => post({
-    url: `${config.live_service}/activity/${id}/media`,
+export const createActivityMedia = (params) => post({
+    url: `${config.media_service}/media/activity`,
     data: params
 })
     .then(function (response) {
@@ -392,28 +377,28 @@ export const createMedia = (id, params) => post({
         console.log(error)
     });
 
-export const getMediaList = (id) => get({url: `${config.live_service}/activity/${id}/media`})
+export const getActivityMediaList = (param) => get({url: `${config.media_service}/media/activity?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteMedia = (id) => del({url: `${config.live_service}/activity/media/${id}`})
+export const getActivityMedia = (id,param) => get({url: `${config.media_service}/media/activity/${id}?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const bulkMedia = (id, params) => put({
-    url: `${config.live_service}/activity/${id}/media/bulk`,
+export const deleteActivityMedia = (param) => del({url: `${config.media_service}/media/activity?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateActivityMedia = (params) => put({
+    url: `${config.media_service}/media/activity`,
     data: params
 })
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getTransProgress = (id, taskIds) => get({url: `${config.live_service}/activity/${id}/progress?taskIds=${taskIds}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

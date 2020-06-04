@@ -159,7 +159,7 @@ class FootballPlayerDetailManagement extends React.Component {
                     message.warn(data.message, 1);
                 }
             } else {
-                message.error('删除失败：' + (data ? data.result + "-" + data.message : data), 3);
+                message.error('删除失败：' + (data ? data.code + "-" + data.message : data), 3);
             }
         });
     }
@@ -182,7 +182,7 @@ class FootballPlayerDetailManagement extends React.Component {
                     message.success('上传视频成功', 1);
                     this.refresh();
                 } else {
-                    message.error('上传视频失败：' + (data ? data.result + "-" + data.message : data), 3);
+                    message.error('上传视频失败：' + (data ? data.code + "-" + data.message : data), 3);
                 }
             });
         }

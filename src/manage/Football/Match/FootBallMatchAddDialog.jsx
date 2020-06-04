@@ -33,9 +33,6 @@ import {
     getAllLeagueMatchs,
     upload,
     getTeamInLeague,
-    getActivityIngest,
-    postActivityIngest,
-    putActivityIngest
 } from "../../../axios";
 import {message} from "antd/lib/index";
 import {getRound, getJueSaiRankRound} from '../../../utils/index';
@@ -70,11 +67,10 @@ const typeData = [
     }, {
         title: '聊天室',
         value: 4,
+    }, {
+        title: '集锦',
+        value: 5,
     },
-    // {
-    //     title: '推荐赛事',
-    //     value: 5,
-    // },
 ];
 
 class FootBallMatchAddDialog extends React.Component {
@@ -142,20 +138,21 @@ class FootBallMatchAddDialog extends React.Component {
         this.setState({
             listloading: true,
         });
-        getActivityInfoList(params).then((data) => {
-            if (data && data.items) {
+        getActivityInfoList({areatype: 2, ...params}).then((data) => {
+            if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
-                pagination.total = data ? data.pager.total : 0;
+                pagination.total = data.data ? data.data.total : 0;
                 pagination.onChange = this.handleLiveListChange;
                 pagination.size = "small";
                 pagination.simple = true;
                 this.setState({
-                    livedata: data.items,
+                    livedata: data.data ? data.data.records : {},
                     listloading: false,
                     pagination,
                 });
             } else {
-                message.error('获取直播列表失败：' + (data ? data.result + "-" + data.message : data), 3);
+                message.error('获取直播列表失败：' + (data ? data.code + ":" + data.message : data), 3);
+
             }
         })
     }
@@ -182,19 +179,29 @@ class FootBallMatchAddDialog extends React.Component {
         data.startedAt = this.state.liveStartTime ? this.state.liveStartTime : startTime.subtract(30, "m");
         data.endedAt = this.state.liveEndTime ? this.state.liveEndTime : endTime.add(210, "m");
         data.name = this.state.createLivename ? this.state.createLivename : this.props.form.getFieldValue('name');
+        data.areatype = 2;
+        data.startedAt = data.startedAt ? moment(data.startedAt).format('YYYY/MM/DD HH:mm:ss') : null;
+        data.endedAt = data.endedAt ? moment(data.endedAt).format('YYYY/MM/DD HH:mm:ss') : null;
+
         this.setState({
             liveloading: true,
         });
-        data.name = "qsn-" + data.name
         createActivity(data).then((data) => {
+            if (data && data.code == 200) {
+                if (data.data) {
             this.setState({
                 liveloading: false,
             });
             this.getLiveInfoList({
-                pageSize: 10,
+                        pageSize: 5,
                 pageNum: 1,
-                filter: {},
             });
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('创建失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
         });
     }
     onHostSelect = (e, op) => {
@@ -216,9 +223,8 @@ class FootBallMatchAddDialog extends React.Component {
 
     showLiveCreatePop = () => {
         this.getLiveInfoList({
-            pageSize: 10,
+            pageSize: 5,
             pageNum: 1,
-            filter: {},
         });
 
         this.setState({livecreatepopvisible: true, createLivename: this.props.form.getFieldValue('name')});
@@ -264,23 +270,14 @@ class FootBallMatchAddDialog extends React.Component {
         this.getLiveInfoList({
             pageSize: pager.pageSize,
             pageNum: pager.current,
-            filter: {},
         });
     }
     onLivelistClick = (form, item) => {
-        const playUrl = `${item.pullDomain}/${item.app}/${item.stream}.m3u8`;
+        const playUrl = item.pullStreamUrls ? `${item.pullStreamUrls.hls}` : `${item.pullDomain}/${item.app}/${item.stream}.m3u8`;
         form.setFieldsValue({
             activityId: item.id,
             playPath: playUrl,
         })
-        this.setState({pullloading: true});
-        this.getActivityIngest(item.id, () => {
-            this.setState({
-                livecreatepopvisible: false,
-                currentLiveData: item,
-                pullloading: false,
-            });
-        });
     }
     onCreateLiveStartChange = (date, dateString) => {
         this.setState({
@@ -399,59 +396,6 @@ class FootBallMatchAddDialog extends React.Component {
     onTeamClick = () => {
         this.fetch();
     }
-
-    handlePullClick = () => {
-        if (this.props.form.getFieldValue("activityId") == null) {
-            message.warn('请选择直播间后再拉流', 3);
-            return;
-        }
-        this.setState({pullloading: true});
-        if (this.state.pullId != null) {
-            putActivityIngest(this.props.form.getFieldValue("activityId"), {
-                ingestId: this.state.pullId,
-                address: this.state.pullInput,
-                status: "active",
-                party: ""
-            }).then(data => {
-                if (data && data.result) {
-                    message.success("拉流成功", 3)
-                } else {
-                    message.error('拉流失败：' + (data ? data.result + "-" + data.message : data), 3);
-                }
-                this.getActivityIngest(this.props.form.getFieldValue("activityId"), () => {
-                    this.setState({pullloading: false});
-                });
-            });
-        } else {
-            postActivityIngest(this.props.form.getFieldValue("activityId"), {
-                address: this.state.pullInput,
-                status: "active",
-                type: "pull"
-            }).then(data => {
-                if (data && data.result) {
-                    message.success("拉流成功", 3)
-                } else {
-                    message.error('拉流失败：' + (data ? data.result + "-" + data.message : data), 3);
-                }
-                this.getActivityIngest(this.props.form.getFieldValue("activityId"), () => {
-                    this.setState({pullloading: false});
-                });
-            });
-        }
-    }
-
-    onPullInputChange = (e) => {
-        const {value} = e.target;
-        this.setState({pullInput: value});
-    }
-    getActivityIngest = (id, callback) => {
-        getActivityIngest(id).then(data => {
-            if (data && data[0] && data[0]["address"]) {
-                this.setState({pullInput: data[0]["address"], pullId: data[0]["id"]});
-            }
-            callback();
-        });
-    }
     getPlaceSelecter = () => {
         let dom = []
         if (this.state.league && this.state.league.place) {
@@ -469,9 +413,6 @@ class FootBallMatchAddDialog extends React.Component {
         form.setFieldsValue({
             place: item
         })
-    }
-    replaceName = (name) => {
-        return name.replace("qsn-", "")
     }
 
     render() {
@@ -516,14 +457,14 @@ class FootBallMatchAddDialog extends React.Component {
                     <DatePicker
                         value={this.state.liveStartTimeDate ? this.state.liveStartTimeDate : (startTime ? startTime.subtract(30, "m") : null)}
                         onChange={onCreateLiveStartChange}
-                        format="YYYY-MM-DD HH:mm:ss"
+                        format="YYYY/MM/DD HH:mm:ss"
                         placeholder="选择开始时间"
                         showTime/>
                     <p className={"ml-l mr-l"}>-</p>
                     <DatePicker
                         value={this.state.liveEndTimeDate ? this.state.liveEndTimeDate : (endTime ? endTime.add(210, "m") : null)}
                         onChange={onCreateLiveEndChange}
-                        format="YYYY-MM-DD HH:mm:ss"
+                        format="YYYY/MM/DD HH:mm:ss"
                         placeholder="选择结束时间"
                         showTime/>
                 </div>
@@ -550,7 +491,7 @@ class FootBallMatchAddDialog extends React.Component {
                     renderItem={item => (
                         <List.Item>
                             <div className="cursor-hand" onClick={onLivelistClick.bind(this, form, item)}>
-                                <p style={{fontSize: 14}}>{this.replaceName(item.name)}</p>
+                                <p style={{fontSize: 14}}>{item.name}</p>
                                 <p className="mb-n"
                                    style={{fontSize: 10}}>{parseTimeStringWithOutYear(item.startedAt)}~{parseTimeStringWithOutYear(item.endedAt)}</p>
                             </div>
@@ -806,7 +747,7 @@ class FootBallMatchAddDialog extends React.Component {
                         </div>
                         <div className="center w-full">
                             {this.state.currentLiveData ?
-                                <p>{this.replaceName(this.state.currentLiveData.name)}</p>
+                                <p>{this.state.currentLiveData.name}</p>
                                 :
                                 <div/>
                             }
@@ -838,31 +779,6 @@ class FootBallMatchAddDialog extends React.Component {
                         {/*<Input style={{minWidth: 300, textAlign: "center"}}/>*/}
                         {/*)}*/}
                         {/*</FormItem>*/}
-                        {/*</div>*/}
-                        {/*<div className="center w-full">*/}
-                        {/*    <p className="mb-n mt-m" style={{fontSize: 20}}>云犀直播小程序地址</p>*/}
-                        {/*</div>*/}
-                        {/*<div className="center w-full">*/}
-                        {/*    <FormItem className="bs-form-item">*/}
-                        {/*        {getFieldDecorator('remark', {})(*/}
-                        {/*            <Input style={{minWidth: 300, textAlign: "center"}} placeholder='云犀直播小程序地址'/>*/}
-                        {/*        )}*/}
-                        {/*    </FormItem>*/}
-                        {/*</div>*/}
-                        {/*<div className="center w-full">*/}
-                        {/*    <div>*/}
-                        {/*        <p className="mt-m mb-n inline-block" style={{fontSize: 22}}>拉流模式</p>*/}
-                        {/*        <Tooltip title="请选择直播间后输入推流码进行推流">*/}
-                        {/*            <Icon className="inline-block" type="question-circle"/>*/}
-                        {/*        </Tooltip>*/}
-                        {/*    </div>*/}
-                        {/*</div>*/}
-                        {/*<div className="center w-full">*/}
-                        {/*    <Input style={{maxWidth: 300, textAlign: "center"}} onChange={this.onPullInputChange}*/}
-                        {/*           value={this.state.pullInput}/>*/}
-                        {/*    <Button type="primary" shape="round"*/}
-                        {/*            onClick={this.handlePullClick}><Icon*/}
-                        {/*        type={this.state.pullloading ? "loading" : "api"}/>开拉</Button>*/}
                         {/*</div>*/}
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>

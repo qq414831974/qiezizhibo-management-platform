@@ -22,11 +22,13 @@ class Dashboard extends React.Component {
 
     fetch = () => {
         //获取直播列表
-        getActivityInfoList({pageSize: 100, pageNum: 1, status: "enabled"}).then((data) => {
-            if (data && data.items && data.items.length > 0) {
+        getActivityInfoList({pageSize: 100, pageNum: 1, status: 0, areatype: 2}).then((data) => {
+            if (data && data.code == 200) {
                 this.setState({
-                    activityData: data.items,
+                    activityData: data.data ? data.data.records : {},
                 });
+            } else {
+                message.error('获取直播列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
         //获取近期的比赛
