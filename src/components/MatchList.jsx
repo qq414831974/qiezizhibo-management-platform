@@ -103,7 +103,7 @@ class MatchList extends Component {
             pagination: pager,
         });
         this.fetch({
-            filter: pager.filters,
+            pageSize: pager.pageSize,
             pageNum: pager.current,
             ...pager.filters,
         });
