@@ -101,6 +101,12 @@ export const modifyActivityInfo = (params) => put({url: `${config.live_service}/
     }).catch(function (error) {
         console.log(error)
     });
+export const getActivityStautsInfo = (id) => get({url: `${config.live_service}/activity/${id}/status`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const getActivityIngest = (id) => get({url: `${config.live_service}/activity/${id}/ingest`})
     .then(function (response) {
         return response.data;

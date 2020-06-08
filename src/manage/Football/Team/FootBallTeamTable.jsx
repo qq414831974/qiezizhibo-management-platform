@@ -424,7 +424,7 @@ class FootBallTeamTable extends React.Component {
                            size="small"
                            title={() =>
                                <div>
-                                   <Tooltip title="刷新">
+                                   <Tooltip title="添加">
                                        <Button type="primary" shape="circle" icon="plus"
                                                onClick={this.showTeamAddDialog}/>
                                    </Tooltip>
