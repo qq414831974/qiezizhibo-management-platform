@@ -267,7 +267,6 @@ class LiveTable extends React.Component {
         save_link.download = name;
         this.fake_click(save_link);
     }
-
     render() {
         const onNameClick = this.onNameClick;
         const {selectedRowKeys} = this.state;
@@ -350,7 +349,7 @@ class LiveTable extends React.Component {
             title: '正在推流',
             align: 'center',
             render: function (text, record, index) {
-                return <p>{record.status == 1 ? "是" : "否"}</p>;
+                return <p>{record.status==1 ? "是" : "否"}</p>;
             },
             width: '10%',
         }, {
