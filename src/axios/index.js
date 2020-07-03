@@ -389,7 +389,7 @@ export const getActivityMediaList = (param) => get({url: `${config.media_service
     }).catch(function (error) {
         console.log(error)
     });
-export const getActivityMedia = (id,param) => get({url: `${config.media_service}/media/activity/${id}?${unpack(param)}`})
+export const getActivityMedia = (id, param) => get({url: `${config.media_service}/media/activity/${id}?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -889,6 +889,66 @@ export const genLeagueReport = (id) => post({url: `${config.football_service}/le
         console.log(error)
     });
 export const getArticleList = (params) => get({url: `${config.system_service}/system/gongzhong/article?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getProducts = (params) => get({url: `${config.pay_service}/product?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getProduct = (id) => get({url: `${config.pay_service}/product/${id}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const createProduct = (params) => post({url: `${config.pay_service}/product`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateProduct = (params) => put({url: `${config.pay_service}/product`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const delProducts = (params) => del({url: `${config.pay_service}/product?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getOrders = (params) => get({url: `${config.pay_service}/order?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getOrder = (id) => get({url: `${config.pay_service}/order/${id}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateOrder = (params) => put({url: `${config.pay_service}/order`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const closeOrder = (id) => post({url: `${config.pay_service}/pay/${id}/close`, data: {}})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const chargeAllMatchByLeagueId = (id) => get({url: `${config.football_service}/league/${id}/chargeAll`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

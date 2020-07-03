@@ -23,6 +23,8 @@ import ScoreBoardSetting from "../manage/Setting/ScoreBoardSetting";
 import BulletinSetting from "../manage/Setting/BulletinSetting";
 import WechatSetting from "../manage/Setting/WechatSetting";
 import FootballMatchSchedule from "../manage/Football/Match/FootballMatchSchedule";
+import ProductManagement from "../manage/Pay/Product/ProductManagement";
+import OrderManagement from "../manage/Pay/Order/OrderManagement";
 
 
 export default class CRouter extends Component {
@@ -52,6 +54,8 @@ export default class CRouter extends Component {
                 <Route exact path="/setting/scoreboard" component={ScoreBoardSetting}/>
                 <Route exact path="/setting/wechat" component={WechatSetting}/>
                 <Route exact path="/setting/bulletin" component={BulletinSetting}/>
+                <Route exact path="/pay/product" component={ProductManagement}/>
+                <Route exact path="/pay/order" component={OrderManagement}/>
                 <Route path="/football/comment/:id" component={CommentManagement}/>
                 <Route path="/live/:id" component={LiveDetailManagement}/>
                 <Route path="/football/footballTeam/:id" component={TeamDetailManagement}/>

@@ -187,6 +187,8 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
 
         const isMobile = this.props.responsive.data.isMobile;
         const handlePosterChange = this.handlePosterChange;
+        const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (leagueData && leagueData.isLiveCharge);
+        const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (leagueData && leagueData.isRecordCharge);
 
         const {getFieldDecorator} = form;
         return (
@@ -233,6 +235,46 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                                 </Upload>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} label="直播收费" className="bs-form-item">
+                            {getFieldDecorator('isLiveCharge', {
+                                initialValue: leagueData.isLiveCharge,
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({isLiveCharge: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem>
+                        {isLiveCharge ? <FormItem {...formItemLayout} label='直播收费（分）'
+                                                             className="bs-form-item">
+                            {getFieldDecorator('livePrice', {
+                                initialValue: leagueData.livePrice,
+                                rules: [{required: true, message: '请输入价格'}],
+                            })(
+                                <Input placeholder='请输入价格'/>
+                            )}
+                        </FormItem> : null}
+                        <FormItem {...formItemLayout} label="录播收费" className="bs-form-item">
+                            {getFieldDecorator('isRecordCharge', {
+                                initialValue: leagueData.isRecordCharge,
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({isRecordCharge: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem>
+                        {isRecordCharge ? <FormItem {...formItemLayout} label='录播收费（分）'
+                                                               className="bs-form-item">
+                            {getFieldDecorator('recordPrice', {
+                                initialValue: leagueData.recordPrice,
+                                rules: [{required: true, message: '请输入价格'}],
+                            })(
+                                <Input placeholder='请输入价格'/>
+                            )}
+                        </FormItem> : null}
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
                                 rules: [{required: true, message: '请选择类型'}],

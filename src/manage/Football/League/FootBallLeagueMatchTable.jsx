@@ -3,7 +3,7 @@ import {Table, Input, Button, Icon, Modal, Tooltip} from 'antd';
 import {getAllLeagueMatchSeries} from '../../../axios/index';
 import {mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
-import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch} from "../../../axios";
+import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch, chargeAllMatchByLeagueId} from "../../../axios";
 import {Form, message} from "antd/lib/index";
 import FootBallLeagueMatchAddDialog from "../League/FootBallLeagueMatchAddDialog"
 import FootBallLeagueMatchModifyDialog from "../League/FootBallLeagueMatchModifyDialog"
@@ -273,6 +273,8 @@ class FootBallLeagueMatchTable extends React.Component {
                     `/football/footballMatch?leagueId=${this.state.record.id}`
                 }>浏览比赛</Link>
             </Button>,
+            <Button key="chargeall" type="primary" className="pull-left"
+                    onClick={this.showChargeAllConfirm}>全部收费</Button>,
             <Button key="delete" type="danger" className="pull-left"
                     onClick={this.handleLeagueDelete}>删除</Button>,
             <Button key="back" onClick={this.handleLeagueMatchModifyCancel}>取消</Button>,
@@ -280,6 +282,26 @@ class FootBallLeagueMatchTable extends React.Component {
                 确定
             </Button>
         ]
+    }
+    handleChargeAllCancel = () => {
+        this.setState({chargeAllVisible: false})
+    }
+    showChargeAllConfirm = () => {
+        this.setState({chargeAllVisible: true})
+    }
+    chargeAll = () => {
+        chargeAllMatchByLeagueId(this.state.record.id).then(data => {
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.setState({chargeAllVisible: false})
+                    message.success('修改成功', 1);
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
     }
 
     render() {
@@ -498,6 +520,17 @@ class FootBallLeagueMatchTable extends React.Component {
             >
                 <p style={{fontSize: 14}}>是否确认删除{this.state.deleteCols}条数据？</p>
                 <p className="mb-n text-danger">注意：删除联赛将删除联赛所有比赛数据！！！</p>
+            </Modal>
+            <Modal
+                key="dialog-chargeall"
+                className={isMobile ? "top-n" : ""}
+                title="确认修改"
+                visible={this.state.chargeAllVisible}
+                onOk={this.chargeAll}
+                onCancel={this.handleChargeAllCancel}
+                zIndex={1001}
+            >
+                <p style={{fontSize: 14}}>是否确认将联赛中的比赛全部设置为与联赛相同的收费方式？</p>
             </Modal>
         </div>
     }

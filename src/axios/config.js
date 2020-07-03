@@ -14,6 +14,7 @@ export const football_service = `${gateway_client_service}/service-football`
 export const media_service = `${gateway_client_service}/service-media`
 export const chat_service = `${gateway_client_service}/service-chat`
 export const live_service = `${gateway_client_service}/service-live`
+export const pay_service = `${gateway_client_service}/service-pay`
 export const websocket_service = `${gateway_client_service}/service-websocket`
 
 

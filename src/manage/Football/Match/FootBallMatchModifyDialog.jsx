@@ -457,6 +457,8 @@ class FootBallMatchModifyDialog extends React.Component {
         const onCreateLiveNameChange = this.onCreateLiveNameChange
         const handleAvatarChange = this.handleAvatarChange
         const isMobile = this.props.responsive.data.isMobile;
+        const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (record && record.isLiveCharge);
+        const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (record && record.isRecordCharge);
 
         const content_create = <div>
             <Divider className="mb-n" orientation="right">
@@ -843,6 +845,55 @@ class FootBallMatchModifyDialog extends React.Component {
                         {/*)}*/}
                         {/*</FormItem>*/}
                         {/*</div>*/}
+                        <div className="center w-full">
+                            <span className="mb-n mt-m" style={{fontSize: 20}}>收费设置</span>
+                        </div>
+                        <div className="center w-full">
+                            <span>直播收费：</span>
+                            <FormItem {...formItemLayout} className="bs-form-item">
+                                {getFieldDecorator('isLiveCharge', {
+                                    initialValue: record ? record.isLiveCharge : false,
+                                    valuePropName: 'checked',
+                                    onChange: (e) => {
+                                        this.setState({isLiveCharge: e.target.checked})
+                                    }
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                            {isLiveCharge ? <FormItem {...formItemLayout}
+                                                      className="bs-form-item">
+                                {getFieldDecorator('livePrice', {
+                                    initialValue: record ? record.livePrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                        </div>
+                        <div className="center w-full">
+                            <span>录播收费：</span>
+                            <FormItem {...formItemLayout} className="bs-form-item">
+                                {getFieldDecorator('isRecordCharge', {
+                                    initialValue: record ? record.isRecordCharge : false,
+                                    valuePropName: 'checked',
+                                    onChange: (e) => {
+                                        this.setState({isRecordCharge: e.target.checked})
+                                    }
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                            {isRecordCharge ? <FormItem {...formItemLayout}
+                                                        className="bs-form-item">
+                                {getFieldDecorator('recordPrice', {
+                                    initialValue: record ? record.recordPrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                        </div>
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>
                         </div>

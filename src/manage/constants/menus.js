@@ -18,6 +18,13 @@ export const menus = [
             { key: '/football/footballPlayer', title: '球员', icon: 'user', },
         ],
     },
+    {
+        key: '/pay', title: '交易管理', icon: 'dollar',
+        sub: [
+            { key: '/pay/order', title: '订单管理', icon: 'shopping-cart', },
+            { key: '/pay/product', title: '产品管理', icon: 'shopping', },
+        ],
+    },
     { key: '/live', title: '直播管理', icon: 'video-camera', },
     { key: '/setting', title: '设置', icon: 'setting',
         sub: [

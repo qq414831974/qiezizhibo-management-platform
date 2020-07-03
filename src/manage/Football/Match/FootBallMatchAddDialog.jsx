@@ -15,7 +15,7 @@ import {
     Upload,
     Progress,
     TreeSelect,
-    Tooltip,
+    Tooltip, Checkbox,
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
@@ -434,6 +434,9 @@ class FootBallMatchAddDialog extends React.Component {
         const isMobile = this.props.responsive.data.isMobile;
         const startTime = form.getFieldValue('startTime') ? moment(form.getFieldValue('startTime')) : null;
         const endTime = form.getFieldValue('startTime') ? moment(form.getFieldValue('startTime')) : null;
+        const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (this.state.currentLeague && this.state.currentLeague.isLiveCharge);
+        const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (this.state.currentLeague && this.state.currentLeague.isRecordCharge);
+
         const content_create = <div>
             <Divider className="mb-n" orientation="right">
                 <div className="center">
@@ -782,6 +785,55 @@ class FootBallMatchAddDialog extends React.Component {
                         {/*)}*/}
                         {/*</FormItem>*/}
                         {/*</div>*/}
+                        <div className="center w-full">
+                            <span className="mb-n mt-m" style={{fontSize: 20}}>收费设置</span>
+                        </div>
+                        <div className="center w-full">
+                            <span>直播收费：</span>
+                            <FormItem {...formItemLayout} className="bs-form-item">
+                                {getFieldDecorator('isLiveCharge', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.isLiveCharge : false,
+                                    valuePropName: 'checked',
+                                    onChange: (e) => {
+                                        this.setState({isLiveCharge: e.target.checked})
+                                    }
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                            {isLiveCharge ? <FormItem {...formItemLayout}
+                                                                 className="bs-form-item">
+                                {getFieldDecorator('livePrice', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.livePrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                        </div>
+                        <div className="center w-full">
+                            <span>录播收费：</span>
+                            <FormItem {...formItemLayout} className="bs-form-item">
+                                {getFieldDecorator('isRecordCharge', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.isRecordCharge : false,
+                                    valuePropName: 'checked',
+                                    onChange: (e) => {
+                                        this.setState({isRecordCharge: e.target.checked})
+                                    }
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                            {isRecordCharge ? <FormItem {...formItemLayout}
+                                                                   className="bs-form-item">
+                                {getFieldDecorator('recordPrice', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.recordPrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                        </div>
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>
                         </div>

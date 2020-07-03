@@ -238,6 +238,42 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 <Checkbox/>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} label="直播收费" className="bs-form-item">
+                            {getFieldDecorator('isLiveCharge', {
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({isLiveCharge: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem>
+                        {this.state.isLiveCharge ? <FormItem {...formItemLayout} label='直播收费（分）'
+                                                             className="bs-form-item">
+                            {getFieldDecorator('livePrice', {
+                                rules: [{required: true, message: '请输入价格'}],
+                            })(
+                                <Input placeholder='请输入价格'/>
+                            )}
+                        </FormItem> : null}
+                        <FormItem {...formItemLayout} label="录播收费" className="bs-form-item">
+                            {getFieldDecorator('isRecordCharge', {
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({isRecordCharge: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem>
+                        {this.state.isRecordCharge ? <FormItem {...formItemLayout} label='录播收费（分）'
+                                                               className="bs-form-item">
+                            {getFieldDecorator('recordPrice', {
+                                rules: [{required: true, message: '请输入价格'}],
+                            })(
+                                <Input placeholder='请输入价格'/>
+                            )}
+                        </FormItem> : null}
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
                                 rules: [{required: true, message: '请选择类型'}],
@@ -320,7 +356,7 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                     if (e == null) {
                                         return null
                                     }
-                                    if (typeof(e) === 'string') {
+                                    if (typeof (e) === 'string') {
                                         return e.replace(/[^\d]/g, '')
                                     }
                                     return e
