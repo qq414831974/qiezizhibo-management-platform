@@ -798,6 +798,12 @@ export const setBulletin = (params) => post({url: `${config.system_service}/syst
     }).catch(function (error) {
         console.log(error)
     });
+export const updateBulletin = (params) => put({url: `${config.system_service}/system/config/bulletin`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const deleteBulletin = (params) => del({url: `${config.system_service}/system/config?${unpack(params)}`})
     .then(function (response) {
         return response.data;
@@ -943,6 +949,12 @@ export const updateOrder = (params) => put({url: `${config.pay_service}/order`, 
         console.log(error)
     });
 export const closeOrder = (id) => post({url: `${config.pay_service}/pay/${id}/close`, data: {}})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const queryOrder = (id) => post({url: `${config.pay_service}/pay/${id}/query`, data: {}})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

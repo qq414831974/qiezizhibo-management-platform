@@ -5,7 +5,7 @@ import BannerUpload from './BannerUpload';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../action";
 import {connect} from "react-redux";
-import {getBulletin, setBulletin, deleteBulletin, delAreaById, createArea} from "../../axios";
+import {getBulletin, setBulletin,updateBulletin, deleteBulletin, delAreaById, createArea} from "../../axios";
 import ScoreBoard from './ScoreBoard';
 import {Form} from "antd/lib/index";
 import BulletinAddDialog from "./BulletinAddDialog";
@@ -93,7 +93,7 @@ class BulletinSetting extends React.Component {
             if (err) {
                 return;
             }
-            setBulletin(values).then((data) => {
+            updateBulletin(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();

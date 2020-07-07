@@ -1,6 +1,6 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Row, Col} from 'antd';
-import {getOrders, updateOrder, closeOrder} from '../../../axios/index';
+import {getOrders, updateOrder, closeOrder, queryOrder} from '../../../axios/index';
 import {Form, message} from "antd/lib/index";
 import OrderModifyDialog from './OrderModifyDialog';
 import {receiveData} from "../../../action";
@@ -180,6 +180,19 @@ class OrderTable extends React.Component {
     dismissCancel = () => {
         this.setState({cancelVisible: false})
     }
+    handleOrderUpdateClick = () => {
+        queryOrder(this.state.record.id).then(data => {
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.setState({dialogModifyVisible: false})
+                    this.refresh();
+                    message.success('更新成功', 1);
+                }
+            } else {
+                message.error('更新失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
+    }
 
     render() {
         const onNameClick = this.onNameClick;
@@ -348,6 +361,8 @@ class OrderTable extends React.Component {
                 title="修改订单"
                 visible={this.state.dialogModifyVisible}
                 footer={[
+                    <Button key="update" type="primary" className="pull-left"
+                            onClick={this.handleOrderUpdateClick}>更新订单状态</Button>,
                     <Button key="cancel" type="danger" onClick={this.handleOrderCancelClick}>取消订单</Button>,
                     <Button key="back" onClick={this.handleOrderModifyCancel}>取消</Button>,
                     <Button key="submit" type="primary" onClick={this.handleOrderModifyCreate}>确定</Button>,
