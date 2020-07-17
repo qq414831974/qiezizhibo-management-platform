@@ -1,6 +1,6 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip} from 'antd';
-import {getAllLeagueMatchSeries} from '../../../axios/index';
+import {getAllLeagueMatchSeries, getwxacodeunlimit} from '../../../axios/index';
 import {mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
 import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch, chargeAllMatchByLeagueId} from "../../../axios";
@@ -303,9 +303,34 @@ class FootBallLeagueMatchTable extends React.Component {
             }
         })
     }
-
+    genWxaCode = (record) => {
+        let page;
+        if (record.isparent) {
+            page = `pages/series/series`
+        } else {
+            page = `pages/leagueManager/leagueManager`
+        }
+        getwxacodeunlimit({page: page, scene: `${record.id}`}).then(data => {
+            this.downloadBase64(`小程序码-联赛-${record.id}.jpg`, `data:image/png;base64,${data}`)
+        })
+    }
+    downloadBase64 = (name, data) => {
+        const save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+        save_link.href = data;
+        save_link.download = name;
+        this.fake_click(save_link);
+    }
+    fake_click = (obj) => {
+        const ev = document.createEvent("MouseEvents");
+        ev.initMouseEvent(
+            "click", true, false, window, 0, 0, 0, 0, 0
+            , false, false, false, false, 0, null
+        );
+        obj.dispatchEvent(ev);
+    }
     render() {
         const onNameClick = this.onNameClick;
+        const genWxaCode = this.genWxaCode;
         const {selectedRowKeys} = this.state;
         const AddDialog = Form.create()(FootBallLeagueMatchAddDialog);
         const ModifyDialog = Form.create()(FootBallLeagueMatchModifyDialog);
@@ -376,7 +401,7 @@ class FootBallLeagueMatchTable extends React.Component {
             title: '类型',
             align: 'center',
             dataIndex: 'isparent',
-            width: '10%',
+            width: '8%',
             render: function (text, record, index) {
                 return <p>{(record.isparent ? "系列赛" : "联赛")}</p>
             }
@@ -384,7 +409,7 @@ class FootBallLeagueMatchTable extends React.Component {
             title: '地区类型',
             align: 'center',
             dataIndex: 'phoneNumber',
-            width: '10%',
+            width: '8%',
             render: function (text, record, index) {
                 let type = "-";
                 if (record.areatype) {
@@ -401,7 +426,7 @@ class FootBallLeagueMatchTable extends React.Component {
                 title: <Tooltip title="备注从9-0开始代表在首页的排序顺序，9第一位，8第二位以此类推"><span>备注</span></Tooltip>,
                 align: 'center',
                 dataIndex: 'remark',
-                width: '10%',
+                width: '8%',
             },
             {
                 title: <span>轮播id</span>,
@@ -412,6 +437,14 @@ class FootBallLeagueMatchTable extends React.Component {
                         copy(`../leagueManager/leagueManager?id=${record.id}`);
                         message.success('轮播链接已复制到剪贴板');
                     }}>{record.id ? `${record.id}` : "-"}</p>
+                }
+            },
+            {
+                title: "小程序码",
+                align: 'center',
+                width: '6%',
+                render: function (text, record, index) {
+                    return <span onClick={genWxaCode.bind(this, record)}>生成</span>
                 }
             },
         ];

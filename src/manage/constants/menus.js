@@ -16,6 +16,7 @@ export const menus = [
             { key: '/football/footballMatch', title: '球赛', icon: 'dribbble', },
             { key: '/football/footballTeam', title: '球队', icon: 'team', },
             { key: '/football/footballPlayer', title: '球员', icon: 'user', },
+            { key: '/football/import', title: '导入', icon: 'import', },
         ],
     },
     {
@@ -29,7 +30,7 @@ export const menus = [
     { key: '/setting', title: '设置', icon: 'setting',
         sub: [
             { key: '/setting/banner', title: '轮播图', icon: 'picture', },
-            { key: '/setting/bulletin', title: '公告栏', icon: 'notification', },
+            { key: '/setting/bulletin', title: '广告/公告', icon: 'notification', },
             { key: '/setting/scoreboard', title: '比分牌', icon: 'table', },
             // { key: '/setting/wechat', title: '小程序', icon: 'wechat', },
         ],

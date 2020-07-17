@@ -13,6 +13,7 @@ import MatchDetailManagement from "../manage/Football/Match/FootBallMatchDetailM
 import FootBallLeagueMatchManagement from "../manage/Football/League/FootBallLeagueMatchManagement";
 import FootBallLeagueMatchSeriesManagement from "../manage/Football/League/FootBallLeagueMatchSeriesManagement";
 import FootballLeagueMatchDetailManagement from "../manage/Football/League/FootballLeagueMatchDetailManagement";
+import ImportManagement from "../manage/Football/Import/ImportManagement";
 import RoleManagement from "../manage/Role/RoleManagement";
 import PermissionManagement from "../manage/Permission/PermissionManagement";
 import AreasManagement from "../manage/Areas/AreasManagement";
@@ -25,6 +26,7 @@ import WechatSetting from "../manage/Setting/WechatSetting";
 import FootballMatchSchedule from "../manage/Football/Match/FootballMatchSchedule";
 import ProductManagement from "../manage/Pay/Product/ProductManagement";
 import OrderManagement from "../manage/Pay/Order/OrderManagement";
+import ImportLYSYManagement from "../manage/Football/Import/LYSY/ImportLYSYManagement";
 
 
 export default class CRouter extends Component {
@@ -56,6 +58,8 @@ export default class CRouter extends Component {
                 <Route exact path="/setting/bulletin" component={BulletinSetting}/>
                 <Route exact path="/pay/product" component={ProductManagement}/>
                 <Route exact path="/pay/order" component={OrderManagement}/>
+                <Route exact path="/football/import" component={ImportManagement}/>
+                <Route exact path="/football/import/lysy" component={ImportLYSYManagement}/>
                 <Route path="/football/comment/:id" component={CommentManagement}/>
                 <Route path="/live/:id" component={LiveDetailManagement}/>
                 <Route path="/football/footballTeam/:id" component={TeamDetailManagement}/>

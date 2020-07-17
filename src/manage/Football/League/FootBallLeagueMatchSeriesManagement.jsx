@@ -7,7 +7,7 @@ import {
     removeLeagueIntoSeries,
     getNoSeriesLeague,
     createLeagueMatch, updateLeagueMatchById,
-    getLeagueMatchById, delLeagueMatchByIds,
+    getLeagueMatchById, delLeagueMatchByIds, getwxacodeunlimit,
 } from "../../../axios";
 import {parseTimeStringYMD} from "../../../utils";
 import copy from "copy-to-clipboard/index";
@@ -206,10 +206,35 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             this.removeRecord();
         }
     }
-
+    genWxaCode = (record) => {
+        let page;
+        if (record.isparent) {
+            page = `pages/series/series`
+        } else {
+            page = `pages/leagueManager/leagueManager`
+        }
+        getwxacodeunlimit({page: page, scene: `${record.id}`}).then(data => {
+            this.downloadBase64(`小程序码-联赛-${record.id}.jpg`, `data:image/png;base64,${data}`)
+        })
+    }
+    downloadBase64 = (name, data) => {
+        const save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+        save_link.href = data;
+        save_link.download = name;
+        this.fake_click(save_link);
+    }
+    fake_click = (obj) => {
+        const ev = document.createEvent("MouseEvents");
+        ev.initMouseEvent(
+            "click", true, false, window, 0, 0, 0, 0, 0
+            , false, false, false, false, 0, null
+        );
+        obj.dispatchEvent(ev);
+    }
     render() {
         const isMobile = this.props.responsive.data.isMobile;
         const onNameClick = this.onNameClick;
+        const genWxaCode = this.genWxaCode;
         const AddDialog = Form.create()(FootBallLeagueMatchAddDialog);
         const ModifyDialog = Form.create()(FootBallLeagueMatchModifyDialog);
         const AddLeagueDialog = Form.create()(FootBallLeagueSeriesAddLeagueDialog);
@@ -253,7 +278,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             title: '联系电话',
             align: 'center',
             dataIndex: 'phoneNumber',
-            width: '15%',
+            width: '10%',
             render: function (text, record, index) {
                 return <p>{record.phoneNumber ? record.phoneNumber : "-"}</p>
             }
@@ -273,6 +298,14 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                         copy(`../leagueManager/leagueManager?id=${record.id}`);
                         message.success('轮播链接已复制到剪贴板');
                     }}>{record.id ? `${record.id}` : "-"}</p>
+                }
+            },
+            {
+                title: "小程序码",
+                align: 'center',
+                width: '5%',
+                render: function (text, record, index) {
+                    return <span onClick={genWxaCode.bind(this, record)}>生成</span>
                 }
             },
         ];

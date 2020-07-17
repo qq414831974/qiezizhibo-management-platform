@@ -918,7 +918,7 @@ export const createProduct = (params) => post({url: `${config.pay_service}/produ
     }).catch(function (error) {
         console.log(error)
     });
-export const updateProduct = (params) => put({url: `${config.pay_service}/product`, data: params})
+export const updateProduct = (params) => put({url: `${config.pay_service}/product?force=true`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -961,6 +961,30 @@ export const queryOrder = (id) => post({url: `${config.pay_service}/pay/${id}/qu
         console.log(error)
     });
 export const chargeAllMatchByLeagueId = (id) => get({url: `${config.football_service}/league/${id}/chargeAll`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getwxacodeunlimit = (param) => post({url: `${config.system_service}/system/wxa_codeunlimit`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const importLYSYTeamPlayer = (param) => get({url: `${config.system_service}/system/file/import/LYSY?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const importLYSYMatch = (param) => get({url: `${config.system_service}/system/file/import/LYSY/match?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const importLYSYLeaguePlayer = (param) => get({url: `${config.system_service}/system/file/import/LYSY/league/player?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

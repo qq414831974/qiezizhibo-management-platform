@@ -802,12 +802,21 @@ class FootBallMatchAddDialog extends React.Component {
                                 )}
                             </FormItem>
                             {isLiveCharge ? <FormItem {...formItemLayout}
-                                                                 className="bs-form-item">
+                                                      className="bs-form-item">
                                 {getFieldDecorator('livePrice', {
                                     initialValue: this.state.currentLeague ? this.state.currentLeague.livePrice : null,
                                     rules: [{required: true, message: '请输入价格'}],
                                 })(
-                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                    <Input addonBefore="永久" addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                            {isLiveCharge ? <FormItem {...formItemLayout}
+                                                      className="bs-form-item">
+                                {getFieldDecorator('liveMonthPrice', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.liveMonthPrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonBefore="一月" addonAfter="分" placeholder='请输入价格'/>
                                 )}
                             </FormItem> : null}
                         </div>
@@ -825,15 +834,57 @@ class FootBallMatchAddDialog extends React.Component {
                                 )}
                             </FormItem>
                             {isRecordCharge ? <FormItem {...formItemLayout}
-                                                                   className="bs-form-item">
+                                                        className="bs-form-item">
                                 {getFieldDecorator('recordPrice', {
                                     initialValue: this.state.currentLeague ? this.state.currentLeague.recordPrice : null,
                                     rules: [{required: true, message: '请输入价格'}],
                                 })(
-                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                    <Input addonBefore="永久" addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                            {isRecordCharge ? <FormItem {...formItemLayout}
+                                                        className="bs-form-item">
+                                {getFieldDecorator('recordMonthPrice', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.recordMonthPrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonBefore="一月" addonAfter="分" placeholder='请输入价格'/>
                                 )}
                             </FormItem> : null}
                         </div>
+                        {isLiveCharge || isRecordCharge ?
+                            <div className="center w-full" style={{fontWeight: 'bold'}}>付费人数放大</div> : null}
+                        {isLiveCharge || isRecordCharge ? <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.base', {
+                                    initialValue: this.state.currentLeague && this.state.currentLeague.expand ? this.state.currentLeague.expand.base : randomNum(0, 10),
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="初始值" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="初始值"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s"> </span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.expandMin', {
+                                    initialValue: this.state.currentLeague && this.state.currentLeague.expand ? this.state.currentLeague.expand.expandMin : 2,
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="放大最小" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="最小值"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s">-</span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.expandMax', {
+                                    initialValue: this.state.currentLeague && this.state.currentLeague.expand ? this.state.currentLeague.expand.expandMax : 5,
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="放大最大" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="最大值"/>
+                                )}
+                            </FormItem>
+                        </div> : null}
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>
                         </div>

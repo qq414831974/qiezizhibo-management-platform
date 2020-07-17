@@ -8,14 +8,15 @@ import {
     Upload,
     Button,
     Modal,
-    List
+    List, Icon, Tooltip, Avatar
 } from 'antd';
 import {receiveData} from "../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {getAreasList, upload, getArticleList, getActivityInfoList} from "../../axios";
+import {getAreasList, upload, getArticleList, getActivityInfoList, getAllMatchs} from "../../axios";
 import imgcover from '../../static/imgcover.jpg';
 import {parseTimeStringWithOutYear} from "../../utils";
+import defultAvatar from "../../static/avatar.jpg";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -33,7 +34,11 @@ const formItemLayout = {
 };
 
 class BulletinAddDialog extends React.Component {
-    state = {loading: true}
+    state = {
+        loading: false,
+        data: [],
+        match: {}
+    }
 
     componentDidMount() {
         getAreasList().then((data) => {
@@ -48,6 +53,25 @@ class BulletinAddDialog extends React.Component {
         });
     }
 
+    fetch = (searchText, pageNum) => {
+        this.setState({
+            loading: true,
+        });
+        getAllMatchs({pageSize: 20, pageNum: pageNum, name: searchText}).then((data) => {
+            if (data && data.code == 200 && data.data) {
+                this.setState({
+                    data: pageNum == 1 ? (data.data ? data.data.records : []) :
+                        (data ? this.state.data.concat(data.data.records) : []),
+                    loading: false,
+                    pageNum: data.data.current,
+                    pageSize: data.data.size,
+                    pageTotal: data.data.total,
+                });
+            } else {
+                message.error('获取比赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        });
+    }
     getAreasOption = () => {
         let dom = [];
         dom.push(<Option value={null} data={null} key={`area-none`}>不选</Option>);
@@ -87,12 +111,19 @@ class BulletinAddDialog extends React.Component {
     onRadioChange = (e) => {
         this.setState({curtain: e.target.value})
     }
+    onMatchRadioChange = (e) => {
+        const {form} = this.props;
+        if (e.target.value == false) {
+            form.setFieldsValue({scene: {type: "home"}})
+        }
+        this.setState({isMatch: e.target.value})
+    }
     getArticleList = (params) => {
         this.setState({
             listloading: true,
         });
         getArticleList(params).then((res) => {
-            if(res && res.code == 200){
+            if (res && res.code == 200) {
                 const data = res.data
                 if (data) {
                     const pagination = {...this.state.pagination};
@@ -139,6 +170,48 @@ class BulletinAddDialog extends React.Component {
             type: "website"
         })
         this.onArticleShowHide();
+    }
+    handleChange = (value) => {
+        const {form} = this.props;
+        form.setFieldsValue({scene: {type: "match", id: `${value}`}})
+    }
+    handleShowMore = (e) => {
+        const num = Math.floor(e.target.scrollTop / 50);
+        if (num + 5 >= this.state.data.length) {
+            this.handleOnLoadMore(e);
+        }
+    }
+    handleOnLoadMore = (e) => {
+        let data = this.state.data;
+        e.target.scrollTop = data.length * 50;
+        if (this.state.loading) {
+            return;
+        }
+        if (data.length > this.state.pageTotal) {
+            this.setState({
+                hasMore: false,
+                loading: false,
+            });
+            return;
+        }
+        this.fetch(this.state.searchText, this.state.pageNum + 1);
+    }
+    handleSearch = (e) => {
+        const value = e.target.value;
+        this.setState({searchText: value});
+        // setTimeout(()=>{
+        if (this.isCompositions) {
+            this.fetch(value, 1);
+        }
+        // },100);
+    }
+    //中文输入中的状态 参考 https://blog.csdn.net/qq1194222919/article/details/80747192
+    onInputCompositionStart = () => {
+        this.isCompositions = false;
+    }
+    onInputCompositionEnd = () => {
+        this.isCompositions = true;
+        this.fetch(this.state.searchText, 1);
     }
 
     render() {
@@ -191,7 +264,20 @@ class BulletinAddDialog extends React.Component {
                 }}
             />
         </div>
-
+        const currentMatch = this.state.match;
+        const options = this.state.data.map(d => <Option style={{height: 50}} key={d.id} value={d.id}>
+            <Tooltip title={d.name + "-" + d.startTime}>
+                {(d.hostteam == null || d.guestteam == null) ?
+                    <span>{d.name}</span>
+                    : <div className="center">
+                        <Avatar src={d.hostteam ? d.hostteam.headImg : defultAvatar}/>
+                        <p className="ml-s">{d.hostteam ? d.hostteam.name : ""}</p>
+                        <p className="ml-s mr-s">{d.score}</p>
+                        <Avatar src={d.guestteam ? d.guestteam.headImg : defultAvatar}/>
+                        <p className="ml-s">{d.guestteam ? d.guestteam.name : ""}</p>
+                    </div>}
+            </Tooltip>
+        </Option>);
         return (
             visible ?
                 <Form>
@@ -205,6 +291,76 @@ class BulletinAddDialog extends React.Component {
                             </RadioGroup>
                         )}
                     </FormItem>
+                    {this.state.curtain ? <FormItem {...formItemLayout} label="位置" className="bs-form-item">
+                        {getFieldDecorator('isMatch', {
+                            initialValue: false,
+                            hidden: true,
+                        })(
+                            <RadioGroup onChange={this.onMatchRadioChange}>
+                                <Radio value={false}>首页</Radio>
+                                <Radio value={true}>比赛</Radio>
+                            </RadioGroup>
+                        )}
+                    </FormItem> : null}
+                    {this.state.isMatch ? <FormItem {...formItemLayout} className="bs-form-item">
+                        {getFieldDecorator('scene', {
+                            rules: [{required: true, message: '请选择关联比赛!'}],
+                        })(
+                            <Input hidden={true}/>
+                        )}
+                    </FormItem> : <FormItem {...formItemLayout} className="bs-form-item">
+                        {getFieldDecorator('scene', {
+                            initialValue: {type: "home"},
+                        })(
+                            <Input hidden={true}/>
+                        )}
+                    </FormItem>}
+                    {this.state.isMatch ?
+                        <div>
+                            <div className="center w-full">
+                                <span style={{fontSize: 16, fontWeight: 'bold'}}>关联比赛</span>
+                            </div>
+                            <Select
+                                showSearch
+                                style={{minWidth: 300}}
+                                placeholder="按名称搜索并选择"
+                                defaultActiveFirstOption={false}
+                                showArrow={false}
+                                filterOption={false}
+                                onChange={this.handleChange}
+                                onPopupScroll={this.handleShowMore}
+                                notFoundContent={null}
+                                // mode="tags"
+                                // loading={this.state.loading}
+                                getInputElement={() => (
+                                    <input onInput={this.handleSearch}
+                                           onCompositionStart={this.onInputCompositionStart}
+                                           onCompositionEnd={this.onInputCompositionEnd}/>)}
+                            >
+                                {options}
+                            </Select>
+                            <div className="center w-full">
+                                <Icon className="ml-s" style={{fontSize: 16}} type="loading"
+                                      hidden={!this.state.loading}/>
+                            </div>
+                            <div className="center w-full">
+                                {(currentMatch.hostteam == null || currentMatch.guestteam == null) ?
+                                    <Tooltip
+                                        title={currentMatch.name + "-" + currentMatch.startTime}><span>{currentMatch.name}</span></Tooltip>
+                                    : <Tooltip title={currentMatch.name + "-" + currentMatch.startTime}>
+                                        <div className="center">
+                                            <Avatar
+                                                src={currentMatch.hostteam ? currentMatch.hostteam.headImg : defultAvatar}/>
+                                            <p className="ml-s">{currentMatch.hostteam ? currentMatch.hostteam.name : ""}</p>
+                                            <p className="ml-s mr-s">{currentMatch.score}</p>
+                                            <Avatar
+                                                src={currentMatch.guestteam ? currentMatch.guestteam.headImg : defultAvatar}/>
+                                            <p className="ml-s">{currentMatch.guestteam ? currentMatch.guestteam.name : ""}</p>
+                                        </div>
+                                    </Tooltip>}
+                            </div>
+                        </div>
+                        : null}
                     <FormItem {...formItemLayout} label="跳转类型" className="bs-form-item">
                         {getFieldDecorator('type', {
                             rules: [{required: true, message: '请选择!'}],

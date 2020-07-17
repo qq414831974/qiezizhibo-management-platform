@@ -19,7 +19,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {uploadimg, getAreasList} from "../../../axios/index";
 import avatar from '../../../static/avatar.jpg';
-import {toChinesNum} from '../../../utils/index';
+import {randomNum, toChinesNum} from '../../../utils/index';
 import {upload} from "../../../axios";
 import imgcover from '../../../static/imgcover.jpg';
 import {message} from "antd/lib/index";
@@ -248,12 +248,20 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 <Checkbox/>
                             )}
                         </FormItem>
-                        {this.state.isLiveCharge ? <FormItem {...formItemLayout} label='直播收费（分）'
+                        {this.state.isLiveCharge ? <FormItem {...formItemLayout} label='直播收费'
                                                              className="bs-form-item">
                             {getFieldDecorator('livePrice', {
                                 rules: [{required: true, message: '请输入价格'}],
                             })(
-                                <Input placeholder='请输入价格'/>
+                                <Input addonBefore="永久" addonAfter="分" placeholder='请输入价格'/>
+                            )}
+                        </FormItem> : null}
+                        {this.state.isLiveCharge ? <FormItem {...formItemLayout} label='直播收费'
+                                                             className="bs-form-item">
+                            {getFieldDecorator('liveMonthPrice', {
+                                rules: [{required: true, message: '请输入价格'}],
+                            })(
+                                <Input addonBefore="一月" addonAfter="分" placeholder='请输入价格'/>
                             )}
                         </FormItem> : null}
                         <FormItem {...formItemLayout} label="录播收费" className="bs-form-item">
@@ -266,14 +274,52 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 <Checkbox/>
                             )}
                         </FormItem>
-                        {this.state.isRecordCharge ? <FormItem {...formItemLayout} label='录播收费（分）'
+                        {this.state.isRecordCharge ? <FormItem {...formItemLayout} label='录播收费'
                                                                className="bs-form-item">
                             {getFieldDecorator('recordPrice', {
                                 rules: [{required: true, message: '请输入价格'}],
                             })(
-                                <Input placeholder='请输入价格'/>
+                                <Input addonBefore="永久" addonAfter="分" placeholder='请输入价格'/>
                             )}
                         </FormItem> : null}
+                        {this.state.isRecordCharge ? <FormItem {...formItemLayout} label='录播收费'
+                                                               className="bs-form-item">
+                            {getFieldDecorator('recordMonthPrice', {
+                                rules: [{required: true, message: '请输入价格'}],
+                            })(
+                                <Input addonBefore="一月" addonAfter="分" placeholder='请输入价格'/>
+                            )}
+                        </FormItem> : null}
+                        {this.state.isLiveCharge || this.state.isRecordCharge ?<div className="center w-full" style={{fontWeight: 'bold'}}>付费人数放大</div>:null}
+                        {this.state.isLiveCharge || this.state.isRecordCharge ? <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.base', {
+                                    initialValue: randomNum(0, 10),
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="初始值" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="初始值"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s"> </span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.expandMin', {
+                                    initialValue: 2,
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="放大最小" style={{minWidth: 60, textAlign: "center"}} placeholder="最小值"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s">-</span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.expandMax', {
+                                    initialValue: 5,
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="放大最大" style={{minWidth: 60, textAlign: "center"}} placeholder="最大值"/>
+                                )}
+                            </FormItem>
+                        </div>: null}
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
                                 rules: [{required: true, message: '请选择类型'}],

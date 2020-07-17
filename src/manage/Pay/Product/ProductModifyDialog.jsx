@@ -54,6 +54,14 @@ class ProductModifyDialog extends React.Component {
                             <Input placeholder='请输入价格!'/>
                         )}
                     </FormItem>
+                    <FormItem {...formItemLayout} label="第二价格（分）" className="bs-form-item">
+                        {getFieldDecorator('secondPrice', {
+                            initialValue: record.secondPrice,
+                            rules: [{required: true, message: '请输入价格!'}],
+                        })(
+                            <Input placeholder='请输入价格!'/>
+                        )}
+                    </FormItem>
                     <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                         {getFieldDecorator('type', {
                             initialValue: record.type,

@@ -10,6 +10,7 @@ import {
     addMatchSchedule,
     uploaddocx_match,
     updateMatchScoreStatusById,
+    getwxacodeunlimit
 } from "../../../axios";
 import {Form, message, notification} from "antd/lib/index";
 import FootBallMatchAddDialog from "../Match/FootBallMatchAddDialog"
@@ -388,6 +389,12 @@ class FootBallMatchTable extends React.Component {
         save_link.download = name;
         this.fake_click(save_link);
     }
+    downloadBase64 = (name, data) => {
+        const save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+        save_link.href = data;
+        save_link.download = name;
+        this.fake_click(save_link);
+    }
     handleUploadChange = (info) => {
         if (info.file.status === 'uploading') {
             this.setState({uploadloading: true});
@@ -419,8 +426,14 @@ class FootBallMatchTable extends React.Component {
             this.setState({viewText: "观看人数", viewType: 1})
         }
     }
+    genWxaCode = (record) => {
+        getwxacodeunlimit({page: `pages/live/live`, scene: `${record.id}`}).then(data => {
+            this.downloadBase64(`小程序码-比赛-${record.id}.jpg`, `data:image/png;base64,${data}`)
+        })
+    }
 
     render() {
+        const genWxaCode = this.genWxaCode;
         const onScoreClick = this.onScoreClick;
         const onNameClick = this.onNameClick;
         const {selectedRowKeys} = this.state;
@@ -486,7 +499,7 @@ class FootBallMatchTable extends React.Component {
             title: '地点',
             align: 'center',
             dataIndex: 'place',
-            width: '20%',
+            width: '18%',
             render: function (text, record, index) {
                 return <p>{record.place ? record.place : "-"}</p>
             }
@@ -502,7 +515,7 @@ class FootBallMatchTable extends React.Component {
             title: '状态',
             align: 'center',
             dataIndex: 'status',
-            width: '10%',
+            width: '6%',
             render: function (text, record, index) {
                 return <p className="cursor-hand"
                           onClick={onScoreClick.bind(this, record)}>{record.status == null ? "未开" : (record.status == -1 ? "未开" : status[record.status].text)}</p>
@@ -529,6 +542,15 @@ class FootBallMatchTable extends React.Component {
                 }
             },
         },
+            {
+                title: "小程序码",
+                align: 'center',
+                dataIndex: 'wxacode',
+                width: '6%',
+                render: function (text, record, index) {
+                    return <span onClick={genWxaCode.bind(this, record)}>生成</span>
+                },
+            },
         ];
         const columns_moblie = [{
             title: '比赛',

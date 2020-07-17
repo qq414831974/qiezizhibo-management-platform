@@ -20,7 +20,7 @@ import {
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
-import {getJueSaiRankRound, getRound, parseTimeStringWithOutYear, trim} from '../../../utils';
+import {getJueSaiRankRound, getRound, parseTimeStringWithOutYear, randomNum, trim} from '../../../utils';
 import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
@@ -867,7 +867,16 @@ class FootBallMatchModifyDialog extends React.Component {
                                     initialValue: record ? record.livePrice : null,
                                     rules: [{required: true, message: '请输入价格'}],
                                 })(
-                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                    <Input addonBefore="永久" addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                            {isLiveCharge ? <FormItem {...formItemLayout}
+                                                      className="bs-form-item">
+                                {getFieldDecorator('liveMonthPrice', {
+                                    initialValue: record ? record.liveMonthPrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonBefore="一月" addonAfter="分" placeholder='请输入价格'/>
                                 )}
                             </FormItem> : null}
                         </div>
@@ -890,10 +899,52 @@ class FootBallMatchModifyDialog extends React.Component {
                                     initialValue: record ? record.recordPrice : null,
                                     rules: [{required: true, message: '请输入价格'}],
                                 })(
-                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                    <Input addonBefore="永久" addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                            {isRecordCharge ? <FormItem {...formItemLayout}
+                                                        className="bs-form-item">
+                                {getFieldDecorator('recordMonthPrice', {
+                                    initialValue: record ? record.recordMonthPrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonBefore="一月" addonAfter="分" placeholder='请输入价格'/>
                                 )}
                             </FormItem> : null}
                         </div>
+                        {isLiveCharge || isRecordCharge ?
+                            <div className="center w-full" style={{fontWeight: 'bold'}}>付费人数放大</div> : null}
+                        {isLiveCharge || isRecordCharge ? <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.base', {
+                                    initialValue: record && record.expand ? record.expand.base : randomNum(0, 10),
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="初始值" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="初始值"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s"> </span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.expandMin', {
+                                    initialValue: record && record.expand ? record.expand.expandMin : 2,
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="放大最小" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="最小值"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s">-</span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.expandMax', {
+                                    initialValue: record && record.expand ? record.expand.expandMax : 5,
+                                    rules: [{required: true, message: '请输入'}],
+                                })(
+                                    <Input addonBefore="放大最大" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="最大值"/>
+                                )}
+                            </FormItem>
+                        </div> : null}
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>
                         </div>
