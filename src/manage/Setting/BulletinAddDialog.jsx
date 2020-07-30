@@ -39,7 +39,7 @@ class BulletinAddDialog extends React.Component {
         data: [],
         match: {}
     }
-
+    isCompositions = true;
     componentDidMount() {
         getAreasList().then((data) => {
             if (data && data.code == 200) {

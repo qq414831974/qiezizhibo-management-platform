@@ -7,7 +7,7 @@ import {
     removeLeagueIntoSeries,
     getNoSeriesLeague,
     createLeagueMatch, updateLeagueMatchById,
-    getLeagueMatchById, delLeagueMatchByIds, getwxacodeunlimit,
+    getLeagueMatchById, delLeagueMatchByIds, getwxacodeunlimit, chargeAllMatchByLeagueId,
 } from "../../../axios";
 import {parseTimeStringYMD} from "../../../utils";
 import copy from "copy-to-clipboard/index";
@@ -206,6 +206,26 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             this.removeRecord();
         }
     }
+    handleChargeAllCancel = () => {
+        this.setState({chargeAllVisible: false})
+    }
+    showChargeAllConfirm = () => {
+        this.setState({chargeAllVisible: true})
+    }
+    chargeAll = () => {
+        chargeAllMatchByLeagueId(this.state.record.id).then(data => {
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.setState({chargeAllVisible: false})
+                    message.success('修改成功', 1);
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
+    }
     genWxaCode = (record) => {
         let page;
         if (record.isparent) {
@@ -399,6 +419,8 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                                 `/football/footballMatch?leagueId=${this.state.record.id}`
                             }>浏览比赛</Link>
                         </Button>,
+                        <Button key="chargeall" type="primary" className="pull-left"
+                                onClick={this.showChargeAllConfirm}>全部收费</Button>,
                         <Button key="delete" type="danger" className="pull-left"
                                 onClick={this.handleLeagueDelete}>删除</Button>,
                         <Button key="delete2" type="danger" className="pull-left"
@@ -442,6 +464,17 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                         visible={this.state.dialogAddSeriesVisible}
                         record={this.state.leagueData}
                         ref={this.saveAddLeagueDialogRef}/>
+                </Modal>
+                <Modal
+                    key="dialog-chargeall"
+                    className={isMobile ? "top-n" : ""}
+                    title="确认修改"
+                    visible={this.state.chargeAllVisible}
+                    onOk={this.chargeAll}
+                    onCancel={this.handleChargeAllCancel}
+                    zIndex={1001}
+                >
+                    <p style={{fontSize: 14}}>是否确认将联赛中的比赛全部设置为与联赛相同的收费方式？</p>
                 </Modal>
             </div>
         );

@@ -15,6 +15,7 @@ import moment from 'moment'
 import 'moment/locale/zh-cn';
 import copy from "copy-to-clipboard/index";
 import LiveModifyDialog from "./LiveModifyDialog";
+import LiveQualityEchartsViews from "./LiveQualityEchartsViews";
 
 moment.locale('zh-cn');
 
@@ -180,7 +181,7 @@ class LiveStatusManagement extends React.Component {
                         </span>
                     </div>
                     <div className="w-full center mt-s">
-                        <Button type="primary" onClick={this.onNameClick.bind(this,this.state.data)}>详细信息</Button>
+                        <Button type="primary" onClick={this.onNameClick.bind(this, this.state.data)}>详细信息</Button>
                     </div>
                     <List
                         rowKey={record => record.id}
@@ -215,6 +216,7 @@ class LiveStatusManagement extends React.Component {
                             </Row>
                         </List.Item>)}
                     />
+                    <LiveQualityEchartsViews id={this.props.id}/>
                 </div>
                 <Modal
                     width={600}

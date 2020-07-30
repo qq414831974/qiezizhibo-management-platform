@@ -74,6 +74,10 @@ class OrderModifyDialog extends React.Component {
                                 <Option value={0}>未支付</Option>
                                 <Option value={1}>已取消</Option>
                                 <Option value={2}>已付款</Option>
+                                <Option value={3}>退款中</Option>
+                                <Option value={4}>已退款</Option>
+                                <Option value={5}>退款失败</Option>
+                                <Option value={6}>退款关闭</Option>
                             </Select>
                         )}
                     </FormItem>

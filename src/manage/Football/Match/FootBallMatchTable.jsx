@@ -74,6 +74,7 @@ class FootBallMatchTable extends React.Component {
     fetch = (params = {}) => {
         params["sortField"] = "startTime";
         params["sortOrder"] = "desc";
+        params["chargeIgnoreMedia"] = true;
         this.setState({loading: true});
         getAllMatchs(params).then((data) => {
             if (data && data.code == 200) {

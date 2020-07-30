@@ -954,6 +954,12 @@ export const closeOrder = (id) => post({url: `${config.pay_service}/pay/${id}/cl
     }).catch(function (error) {
         console.log(error)
     });
+export const refundOrder = (id) => post({url: `${config.pay_service}/pay/${id}/refund`, data: {}})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const queryOrder = (id) => post({url: `${config.pay_service}/pay/${id}/query`, data: {}})
     .then(function (response) {
         return response.data;
@@ -985,6 +991,42 @@ export const importLYSYMatch = (param) => get({url: `${config.system_service}/sy
         console.log(error)
     });
 export const importLYSYLeaguePlayer = (param) => get({url: `${config.system_service}/system/file/import/LYSY/league/player?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getFreeTickets = (param) => get({url: `${config.pay_service}/freeTicket?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getFreeTicketById = (id) => get({url: `${config.pay_service}/freeTicket/${id}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addFreeTicket = (param) => post({url: `${config.pay_service}/freeTicket`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateFreeTicket = (param) => put({url: `${config.pay_service}/freeTicket`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteFreeTickets = (params) => del({url: `${config.pay_service}/freeTicket?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLiveQuality = (id) => get({url: `${config.live_service}/activity/${id}/quality`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

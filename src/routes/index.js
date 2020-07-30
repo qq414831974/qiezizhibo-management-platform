@@ -27,6 +27,7 @@ import FootballMatchSchedule from "../manage/Football/Match/FootballMatchSchedul
 import ProductManagement from "../manage/Pay/Product/ProductManagement";
 import OrderManagement from "../manage/Pay/Order/OrderManagement";
 import ImportLYSYManagement from "../manage/Football/Import/LYSY/ImportLYSYManagement";
+import FreeTicketManagement from "../manage/Pay/FreeTicket/FreeTicketManagement";
 
 
 export default class CRouter extends Component {
@@ -68,6 +69,7 @@ export default class CRouter extends Component {
                 <Route path="/football/footballLeagueSeries/:id" component={FootBallLeagueMatchSeriesManagement}/>
                 <Route path="/football/footballPlayer/:id" component={FootballPlayerDetailManagement}/>
                 <Route path="/football/schedule" component={FootballMatchSchedule}/>
+                <Route path="/freeTicket" component={FreeTicketManagement}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )

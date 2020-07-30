@@ -202,11 +202,11 @@ class UserModifyDialog extends React.Component {
                             <Input.TextArea placeholder='备注'/>
                         )}
                     </FormItem>
-                    <FormItem {...formItemLayout} className="bs-form-item">
+                    <FormItem {...formItemLayout} label="用户id" className="bs-form-item">
                         {getFieldDecorator('userNo', {
                             initialValue: record.userNo,
                         })(
-                            <Input hidden={true}/>
+                            <Input disabled/>
                         )}
                     </FormItem>
                 </Form>

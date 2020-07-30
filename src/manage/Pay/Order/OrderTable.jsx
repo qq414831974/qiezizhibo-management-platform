@@ -1,11 +1,12 @@
 import React from 'react';
-import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Row, Col} from 'antd';
-import {getOrders, updateOrder, closeOrder, queryOrder} from '../../../axios/index';
+import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Row, Col, Avatar} from 'antd';
+import {getOrders, updateOrder, closeOrder, queryOrder, refundOrder} from '../../../axios/index';
 import {Form, message} from "antd/lib/index";
 import OrderModifyDialog from './OrderModifyDialog';
 import {receiveData} from "../../../action";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
+import defultAvatar from "../../../static/avatar.jpg";
 
 const InputGroup = Input.Group;
 
@@ -164,6 +165,9 @@ class OrderTable extends React.Component {
     handleOrderCancelClick = () => {
         this.setState({cancelVisible: true})
     }
+    handleOrderRefundClick = () => {
+        this.setState({refundVisible: true})
+    }
     handleCancelOK = () => {
         closeOrder(this.state.record.id).then(data => {
             if (data && data.code == 200) {
@@ -177,8 +181,24 @@ class OrderTable extends React.Component {
             }
         })
     }
+    handleRefundOK = () => {
+        refundOrder(this.state.record.id).then(data => {
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.setState({refundVisible: false, dialogModifyVisible: false})
+                    this.refresh();
+                    message.success('退款发起成功', 1);
+                }
+            } else {
+                message.error('退款发起失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
+    }
     dismissCancel = () => {
         this.setState({cancelVisible: false})
+    }
+    dismissRefund = () => {
+        this.setState({refundVisible: false})
     }
     handleOrderUpdateClick = () => {
         queryOrder(this.state.record.id).then(data => {
@@ -193,9 +213,14 @@ class OrderTable extends React.Component {
             }
         })
     }
+    toMatch = (item) => {
+        const history = this.props.history;
+        history.push(`/football/footballMatch/${item.id}`);
+    }
 
     render() {
         const onNameClick = this.onNameClick;
+        const toMatch = this.toMatch;
 
         const ModifyDialog = Form.create()(OrderModifyDialog);
 
@@ -219,6 +244,10 @@ class OrderTable extends React.Component {
                             <Radio value={0}>未支付</Radio>
                             <Radio value={1}>已取消</Radio>
                             <Radio value={2}>已付款</Radio>
+                            <Radio value={3}>退款中</Radio>
+                            <Radio value={4}>已退款</Radio>
+                            <Radio value={5}>退款失败</Radio>
+                            <Radio value={6}>退款关闭</Radio>
                         </Radio.Group>
                     </div>
                 </div>
@@ -230,7 +259,7 @@ class OrderTable extends React.Component {
                     filterDropdownVisible: visible,
                 }, () => this.searchInput && this.searchInput.focus());
             },
-            width: '30%',
+            width: '25%',
             align: 'center',
             render: function (text, record, index) {
                 return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.id}</a>;
@@ -286,6 +315,18 @@ class OrderTable extends React.Component {
                     case 2:
                         statusString = "已付款"
                         break;
+                    case 3:
+                        statusString = "退款中"
+                        break;
+                    case 4:
+                        statusString = "已退款"
+                        break;
+                    case 5:
+                        statusString = "退款失败"
+                        break;
+                    case 6:
+                        statusString = "退款关闭"
+                        break;
                 }
                 return <span>{statusString}</span>;
             },
@@ -300,7 +341,28 @@ class OrderTable extends React.Component {
             key: 'description',
             dataIndex: 'description',
             align: 'center',
-            width: '30%',
+            width: '35%',
+            render: function (text, record, index) {
+                if (record.match) {
+                    const match = record.match;
+                    const hostteam = match.hostteam;
+                    const guestteam = match.guestteam;
+                    if (hostteam == null || guestteam == null) {
+                        return <Tooltip title={`比赛时间：${match.startTime}`}><span className="cursor-hand"
+                                                                                onClick={toMatch.bind(this, record.match)}>{match.name}</span></Tooltip>;
+                    }
+                    return <Tooltip title={`比赛时间：${match.startTime}`}>
+                        <div className="center cursor-hand" onClick={toMatch.bind(this, record.match)}>
+                            <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
+                            <p className="ml-s">{hostteam.name}</p>
+                            <p className="ml-s mr-s">VS</p>
+                            <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
+                            <p className="ml-s">{guestteam.name}</p>
+                        </div>
+                    </Tooltip>;
+                }
+                return <span>{record.description}</span>;
+            },
         }
         ];
         const columns_moblie = [{
@@ -363,6 +425,7 @@ class OrderTable extends React.Component {
                 footer={[
                     <Button key="update" type="primary" className="pull-left"
                             onClick={this.handleOrderUpdateClick}>更新订单状态</Button>,
+                    <Button key="refund" type="danger" onClick={this.handleOrderRefundClick}>发起退款</Button>,
                     <Button key="cancel" type="danger" onClick={this.handleOrderCancelClick}>取消订单</Button>,
                     <Button key="back" onClick={this.handleOrderModifyCancel}>取消</Button>,
                     <Button key="submit" type="primary" onClick={this.handleOrderModifyCreate}>确定</Button>,
@@ -379,7 +442,17 @@ class OrderTable extends React.Component {
                 onCancel={this.dismissCancel}
                 zIndex={1001}
             >
-                <p className="mb-n" style={{fontSize: 14}}>是否确认取消订单？</p>
+                <p className="mb-n" style={{fontSize: 14}}>是否确认取消该订单？</p>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="确认退款"
+                visible={this.state.refundVisible}
+                onOk={this.handleRefundOK}
+                onCancel={this.dismissRefund}
+                zIndex={1001}
+            >
+                <p className="mb-n" style={{fontSize: 14}}>是否确认退款该订单？</p>
             </Modal>
         </div>
     }
