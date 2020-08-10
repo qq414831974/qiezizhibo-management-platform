@@ -26,18 +26,23 @@ class ImportLYSYManagement extends React.Component {
         this.setState({importPlayerRankVisible: false})
     }
     importTeamConfirm = () => {
+        if (this.state.importLoading) {
+            return;
+        }
         const leagueId = this.state.importTeamLYSYLeagueId;
         const city = this.state.importTeamLYSYCity;
         if (leagueId == null || city == null) {
             message.error("参数不能为空", 3)
             return;
         }
+        this.setState({importLoading: true})
         importLYSYTeamPlayer({
             leagueId: leagueId,
             city: city,
         }).then(data => {
             if (data && data.code == 200) {
                 if (data.data) {
+                    this.setState({importLoading: false, importTeamVisible: false})
                     message.success(data.message, 1);
                 }
             } else {
@@ -46,6 +51,9 @@ class ImportLYSYManagement extends React.Component {
         })
     }
     importMatchConfirm = () => {
+        if (this.state.importLoading) {
+            return;
+        }
         const lysyLeagueId = this.state.importMatchLYSYLeagueId;
         const leagueId = this.state.importMatchLeagueId;
         const duration = this.state.importMatchDuration;
@@ -53,6 +61,7 @@ class ImportLYSYManagement extends React.Component {
             message.error("参数不能为空", 3)
             return;
         }
+        this.setState({importLoading: true})
         importLYSYMatch({
             leagueId: leagueId,
             lysyLeagueId: lysyLeagueId,
@@ -60,6 +69,7 @@ class ImportLYSYManagement extends React.Component {
         }).then(data => {
             if (data && data.code == 200) {
                 if (data.data) {
+                    this.setState({importLoading: false, importMatchVisible: false})
                     message.success(data.message, 1);
                 }
             } else {
@@ -68,18 +78,23 @@ class ImportLYSYManagement extends React.Component {
         })
     }
     importPlayerRankConfirm = () => {
+        if (this.state.importLoading) {
+            return;
+        }
         const lysyLeagueId = this.state.importPlayerRankLYSYLeagueId;
         const leagueId = this.state.importPlayerRankLeagueId;
         if (lysyLeagueId == null || leagueId == null) {
             message.error("参数不能为空", 3)
             return;
         }
+        this.setState({importLoading: true})
         importLYSYLeaguePlayer({
             leagueId: leagueId,
             lysyLeagueId: lysyLeagueId,
         }).then(data => {
             if (data && data.code == 200) {
                 if (data.data) {
+                    this.setState({importLoading: false, importPlayerRankVisible: false})
                     message.success(data.message, 1);
                 }
             } else {
@@ -214,7 +229,8 @@ class ImportLYSYManagement extends React.Component {
                     visible={this.state.importTeamVisible}
                     footer={[
                         <Button key="back" onClick={this.importTeamCancel}>取消</Button>,
-                        <Button key="confirm" type="primary" onClick={this.importTeamConfirm}>确定</Button>,
+                        <Button key="confirm" type="primary" loading={this.state.importLoading}
+                                onClick={this.importTeamConfirm}>{this.state.importLoading ? "导入中" : "确定"}</Button>,
                     ]}
                     onCancel={this.importTeamCancel}>
                     {this.getImportTeamContent()}
@@ -224,7 +240,8 @@ class ImportLYSYManagement extends React.Component {
                     visible={this.state.importMatchVisible}
                     footer={[
                         <Button key="back" onClick={this.importMatchCancel}>取消</Button>,
-                        <Button key="confirm" type="primary" onClick={this.importMatchConfirm}>确定</Button>,
+                        <Button key="confirm" type="primary" loading={this.state.importLoading}
+                                onClick={this.importMatchConfirm}>{this.state.importLoading ? "导入中" : "确定"}</Button>,
                     ]}
                     onCancel={this.importMatchCancel}>
                     {this.getImportMatchContent()}
@@ -234,7 +251,8 @@ class ImportLYSYManagement extends React.Component {
                     visible={this.state.importPlayerRankVisible}
                     footer={[
                         <Button key="back" onClick={this.importPlayerRankCancel}>取消</Button>,
-                        <Button key="confirm" type="primary" onClick={this.importPlayerRankConfirm}>确定</Button>,
+                        <Button key="confirm" type="primary" loading={this.state.importLoading}
+                                onClick={this.importPlayerRankConfirm}>{this.state.importLoading ? "导入中" : "确定"}</Button>,
                     ]}
                     onCancel={this.importPlayerRankCancel}>
                     {this.getImportPlayerRankContent()}

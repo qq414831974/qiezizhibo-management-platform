@@ -25,7 +25,9 @@ class LiveQualityEchartsViews extends React.Component {
             if (res && res.code == 200) {
                 this.setState({
                     FPSValue: this.getFPSValue(res.data),
+                    metaFPSValue: this.getMetaFPSValue(res.data),
                     bitrateValue: this.getBitRateValue(res.data),
+                    metaBitrateValue: this.getMetaBitRateValue(res.data),
                     key: this.getKey(res.data),
                     loading: false,
                 });
@@ -48,10 +50,24 @@ class LiveQualityEchartsViews extends React.Component {
         })
         return value;
     }
+    getMetaFPSValue = (data) => {
+        const value = [];
+        Object.values(data).forEach(v => {
+            value.push(v.mateFps);
+        })
+        return value;
+    }
     getBitRateValue = (data) => {
         const value = [];
         Object.values(data).forEach(v => {
             value.push(v.videoRate);
+        })
+        return value;
+    }
+    getMetaBitRateValue = (data) => {
+        const value = [];
+        Object.values(data).forEach(v => {
+            value.push(v.metaVideoRate * 1000);
         })
         return value;
     }
@@ -131,6 +147,36 @@ class LiveQualityEchartsViews extends React.Component {
                 }
             },
             series: [{
+                name: '标准帧数',
+                type: 'line',
+                smooth: true,
+                showSymbol: false,
+                symbol: 'circle',
+                symbolSize: 6,
+                data: this.state.metaFPSValue,
+                areaStyle: {
+                    normal: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                            offset: 0,
+                            color: 'rgba(127,255,170,0.5)'
+                        }, {
+                            offset: 1,
+                            color: 'rgba(127,255,170,0.5)'
+                        }], false)
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        color: 'rgba(60,179,113,0.5)'
+                    }
+                },
+                lineStyle: {
+
+                    normal: {
+                        width: 3
+                    }
+                }
+            }, {
                 name: '帧数',
                 type: 'line',
                 smooth: true,
@@ -237,27 +283,27 @@ class LiveQualityEchartsViews extends React.Component {
                 }
             },
             series: [{
-                name: '码率',
+                name: '最高码率',
                 type: 'line',
                 smooth: true,
                 showSymbol: false,
                 symbol: 'circle',
                 symbolSize: 6,
-                data: this.state.bitrateValue,
+                data: this.state.metaBitrateValue,
                 areaStyle: {
                     normal: {
                         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
                             offset: 0,
-                            color: 'rgba(216, 244, 247,1)'
+                            color: 'rgba(127,255,170,0.5)'
                         }, {
                             offset: 1,
-                            color: 'rgba(216, 244, 247,1)'
+                            color: 'rgba(127,255,170,0.5)'
                         }], false)
                     }
                 },
                 itemStyle: {
                     normal: {
-                        color: '#58c8da'
+                        color: 'rgba(60,179,113,0.5)'
                     }
                 },
                 lineStyle: {
@@ -266,7 +312,38 @@ class LiveQualityEchartsViews extends React.Component {
                         width: 3
                     }
                 }
-            }
+            },
+                {
+                    name: '码率',
+                    type: 'line',
+                    smooth: true,
+                    showSymbol: false,
+                    symbol: 'circle',
+                    symbolSize: 6,
+                    data: this.state.bitrateValue,
+                    areaStyle: {
+                        normal: {
+                            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                offset: 0,
+                                color: 'rgba(216, 244, 247,1)'
+                            }, {
+                                offset: 1,
+                                color: 'rgba(216, 244, 247,1)'
+                            }], false)
+                        }
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: '#58c8da'
+                        }
+                    },
+                    lineStyle: {
+
+                        normal: {
+                            width: 3
+                        }
+                    }
+                }
             ]
         };
         return this.state.loading ? null : <div className="mt-l">

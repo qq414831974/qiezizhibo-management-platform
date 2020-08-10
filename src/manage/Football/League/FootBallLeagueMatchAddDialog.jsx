@@ -294,7 +294,7 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                         {this.state.isLiveCharge || this.state.isRecordCharge ? <div className="center w-full">
                             <FormItem style={{margin: 0}}>
                                 {getFieldDecorator('expand.base', {
-                                    initialValue: randomNum(0, 10),
+                                    initialValue: randomNum(1, 10),
                                     rules: [{required: true, message: '请输入'}],
                                 })(
                                     <Input addonBefore="初始值" style={{minWidth: 60, textAlign: "center"}}

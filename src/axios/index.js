@@ -978,19 +978,19 @@ export const getwxacodeunlimit = (param) => post({url: `${config.system_service}
     }).catch(function (error) {
         console.log(error)
     });
-export const importLYSYTeamPlayer = (param) => get({url: `${config.system_service}/system/file/import/LYSY?${unpack(param)}`})
+export const importLYSYTeamPlayer = (param) => get({url: `${config.system_service}/file/import/LYSY?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const importLYSYMatch = (param) => get({url: `${config.system_service}/system/file/import/LYSY/match?${unpack(param)}`})
+export const importLYSYMatch = (param) => get({url: `${config.system_service}/file/import/LYSY/match?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const importLYSYLeaguePlayer = (param) => get({url: `${config.system_service}/system/file/import/LYSY/league/player?${unpack(param)}`})
+export const importLYSYLeaguePlayer = (param) => get({url: `${config.system_service}/file/import/LYSY/league/player?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1026,7 +1026,7 @@ export const deleteFreeTickets = (params) => del({url: `${config.pay_service}/fr
     }).catch(function (error) {
         console.log(error)
     });
-export const getLiveQuality = (id) => get({url: `${config.live_service}/activity/${id}/quality`})
+export const getLiveQuality = (id) => get({url: `${config.live_service}/activity/${id}/quality/info`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
