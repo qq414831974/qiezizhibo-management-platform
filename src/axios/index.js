@@ -1032,6 +1032,12 @@ export const getLiveQuality = (id) => get({url: `${config.live_service}/activity
     }).catch(function (error) {
         console.log(error)
     });
+export const getMatchMonopolys = (param) => get({url: `${config.football_service}/match/monopoly?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 //47.92.82. 5
 //129.204.161. 196
 //www.qiezizhibo. com

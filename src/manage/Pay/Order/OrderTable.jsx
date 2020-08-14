@@ -358,6 +358,7 @@ class OrderTable extends React.Component {
                             <p className="ml-s mr-s">VS</p>
                             <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
                             <p className="ml-s">{guestteam.name}</p>
+                            {record.type == 3 ? <span className="danger">买断</span>:null}
                         </div>
                     </Tooltip>;
                 }

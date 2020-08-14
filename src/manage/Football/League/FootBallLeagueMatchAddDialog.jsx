@@ -320,6 +320,24 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 )}
                             </FormItem>
                         </div>: null}
+                        <FormItem {...formItemLayout} label="开启买断" className="bs-form-item">
+                            {getFieldDecorator('isMonopolyCharge', {
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({isMonopolyCharge: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem>
+                        {this.state.isMonopolyCharge ? <FormItem {...formItemLayout} label='买断收费'
+                                                               className="bs-form-item">
+                            {getFieldDecorator('monopolyPrice', {
+                                rules: [{required: true, message: '请输入价格'}],
+                            })(
+                                <Input addonAfter="分" placeholder='请输入价格'/>
+                            )}
+                        </FormItem> : null}
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
                                 rules: [{required: true, message: '请选择类型'}],

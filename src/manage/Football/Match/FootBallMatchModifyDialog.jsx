@@ -459,6 +459,7 @@ class FootBallMatchModifyDialog extends React.Component {
         const isMobile = this.props.responsive.data.isMobile;
         const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (record && record.isLiveCharge);
         const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (record && record.isRecordCharge);
+        const isMonopolyCharge = this.state.isMonopolyCharge != null ? this.state.isMonopolyCharge : (record && record.isMonopolyCharge);
 
         const content_create = <div>
             <Divider className="mb-n" orientation="right">
@@ -945,6 +946,29 @@ class FootBallMatchModifyDialog extends React.Component {
                                 )}
                             </FormItem>
                         </div> : null}
+                        <div className="center w-full">
+                            <span>开启买断：</span>
+                            <FormItem {...formItemLayout} className="bs-form-item">
+                                {getFieldDecorator('isMonopolyCharge', {
+                                    initialValue: record ? record.isMonopolyCharge : false,
+                                    valuePropName: 'checked',
+                                    onChange: (e) => {
+                                        this.setState({isMonopolyCharge: e.target.checked})
+                                    }
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                            {isMonopolyCharge ? <FormItem {...formItemLayout}
+                                                    className="bs-form-item">
+                                {getFieldDecorator('monopolyPrice', {
+                                    initialValue: record ? record.monopolyPrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                        </div>
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>
                         </div>

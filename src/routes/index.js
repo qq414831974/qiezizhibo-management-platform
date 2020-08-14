@@ -28,6 +28,7 @@ import ProductManagement from "../manage/Pay/Product/ProductManagement";
 import OrderManagement from "../manage/Pay/Order/OrderManagement";
 import ImportLYSYManagement from "../manage/Football/Import/LYSY/ImportLYSYManagement";
 import FreeTicketManagement from "../manage/Pay/FreeTicket/FreeTicketManagement";
+import MatchMonopolyManagement from "../manage/Pay/Monopoly/MatchMonopolyManagement";
 
 
 export default class CRouter extends Component {
@@ -70,6 +71,7 @@ export default class CRouter extends Component {
                 <Route path="/football/footballPlayer/:id" component={FootballPlayerDetailManagement}/>
                 <Route path="/football/schedule" component={FootballMatchSchedule}/>
                 <Route path="/freeTicket" component={FreeTicketManagement}/>
+                <Route path="/monopoly" component={MatchMonopolyManagement}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )

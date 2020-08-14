@@ -24,6 +24,7 @@ export const menus = [
         sub: [
             { key: '/pay/order', title: '订单管理', icon: 'shopping-cart', },
             { key: '/pay/product', title: '产品管理', icon: 'shopping', },
+            { key: '/monopoly', title: '比赛买断', icon: 'money-collect', },
             { key: '/freeTicket', title: '免费观看', icon: 'transaction', },
         ],
     },

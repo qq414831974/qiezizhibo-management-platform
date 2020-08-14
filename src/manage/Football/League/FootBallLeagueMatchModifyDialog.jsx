@@ -195,6 +195,7 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
         const isSeries = this.state.isSeries != null ? this.state.isSeries : (record && record.isparent);
         const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (record && record.isLiveCharge);
         const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (record && record.isRecordCharge);
+        const isMonopolyCharge = this.state.isMonopolyCharge != null ? this.state.isMonopolyCharge : (record && record.isMonopolyCharge);
         return (
             visible ?
                 <div>
@@ -335,6 +336,26 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                 )}
                             </FormItem>
                         </div> : null}
+                        <FormItem {...formItemLayout} label="开启买断" className="bs-form-item">
+                            {getFieldDecorator('isMonopolyCharge', {
+                                initialValue: record.isMonopolyCharge,
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({isMonopolyCharge: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem>
+                        {isMonopolyCharge ? <FormItem {...formItemLayout} label='买断收费'
+                                                className="bs-form-item">
+                            {getFieldDecorator('monopolyPrice', {
+                                rules: [{required: true, message: '请输入价格'}],
+                                initialValue: record.monopolyPrice,
+                            })(
+                                <Input addonAfter="分" placeholder='请输入价格'/>
+                            )}
+                        </FormItem> : null}
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
                                 rules: [{required: true, message: '请选择类型'}],

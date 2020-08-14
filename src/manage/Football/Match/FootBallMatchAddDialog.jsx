@@ -436,6 +436,7 @@ class FootBallMatchAddDialog extends React.Component {
         const endTime = form.getFieldValue('startTime') ? moment(form.getFieldValue('startTime')) : null;
         const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (this.state.currentLeague && this.state.currentLeague.isLiveCharge);
         const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (this.state.currentLeague && this.state.currentLeague.isRecordCharge);
+        const isMonopolyCharge = this.state.isMonopolyCharge != null ? this.state.isMonopolyCharge : (this.state.currentLeague && this.state.currentLeague.isMonopolyCharge);
 
         const content_create = <div>
             <Divider className="mb-n" orientation="right">
@@ -885,6 +886,29 @@ class FootBallMatchAddDialog extends React.Component {
                                 )}
                             </FormItem>
                         </div> : null}
+                        <div className="center w-full">
+                            <span>开启买断：</span>
+                            <FormItem {...formItemLayout} className="bs-form-item">
+                                {getFieldDecorator('isMonopolyCharge', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.isMonopolyCharge : false,
+                                    valuePropName: 'checked',
+                                    onChange: (e) => {
+                                        this.setState({isMonopolyCharge: e.target.checked})
+                                    }
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                            {isMonopolyCharge ? <FormItem {...formItemLayout}
+                                                        className="bs-form-item">
+                                {getFieldDecorator('monopolyPrice', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.monopolyPrice : null,
+                                    rules: [{required: true, message: '请输入价格'}],
+                                })(
+                                    <Input addonAfter="分" placeholder='请输入价格'/>
+                                )}
+                            </FormItem> : null}
+                        </div>
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>
                         </div>
