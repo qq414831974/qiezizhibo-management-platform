@@ -1038,6 +1038,30 @@ export const getMatchMonopolys = (param) => get({url: `${config.football_service
     }).catch(function (error) {
         console.log(error)
     });
+export const getShareSentenceList = () => get({url: `${config.system_service}/system/share/sentence`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const createShareSentence = (params) => post({url: `${config.system_service}/system/share/sentence`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateShareSentence = (params) => put({url: `${config.system_service}/system/share/sentence`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const delShareSentenceById = (params) => del({url: `${config.system_service}/system/share/sentence?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 //47.92.82. 5
 //129.204.161. 196
 //www.qiezizhibo. com

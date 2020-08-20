@@ -29,6 +29,7 @@ import OrderManagement from "../manage/Pay/Order/OrderManagement";
 import ImportLYSYManagement from "../manage/Football/Import/LYSY/ImportLYSYManagement";
 import FreeTicketManagement from "../manage/Pay/FreeTicket/FreeTicketManagement";
 import MatchMonopolyManagement from "../manage/Pay/Monopoly/MatchMonopolyManagement";
+import ShareSentenceManagement from "../manage/Setting/ShareSentence/ShareSentenceManagement";
 
 
 export default class CRouter extends Component {
@@ -58,6 +59,7 @@ export default class CRouter extends Component {
                 <Route exact path="/setting/scoreboard" component={ScoreBoardSetting}/>
                 <Route exact path="/setting/wechat" component={WechatSetting}/>
                 <Route exact path="/setting/bulletin" component={BulletinSetting}/>
+                <Route exact path="/setting/sharesentence" component={ShareSentenceManagement}/>
                 <Route exact path="/pay/product" component={ProductManagement}/>
                 <Route exact path="/pay/order" component={OrderManagement}/>
                 <Route exact path="/football/import" component={ImportManagement}/>

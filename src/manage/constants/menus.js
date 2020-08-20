@@ -34,6 +34,7 @@ export const menus = [
             { key: '/setting/banner', title: '轮播图', icon: 'picture', },
             { key: '/setting/bulletin', title: '广告/公告', icon: 'notification', },
             { key: '/setting/scoreboard', title: '比分牌', icon: 'table', },
+            { key: '/setting/sharesentence', title: '分享语句', icon: 'share-alt', },
             // { key: '/setting/wechat', title: '小程序', icon: 'wechat', },
         ],
     },

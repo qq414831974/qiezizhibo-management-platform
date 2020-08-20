@@ -24,7 +24,7 @@ const formItemLayout = {
     },
 };
 
-class UserAddDialog extends React.Component {
+class AreasAddDialog extends React.Component {
     state = {loading: true}
 
     componentDidMount() {
@@ -58,4 +58,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserAddDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(AreasAddDialog);
