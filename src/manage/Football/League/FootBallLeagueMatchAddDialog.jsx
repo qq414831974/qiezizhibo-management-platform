@@ -472,7 +472,9 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                             </Col>
                             <Col span={12}>
                                 <FormItem>
-                                    {getFieldDecorator('city', {})(
+                                    {getFieldDecorator('city', {
+                                        rules: [{required: true, message: '请输入城市'}],
+                                    })(
                                         <Input placeholder='请输入城市'/>
                                     )}
                                 </FormItem>
