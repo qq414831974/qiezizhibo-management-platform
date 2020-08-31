@@ -1,5 +1,5 @@
 import React from 'react';
-import {Table, Input, Button, Icon, Modal, Tooltip, Upload, Radio} from 'antd';
+import {Table, Input, Button, Icon, Modal, Tooltip, Upload, Radio, Menu, Dropdown} from 'antd';
 import {getAllMatchs} from '../../../axios/index';
 import {mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
@@ -10,7 +10,8 @@ import {
     addMatchSchedule,
     uploaddocx_match,
     updateMatchScoreStatusById,
-    getwxacodeunlimit
+    getwxacodeunlimit,
+    getActivityMediaM3U8List
 } from "../../../axios";
 import {Form, message, notification} from "antd/lib/index";
 import FootBallMatchAddDialog from "../Match/FootBallMatchAddDialog"
@@ -356,6 +357,41 @@ class FootBallMatchTable extends React.Component {
         });
         this.download("小程序跳转链接导出（比赛）.txt", content);
     }
+    handleExportDownloadMulti = () => {
+        const selectedRowKeys = this.state.selectedRowKeys;
+        let content = "";
+        let ids = [];
+        let matchActivityMap = {}
+        selectedRowKeys.forEach(selectedItem => {
+            this.state.data && this.state.data.forEach(item => {
+                if (selectedItem == item.id) {
+                    ids.push(item.activityId);
+                    matchActivityMap[item.activityId] = item.name;
+                }
+            });
+        });
+        getActivityMediaM3U8List({activityId: ids}).then(data => {
+            if (data && data.code == 200) {
+                if (data.data) {
+                    const map = data.data;
+                    for(let key in map){
+                        const name =  matchActivityMap[key];
+                        const urls = map[key];
+                        let urlcontent = "";
+                        for(let urlKey in urls){
+                            urlcontent = urlcontent + `${urls[urlKey]}\r\n\r\n`;
+                        }
+                        content = content + `${name}\r\n${urlcontent}\r\n\r\n`;
+                    }
+                    this.download("下载地址（比赛）.txt", content);
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('获取下载地址失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        })
+    }
     handleScheduleMulti = () => {
         const selectedRowKeys = this.state.selectedRowKeys;
         const param = [];
@@ -419,13 +455,20 @@ class FootBallMatchTable extends React.Component {
             return;
         }
     }
-    onViewTitleClick = () => {
-        const type = this.state.viewType ? this.state.viewType : 1;
-        if (type == 1) {
-            this.setState({viewText: "点击量", viewType: 2})
-        } else {
-            this.setState({viewText: "观看人数", viewType: 1})
+    onViewTitleClick = (e) => {
+        let text = "点击量";
+        switch (e.key) {
+            case "1":
+                text = "点击量";
+                break;
+            case "2":
+                text = "实际点击量";
+                break;
+            case "3":
+                text = "实际人数";
+                break;
         }
+        this.setState({viewText: text, viewType: e.key})
     }
     genWxaCode = (record) => {
         getwxacodeunlimit({page: `pages/live/live`, scene: `${record.id}`}).then(data => {
@@ -443,6 +486,20 @@ class FootBallMatchTable extends React.Component {
         const ScoreDialog = Form.create()(FootBallMatchScoreDialog);
         const state = this.state;
         const isMobile = this.props.responsive.data.isMobile;
+
+        const onlineDropdown = (
+            <Menu onClick={this.onViewTitleClick}>
+                <Menu.Item key="1">
+                    <span>点击量</span>
+                </Menu.Item>
+                <Menu.Item key="2">
+                    <span>实际点击量</span>
+                </Menu.Item>
+                <Menu.Item key="3">
+                    <span>实际人数</span>
+                </Menu.Item>
+            </Menu>
+        );
 
         const rowSelection = {
             selectedRowKeys,
@@ -500,7 +557,7 @@ class FootBallMatchTable extends React.Component {
             title: '地点',
             align: 'center',
             dataIndex: 'place',
-            width: '18%',
+            width: '20%',
             render: function (text, record, index) {
                 return <p>{record.place ? record.place : "-"}</p>
             }
@@ -508,7 +565,7 @@ class FootBallMatchTable extends React.Component {
             title: '时间',
             align: 'center',
             dataIndex: 'datebegin',
-            width: '20%',
+            width: '15%',
             render: function (text, record, index) {
                 return <p>{(record.startTime ? parseTimeString(record.startTime) : "-")}</p>
             }
@@ -516,7 +573,7 @@ class FootBallMatchTable extends React.Component {
             title: '状态',
             align: 'center',
             dataIndex: 'status',
-            width: '6%',
+            width: '8%',
             render: function (text, record, index) {
                 return <p className="cursor-hand"
                           onClick={onScoreClick.bind(this, record)}>{record.status == null ? "未开" : (record.status == -1 ? "未开" : status[record.status].text)}</p>
@@ -524,23 +581,32 @@ class FootBallMatchTable extends React.Component {
         }, {
             title: '比分',
             align: 'center',
-            width: '7%',
+            width: '8%',
             render: function (text, record, index) {
                 return <p className="cursor-hand"
                           onClick={onScoreClick.bind(this, record)}>{record.score ? (record.score + (record.penaltyscore ? `(${record.penaltyscore})` : "")) : "-"}</p>;
             },
         }, {
-            title: <span onClick={this.onViewTitleClick}>{state.viewType ? state.viewText : "观看人数"}</span>,
+            title: <Dropdown overlay={onlineDropdown}
+                             trigger={['click']}><span>{state.viewType ? state.viewText : "点击量"}</span></Dropdown>,
             align: 'center',
             dataIndex: 'online',
             width: '8%',
             render: function (text, record, index) {
-                const type = state.viewType ? state.viewType : 1;
-                if (type == 1) {
-                    return <Tooltip title="括号中的为实际人数"><p>{`${record.online}(${record.onlineforreal})`}</p></Tooltip>;
-                } else {
-                    return <p>{record.online}</p>
+                const type = state.viewType ? state.viewType : "1";
+                let number = 0;
+                switch (type) {
+                    case "1":
+                        number = record.online;
+                        break;
+                    case "2":
+                        number = record.onlineforreal;
+                        break;
+                    case "3":
+                        number = record.onlineCount;
+                        break;
                 }
+                return <span>{number}</span>
             },
         },
             {
@@ -642,6 +708,13 @@ class FootBallMatchTable extends React.Component {
                                    {/*        </Tooltip>*/}
                                    {/*    }*/}
                                    {/*</Upload>*/}
+                                   <Tooltip title="导出下载地址">
+                                       <Button type="primary" shape="circle" icon="download"
+                                               hidden={this.state.selectedRowKeys.length > 0 ? false : true}
+                                               onClick={this.handleExportDownloadMulti}>
+                                           {selectedRowKeys.length}
+                                       </Button>
+                                   </Tooltip>
                                    <Tooltip title="导出小程序地址">
                                        <Button type="primary" shape="circle" icon="export"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}

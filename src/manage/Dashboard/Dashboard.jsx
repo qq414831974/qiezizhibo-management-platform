@@ -7,7 +7,7 @@ import EchartsViews from './EchartsViews';
 import EchartsProjects from './EchartsProjects';
 import avatar from '../../static/avatar.jpg';
 import logo from '../../static/logo.png';
-import {getActivityInfoList, getRecentMatches} from "../../axios/index";
+import {getRecentMatches} from "../../axios/index";
 
 
 class Dashboard extends React.Component {
@@ -21,16 +21,6 @@ class Dashboard extends React.Component {
     }
 
     fetch = () => {
-        //获取直播列表
-        getActivityInfoList({pageSize: 100, pageNum: 1, status: 0}).then((data) => {
-            if (data && data.code == 200) {
-                this.setState({
-                    activityData: data.data ? data.data.records : {},
-                });
-            } else {
-                message.error('获取直播列表失败：' + (data ? data.code + ":" + data.message : data), 3);
-            }
-        });
         //获取近期的比赛
         getRecentMatches().then((res) => {
             if (res && res.code == 200) {
@@ -44,22 +34,6 @@ class Dashboard extends React.Component {
                 message.error('获取近期比赛信息失败：' + (res ? res.code + ":" + res.message : res), 3);
             }
         });
-    }
-    //获取直播详细
-    getLiveDetail = () => {
-        let total = 0;//总数
-        let living = 0;//正在直播数
-        if (this.state.activityData) {
-            this.state.activityData.forEach((item, index) => {
-                if (item.status == "enabled") {
-                    if (item.isPushing == true) {
-                        living = living + 1;
-                    }
-                    total = total + 1;
-                }
-            });
-        }
-        return {total, living};
     }
     //获取比赛详细
     getMatchDetail = () => {
@@ -129,64 +103,16 @@ class Dashboard extends React.Component {
     }
 
     render() {
-        const {total, living} = this.getLiveDetail();
         const {totalMatch, matching, done, matchDom} = this.getMatchDetail();
         return (
             <div className="gutter-example button-demo">
                 <Row gutter={10}>
-                    <Col className="gutter-row" md={4}>
+                    <Col className="gutter-row" md={8}>
                         <div className="gutter-box">
-                            <Card bordered={false}>
-                                <div className="clear y-center">
-                                    <div className="pull-left mr-m">
-                                        <Icon type="heart" className="text-2x text-danger"/>
-                                    </div>
-                                    <div className="clear">
-                                        <div className="text-muted">直播</div>
-                                        <h2>{total}</h2>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-                        <div className="gutter-box">
-                            <Card bordered={false}>
-                                <div className="clear y-center">
-                                    <div className="pull-left mr-m">
-                                        <Icon type="cloud" className="text-2x"/>
-                                    </div>
-                                    <div className="clear">
-                                        <div className="text-muted">近期比赛</div>
-                                        <h2>{totalMatch}</h2>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-                    </Col>
-                    <Col className="gutter-row" md={4}>
-                        <div className="gutter-box">
-                            <Card bordered={false}>
-                                <div className="clear y-center">
-                                    <div className="pull-left mr-m">
-                                        <Icon type="camera" className="text-2x text-info"/>
-                                    </div>
-                                    <div className="clear">
-                                        <div className="text-muted">正在直播</div>
-                                        <h2>{living}</h2>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-                        <div className="gutter-box">
-                            <Card bordered={false}>
-                                <div className="clear y-center">
-                                    <div className="pull-left mr-m">
-                                        <Icon type="mail" className="text-2x text-success"/>
-                                    </div>
-                                    <div className="clear">
-                                        <div className="text-muted">正在比赛</div>
-                                        <h2>{matching}</h2>
-                                    </div>
-                                </div>
+                            <Card title="新增功能" bordered={false} style={{height: 214,width:"100%"}}>
+                                <div className="w-full">2020-08-31：新增批量导出比赛下载地址</div>
+                                <div className="w-full">2020-08-31：新增后台添加微信分享语句</div>
+                                <div className="w-full">2020-08-30：新增实际观看人数查看</div>
                             </Card>
                         </div>
                     </Col>

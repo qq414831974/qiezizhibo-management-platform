@@ -264,8 +264,8 @@ class FootballLeagueMatchDetailManagement extends React.Component {
     handleDeleteTeamOK = () => {
         this.state.currentTeam &&
         deleteTeamInLeague({
-            leagueId: this.state.currentTeam.leaguematchid,
-            teamId: this.state.currentTeam.teamid
+            leagueId: this.state.currentTeam.leaguematchId,
+            teamId: this.state.currentTeam.teamId
         }).then(data => {
             this.setState({deleteVisible: false, modifyTeamVisible: false});
             if (data && data.code == 200) {

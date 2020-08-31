@@ -410,7 +410,12 @@ export const updateActivityMedia = (params) => put({
     }).catch(function (error) {
         console.log(error)
     });
-
+export const getActivityMediaM3U8List = (param) => get({url: `${config.media_service}/media/activity/m3u8?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const getPing = (id) => get({url: `${config.live_service}/activity/${id}/ping`})
     .then(function (response) {
         return response.data;
