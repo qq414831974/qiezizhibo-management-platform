@@ -71,7 +71,7 @@ const typeData = [
         title: '聊天室',
         value: 4,
     }, {
-        title: '推荐赛事',
+        title: '集锦',
         value: 5,
     },
 ];
@@ -191,19 +191,25 @@ class FootBallMatchModifyDialog extends React.Component {
             alert("请输入直播名")
             return;
         }
-        if (this.state.liveStartTime == null) {
-            alert("请选择直播开始时间")
-            return;
-        }
-        if (this.state.liveEndTime == null) {
-            alert("请选择直播结束时间")
+        // if (this.state.liveStartTime == null) {
+        //     alert("请选择直播开始时间")
+        //     return;
+        // }
+        // if (this.state.liveEndTime == null) {
+        //     alert("请选择直播结束时间")
+        //     return;
+        // }
+        const startTime = moment(this.props.form.getFieldValue('startTime')).subtract(30, "m");
+        const endTime = moment(this.props.form.getFieldValue('startTime')).add(210, "m");
+        if (startTime.isBefore(new moment())) {
+            alert("开始时间不能小于现在时间")
             return;
         }
         let data = {}
-        data.startedAt = this.state.liveStartTime
-        data.endedAt = this.state.liveEndTime
-        data.name = this.state.createLivename
-        data.areatype = 0
+        data.startedAt = this.state.liveStartTime ? this.state.liveStartTime : startTime;
+        data.endedAt = this.state.liveEndTime ? this.state.liveEndTime : endTime;
+        data.name = this.state.createLivename ? this.state.createLivename : this.props.form.getFieldValue('name');
+        data.areatype = 0;
         data.startedAt = data.startedAt ? moment(data.startedAt).format('YYYY/MM/DD HH:mm:ss') : null;
         data.endedAt = data.endedAt ? moment(data.endedAt).format('YYYY/MM/DD HH:mm:ss') : null;
         this.setState({
@@ -216,8 +222,8 @@ class FootBallMatchModifyDialog extends React.Component {
                         liveloading: false,
                     });
                     this.getLiveInfoList({
-                        pageSize: 10,
-                        pageNum: 5,
+                        pageSize: 5,
+                        pageNum: 1,
                     });
                 } else {
                     message.warn(data.message, 1);
@@ -249,7 +255,7 @@ class FootBallMatchModifyDialog extends React.Component {
             pageSize: 5,
             pageNum: 1,
         });
-        this.setState({livecreatepopvisible: true});
+        this.setState({livecreatepopvisible: true, createLivename: this.props.form.getFieldValue('name')});
     }
     handleLiveCreatePopCancel = () => {
         this.setState({livecreatepopvisible: false});
@@ -274,9 +280,11 @@ class FootBallMatchModifyDialog extends React.Component {
         }} value={null} data={null} key={"league-none"}>{<p
             className="ml-s mt-n mb-n">无联赛</p>}</Option>);
         this.state.leaguedata.forEach((item, index) => {
-            dom.push(<Option value={item.id} data={item} key={"league" + item.id}>{<div className="inline-p"><Avatar
+            dom.push(<Option onClick={() => {
+                this.setState({currentLeague: item})
+            }} value={item.id} data={item} key={"league" + item.id}>{<div className="inline-p"><Avatar
                 src={item.headImg}/><p
-                className="ml-s mt-n mb-n">{item.name}</p></div>}</Option>)
+                className="ml-s">{item.name}</p></div>}</Option>);
         });
         return dom;
     }
@@ -305,12 +313,14 @@ class FootBallMatchModifyDialog extends React.Component {
     }
     onCreateLiveStartChange = (date, dateString) => {
         this.setState({
-            liveStartTime: dateString
+            liveStartTime: dateString,
+            liveStartTimeDate: date
         });
     }
     onCreateLiveEndChange = (date, dateString) => {
         this.setState({
-            liveEndTime: dateString
+            liveEndTime: dateString,
+            liveEndTimeDate: date
         });
     }
     onCreateLiveNameChange = (e) => {
@@ -457,6 +467,8 @@ class FootBallMatchModifyDialog extends React.Component {
         const onCreateLiveNameChange = this.onCreateLiveNameChange
         const handleAvatarChange = this.handleAvatarChange
         const isMobile = this.props.responsive.data.isMobile;
+        const startTime = form.getFieldValue('startTime') ? moment(form.getFieldValue('startTime')) : null;
+        const endTime = form.getFieldValue('startTime') ? moment(form.getFieldValue('startTime')) : null;
         const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (record && record.isLiveCharge);
         const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (record && record.isRecordCharge);
         const isMonopolyCharge = this.state.isMonopolyCharge != null ? this.state.isMonopolyCharge : (record && record.isMonopolyCharge);
@@ -483,11 +495,19 @@ class FootBallMatchModifyDialog extends React.Component {
                            onChange={onCreateLiveNameChange}/>
                 </div>
                 <div className="center w-full mt-m">
-                    <DatePicker onChange={onCreateLiveStartChange} format="YYYY/MM/DD HH:mm:ss" placeholder="选择开始时间"
-                                showTime/>
+                    <DatePicker
+                        value={this.state.liveStartTimeDate ? this.state.liveStartTimeDate : (startTime ? startTime.subtract(30, "m") : null)}
+                        onChange={onCreateLiveStartChange}
+                        format="YYYY/MM/DD HH:mm:ss"
+                        placeholder="选择开始时间"
+                        showTime/>
                     <p className={"ml-l mr-l"}>-</p>
-                    <DatePicker onChange={onCreateLiveEndChange} format="YYYY/MM/DD HH:mm:ss" placeholder="选择结束时间"
-                                showTime/>
+                    <DatePicker
+                        value={this.state.liveEndTimeDate ? this.state.liveEndTimeDate : (endTime ? endTime.add(210, "m") : null)}
+                        onChange={onCreateLiveEndChange}
+                        format="YYYY/MM/DD HH:mm:ss"
+                        placeholder="选择结束时间"
+                        showTime/>
                 </div>
                 <div className="center">
                     <Button type="primary"
@@ -960,7 +980,7 @@ class FootBallMatchModifyDialog extends React.Component {
                                 )}
                             </FormItem>
                             {isMonopolyCharge ? <FormItem {...formItemLayout}
-                                                    className="bs-form-item">
+                                                          className="bs-form-item">
                                 {getFieldDecorator('monopolyPrice', {
                                     initialValue: record ? record.monopolyPrice : null,
                                     rules: [{required: true, message: '请输入价格'}],

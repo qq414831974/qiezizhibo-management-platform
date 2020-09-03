@@ -167,15 +167,15 @@ class FootBallMatchAddDialog extends React.Component {
         //     alert("请选择直播结束时间")
         //     return;
         // }
-        const startTime = moment(this.props.form.getFieldValue('startTime'));
-        const endTime = moment(this.props.form.getFieldValue('startTime'));
+        const startTime = moment(this.props.form.getFieldValue('startTime')).subtract(30, "m");
+        const endTime = moment(this.props.form.getFieldValue('startTime')).add(210, "m");
         if (startTime.isBefore(new moment())) {
             alert("开始时间不能小于现在时间")
             return;
         }
         let data = {}
-        data.startedAt = this.state.liveStartTime ? this.state.liveStartTime : startTime.subtract(30, "m");
-        data.endedAt = this.state.liveEndTime ? this.state.liveEndTime : endTime.add(210, "m");
+        data.startedAt = this.state.liveStartTime ? this.state.liveStartTime : startTime;
+        data.endedAt = this.state.liveEndTime ? this.state.liveEndTime : endTime;
         data.name = this.state.createLivename ? this.state.createLivename : this.props.form.getFieldValue('name');
         data.areatype = 0;
         data.startedAt = data.startedAt ? moment(data.startedAt).format('YYYY/MM/DD HH:mm:ss') : null;
