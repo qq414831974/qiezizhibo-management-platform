@@ -895,6 +895,24 @@ export const getArticleList = (params) => get({url: `${config.system_service}/sy
     }).catch(function (error) {
         console.log(error)
     });
+export const getLeagueEncryption = (leagueId) => get({url: `${config.football_service}/league/${leagueId}/encryption`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getMatchEncryption = (matchId) => get({url: `${config.football_service}/match/${matchId}/encryption`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const setLeagueEncryptionAll = (leagueId) => get({url: `${config.football_service}/league/${leagueId}/encryptionAll`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 //47.92.82. 5
 //129.204.161. 196
 //www.qiezizhibo. com

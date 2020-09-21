@@ -1,6 +1,6 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip} from 'antd';
-import {getAllLeagueMatchSeries} from '../../../axios/index';
+import {getAllLeagueMatchSeries, setLeagueEncryptionAll} from '../../../axios/index';
 import {mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
 import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch} from "../../../axios";
@@ -274,6 +274,8 @@ class FootBallLeagueMatchTable extends React.Component {
                     `/football/footballMatch?leagueId=${this.state.record.id}`
                 }>浏览比赛</Link>
             </Button>,
+            <Button key="encryption" type="primary" className="pull-left"
+                    onClick={this.handleLeagueEncryptionAllConfirm}>设置加密</Button>,
             <Button key="delete" type="danger" className="pull-left"
                     onClick={this.handleLeagueDelete}>删除</Button>,
             <Button key="back" onClick={this.handleLeagueMatchModifyCancel}>取消</Button>,
@@ -281,6 +283,27 @@ class FootBallLeagueMatchTable extends React.Component {
                 确定
             </Button>
         ]
+    }
+    handleLeagueEncryptionAllConfirm = () => {
+        this.setState({encrypitonAllConfirm: true})
+    }
+    cancelLeagueEncryptionAllConfirm = () => {
+        this.setState({encrypitonAllConfirm: false})
+    }
+    handleLeagueEncryptionAll = () => {
+        setLeagueEncryptionAll(this.state.record.id).then(data => {
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.refresh();
+                    message.success('比赛全部设置加密成功', 1);
+                    this.cancelLeagueEncryptionAllConfirm();
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('比赛全部设置加密失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
     }
 
     render() {
@@ -482,6 +505,17 @@ class FootBallLeagueMatchTable extends React.Component {
             >
                 <p style={{fontSize: 14}}>是否确认删除{this.state.deleteCols}条数据？</p>
                 <p className="mb-n text-danger">注意：删除联赛将删除联赛所有比赛数据！！！</p>
+            </Modal>
+            <Modal
+                key="dialog-encryptionAll"
+                className={isMobile ? "top-n" : ""}
+                title="确认设置加密"
+                visible={this.state.encrypitonAllConfirm}
+                onOk={this.handleLeagueEncryptionAll}
+                onCancel={this.cancelLeagueEncryptionAllConfirm}
+                zIndex={1001}
+            >
+                <p style={{fontSize: 14}}>将设置联赛下的所有比赛为加密，是否确认？</p>
             </Modal>
         </div>
     }

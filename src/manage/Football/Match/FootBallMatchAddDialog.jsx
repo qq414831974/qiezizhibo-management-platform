@@ -15,7 +15,7 @@ import {
     Upload,
     Progress,
     TreeSelect,
-    Tooltip,
+    Tooltip, Radio,
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
@@ -37,6 +37,7 @@ import {
 import {message} from "antd/lib/index";
 import {getRound, getJueSaiRankRound} from '../../../utils/index';
 
+const RadioGroup = Radio.Group;
 const Option = Select.Option;
 moment.locale('zh-cn');
 
@@ -67,9 +68,6 @@ const typeData = [
     }, {
         title: '聊天室',
         value: 4,
-    }, {
-        title: '集锦',
-        value: 5,
     },
 ];
 
@@ -511,6 +509,26 @@ class FootBallMatchAddDialog extends React.Component {
             visible ?
                 <div>
                     <Form>
+                        <FormItem {...formItemLayout} label="加密" className="bs-form-item">
+                            {getFieldDecorator('encryption.isEncryption', {
+                                rules: [{required: true, message: '请选择加密类型'}],
+                                initialValue: false
+                            })(
+                                <RadioGroup>
+                                    <Radio value={false}>不加密</Radio>
+                                    <Radio value={true}>加密</Radio>
+                                </RadioGroup>
+                            )}
+                        </FormItem>
+                        {form.getFieldValue("encryption.isEncryption") == false ? null :
+                            <FormItem {...formItemLayout} label="密码" className="bs-form-item">
+                                {getFieldDecorator('encryption.password', {
+                                    rules: [{required: true, message: '请输入密码'}],
+                                })(
+                                    <Input/>
+                                )}
+                            </FormItem>
+                        }
                         <div className="center w-full mb-m">
                             <FormItem {...formItemLayout} className="bs-form-item">
                                 {getFieldDecorator('leaguematchId', {

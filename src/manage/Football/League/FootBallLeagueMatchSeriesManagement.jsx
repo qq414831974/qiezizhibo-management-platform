@@ -7,7 +7,7 @@ import {
     removeLeagueIntoSeries,
     getNoSeriesLeague,
     createLeagueMatch, updateLeagueMatchById,
-    getLeagueMatchById, delLeagueMatchByIds,
+    getLeagueMatchById, delLeagueMatchByIds, setLeagueEncryptionAll,
 } from "../../../axios";
 import {parseTimeStringYMD} from "../../../utils";
 import copy from "copy-to-clipboard/index";
@@ -206,7 +206,26 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             this.removeRecord();
         }
     }
-
+    handleLeagueEncryptionAllConfirm = () => {
+        this.setState({encrypitonAllConfirm: true})
+    }
+    cancelLeagueEncryptionAllConfirm = () => {
+        this.setState({encrypitonAllConfirm: false})
+    }
+    handleLeagueEncryptionAll = () => {
+        setLeagueEncryptionAll(this.state.record.id).then(data => {
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.refresh();
+                    message.success('比赛全部设置加密成功', 1);
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('比赛全部设置加密失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
+    }
     render() {
         const isMobile = this.props.responsive.data.isMobile;
         const onNameClick = this.onNameClick;
@@ -350,7 +369,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                     className={isMobile ? "top-n" : ""}
                     width={700}
                     visible={this.state.dialogModifyVisible}
-                    title="编辑球队"
+                    title="编辑联赛"
                     okText="确定"
                     onCancel={this.handleLeagueMatchModifyCancel}
                     destroyOnClose="true"
@@ -366,6 +385,8 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                                 `/football/footballMatch?leagueId=${this.state.record.id}`
                             }>浏览比赛</Link>
                         </Button>,
+                        <Button key="encryption" type="primary" className="pull-left"
+                                onClick={this.handleLeagueEncryptionAllConfirm}>设置加密</Button>,
                         <Button key="delete" type="danger" className="pull-left"
                                 onClick={this.handleLeagueDelete}>删除</Button>,
                         <Button key="delete2" type="danger" className="pull-left"
@@ -409,6 +430,17 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                         visible={this.state.dialogAddSeriesVisible}
                         record={this.state.leagueData}
                         ref={this.saveAddLeagueDialogRef}/>
+                </Modal>
+                <Modal
+                    key="dialog-encryptionAll"
+                    className={isMobile ? "top-n" : ""}
+                    title="确认设置加密"
+                    visible={this.state.encrypitonAllConfirm}
+                    onOk={this.handleLeagueEncryptionAll}
+                    onCancel={this.cancelLeagueEncryptionAllConfirm}
+                    zIndex={1001}
+                >
+                    <p style={{fontSize: 14}}>将设置联赛下的所有比赛为加密，是否确认？</p>
                 </Modal>
             </div>
         );

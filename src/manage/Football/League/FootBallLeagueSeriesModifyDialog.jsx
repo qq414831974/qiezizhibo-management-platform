@@ -17,7 +17,7 @@ import 'moment/locale/zh-cn';
 import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {getAreasList, uploadimg} from "../../../axios/index";
+import {getAreasList, getLeagueEncryption, uploadimg} from "../../../axios/index";
 
 import defultAvatar from '../../../static/avatar.jpg';
 import {toChinesNum} from "../../../utils";
@@ -46,9 +46,9 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
     state = {}
 
     componentDidMount() {
-        this.setState({loading: true});
+        this.setState({loading: true, encryptionLoading: true});
         getAreasList().then((data) => {
-            if (data && data.code ==200) {
+            if (data && data.code == 200) {
                 this.setState({
                     loading: false,
                     areas: data.data,
@@ -57,6 +57,16 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                 message.error('获取地区列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
+        getLeagueEncryption(this.props.record.id).then(data => {
+            if (data && data.code == 200) {
+                this.setState({
+                    encryptionLoading: false,
+                    encryptionData: data.data,
+                });
+            } else {
+                message.error('获取联赛加密信息失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
     }
 
     handleAvatarChange = (info) => {
@@ -180,7 +190,8 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
     getAreasOption = () => {
         let dom = [];
         this.state.areas.forEach((item) => {
-            dom.push(<Option value={item.province} data={item.province} key={`area-${item.id}`}>{item.province}</Option>);
+            dom.push(<Option value={item.province} data={item.province}
+                             key={`area-${item.id}`}>{item.province}</Option>);
         })
         return dom;
     }
@@ -199,7 +210,8 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                             <div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
                                 <span>系列赛：</span>
                                 <Avatar src={leagueData.headimg ? leagueData.headimg : defultAvatar}/>
-                                <span className="ml-s">{leagueData.name}{leagueData.englishName ? "(" + leagueData.englishName + ")" : ""}</span>
+                                <span
+                                    className="ml-s">{leagueData.name}{leagueData.englishName ? "(" + leagueData.englishName + ")" : ""}</span>
                             </div>
                         </div>
                         <FormItem {...formItemLayout} className="bs-form-item round-div ml-l mb-s">
@@ -236,6 +248,40 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 </Upload>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} label="加密" className="bs-form-item">
+                            {getFieldDecorator('encryption.isEncryption', {
+                                rules: [{required: true, message: '请选择加密类型'}],
+                                initialValue: this.state.encryptionData ? this.state.encryptionData.isEncryption : false,
+                            })(
+                                <RadioGroup disabled={this.state.encryptionLoading}>
+                                    <Radio value={false}>不加密</Radio>
+                                    <Radio value={true}>加密</Radio>
+                                </RadioGroup>
+                            )}
+                        </FormItem>
+                        {form.getFieldValue("encryption.isEncryption") == false ? null :
+                            <div>
+                                <FormItem {...formItemLayout} label="联赛加密" className="bs-form-item">
+                                    {getFieldDecorator('encryption.isLeagueEncryption', {
+                                        rules: [{required: true, message: '请选择联赛加密'}],
+                                        initialValue: this.state.encryptionData ? this.state.encryptionData.isLeagueEncryption : false,
+                                    })(
+                                        <RadioGroup disabled={this.state.encryptionLoading}>
+                                            <Radio value={false}>不加密</Radio>
+                                            <Radio value={true}>加密</Radio>
+                                        </RadioGroup>
+                                    )}
+                                </FormItem>
+                                <FormItem {...formItemLayout} label="密码" className="bs-form-item">
+                                    {getFieldDecorator('encryption.password', {
+                                        rules: [{required: true, message: '请输入密码'}],
+                                        initialValue: this.state.encryptionData ? this.state.encryptionData.password : null,
+                                    })(
+                                        <Input disabled={this.state.encryptionLoading}/>
+                                    )}
+                                </FormItem>
+                            </div>
+                        }
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
                                 rules: [{required: true, message: '请选择类型'}],
@@ -313,11 +359,11 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                             {getFieldDecorator('regulations.population', {
                                 initialValue: record.regulations ? record.regulations.population : null,
                                 getValueFromEvent(e) {
-                                    if(e == null){
+                                    if (e == null) {
                                         return null
                                     }
-                                    if(typeof(e) === 'string'){
-                                        return e.replace(/[^\d]/g,'')
+                                    if (typeof (e) === 'string') {
+                                        return e.replace(/[^\d]/g, '')
                                     }
                                     return e
                                 },
@@ -353,7 +399,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                         initialValue: record.province,
                                         rules: [{required: true, message: '请选择省份'}],
                                     })(
-                                        <Select disabled={this.state.loading}>
+                                        <Select disabled={true}>
                                             {this.state.areas ? this.getAreasOption() : null}
                                         </Select>
                                     )}
@@ -364,11 +410,12 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 </span>
                             </Col>
                             <Col span={12}>
-                                <FormItem hidden={true}>
+                                <FormItem {...formItemLayout} label="城市" className="bs-form-item">
                                     {getFieldDecorator('city', {
+                                        rules: [{required: true, message: '请输入城市'}],
                                         initialValue: record.city,
                                     })(
-                                        <Input hidden={true} placeholder='请输入城市'/>
+                                        <Input placeholder='请输入城市'/>
                                     )}
                                 </FormItem>
                             </Col>

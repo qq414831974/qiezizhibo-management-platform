@@ -16,7 +16,7 @@ import {
     Progress,
     TreeSelect,
     Tooltip,
-    Checkbox,
+    Checkbox, Radio,
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
@@ -36,10 +36,12 @@ import {
     getAllLeagueMatchs,
     upload,
     getTeamInLeague,
+    getMatchEncryption, getLeagueEncryption,
 } from "../../../axios";
 import {message} from "antd/lib/index";
 import {toChinesNum} from '../../../utils/index';
 
+const RadioGroup = Radio.Group;
 const Option = Select.Option;
 moment.locale('zh-cn');
 
@@ -70,9 +72,6 @@ const typeData = [
     }, {
         title: '聊天室',
         value: 4,
-    }, {
-        title: '推荐赛事',
-        value: 5,
     },
 ];
 
@@ -99,6 +98,7 @@ class FootBallMatchModifyDialog extends React.Component {
             leagueloading: true,
             teamloading: true,
             currentliveloading: true,
+            encryptionLoading: true,
         });
         if (param || this.state.league) {
             const league = param || this.state.league
@@ -143,6 +143,16 @@ class FootBallMatchModifyDialog extends React.Component {
             }
         });
         this.getLiveInfo(this.props.record.activityId ? this.props.record.activityId : this.props.record.activityOld)
+        getMatchEncryption(this.props.record.id).then(data => {
+            if (data && data.code == 200) {
+                this.setState({
+                    encryptionLoading: false,
+                    encryptionData: data.data,
+                });
+            } else {
+                message.error('获取联赛加密信息失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
     }
     getLiveInfoList = (params) => {
         this.setState({
@@ -527,6 +537,27 @@ class FootBallMatchModifyDialog extends React.Component {
             visible ?
                 <div>
                     <Form>
+                        <FormItem {...formItemLayout} label="加密" className="bs-form-item">
+                            {getFieldDecorator('encryption.isEncryption', {
+                                rules: [{required: true, message: '请选择加密类型'}],
+                                initialValue: this.state.encryptionData ? this.state.encryptionData.isEncryption : false,
+                            })(
+                                <RadioGroup disabled={this.state.encryptionLoading}>
+                                    <Radio value={false}>不加密</Radio>
+                                    <Radio value={true}>加密</Radio>
+                                </RadioGroup>
+                            )}
+                        </FormItem>
+                        {form.getFieldValue("encryption.isEncryption") == false ? null :
+                            <FormItem {...formItemLayout} label="密码" className="bs-form-item">
+                                {getFieldDecorator('encryption.password', {
+                                    rules: [{required: true, message: '请输入密码'}],
+                                    initialValue: this.state.encryptionData ? this.state.encryptionData.password : false,
+                                })(
+                                    <Input disabled={this.state.encryptionLoading}/>
+                                )}
+                            </FormItem>
+                        }
                         <div className="center w-full mb-m">
                             <FormItem {...formItemLayout} className="bs-form-item">
                                 {getFieldDecorator('leaguematchId', {
