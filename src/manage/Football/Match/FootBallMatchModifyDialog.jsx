@@ -201,10 +201,6 @@ class FootBallMatchModifyDialog extends React.Component {
         // }
         const startTime = moment(this.props.form.getFieldValue('startTime')).subtract(30, "m");
         const endTime = moment(this.props.form.getFieldValue('startTime')).add(210, "m");
-        if (startTime.isBefore(new moment())) {
-            alert("开始时间不能小于现在时间")
-            return;
-        }
         let data = {}
         data.startedAt = this.state.liveStartTime ? this.state.liveStartTime : startTime;
         data.endedAt = this.state.liveEndTime ? this.state.liveEndTime : endTime;

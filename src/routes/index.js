@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 // import { Router, Route, hashHistory, IndexRedirect } from 'react-router';
 import {Route, Redirect, Switch} from 'react-router-dom';
 import UserManagement from '../manage/User/UserManagement';
+import ExpManagement from '../manage/Exp/ExpManagement';
+import GrowthManagement from '../manage/Growth/GrowthManagement';
 import FootBallPlayerManagement from "../manage/Football/Player/FootBallPlayerManagement";
 import FootballPlayerDetailManagement from "../manage/Football/Player/FootballPlayerDetailManagement";
 import LiveManagement from "../manage/Live/LiveManagement";
@@ -30,6 +32,9 @@ import ImportLYSYManagement from "../manage/Football/Import/LYSY/ImportLYSYManag
 import FreeTicketManagement from "../manage/Pay/FreeTicket/FreeTicketManagement";
 import MatchMonopolyManagement from "../manage/Pay/Monopoly/MatchMonopolyManagement";
 import ShareSentenceManagement from "../manage/Setting/ShareSentence/ShareSentenceManagement";
+import GiftManagement from "../manage/Pay/Gift/GiftManagement";
+import FootBallLeagueHeatManagement from "../manage/Football/Heat/League/FootBallLeagueHeatManagement";
+import FootBallMatchHeatManagement from "../manage/Football/Heat/Match/FootBallMatchHeatManagement";
 
 
 export default class CRouter extends Component {
@@ -47,6 +52,8 @@ export default class CRouter extends Component {
             <Switch>
                 <Route exact path="/index" component={Dashboard}/>
                 <Route exact path="/user" component={UserManagement}/>
+                <Route exact path="/exp/exp" component={ExpManagement}/>
+                <Route exact path="/exp/growth" component={GrowthManagement}/>
                 <Route exact path="/role/role" component={RoleManagement}/>
                 <Route exact path="/role/permission" component={PermissionManagement}/>
                 <Route exact path="/area" component={AreasManagement}/>
@@ -62,8 +69,13 @@ export default class CRouter extends Component {
                 <Route exact path="/setting/sharesentence" component={ShareSentenceManagement}/>
                 <Route exact path="/pay/product" component={ProductManagement}/>
                 <Route exact path="/pay/order" component={OrderManagement}/>
+                <Route exact path="/pay/freeTicket" component={FreeTicketManagement}/>
+                <Route exact path="/pay/monopoly" component={MatchMonopolyManagement}/>
+                <Route exact path="/pay/gift" component={GiftManagement}/>
                 <Route exact path="/football/import" component={ImportManagement}/>
                 <Route exact path="/football/import/lysy" component={ImportLYSYManagement}/>
+                <Route exact path="/football/league/heat" component={FootBallLeagueHeatManagement}/>
+                <Route exact path="/football/match/heat" component={FootBallMatchHeatManagement}/>
                 <Route path="/football/comment/:id" component={CommentManagement}/>
                 <Route path="/live/:id" component={LiveDetailManagement}/>
                 <Route path="/football/footballTeam/:id" component={TeamDetailManagement}/>
@@ -72,8 +84,6 @@ export default class CRouter extends Component {
                 <Route path="/football/footballLeagueSeries/:id" component={FootBallLeagueMatchSeriesManagement}/>
                 <Route path="/football/footballPlayer/:id" component={FootballPlayerDetailManagement}/>
                 <Route path="/football/schedule" component={FootballMatchSchedule}/>
-                <Route path="/freeTicket" component={FreeTicketManagement}/>
-                <Route path="/monopoly" component={MatchMonopolyManagement}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )

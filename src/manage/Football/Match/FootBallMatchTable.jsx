@@ -1,7 +1,7 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip, Upload, Radio, Menu, Dropdown} from 'antd';
 import {getAllMatchs} from '../../../axios/index';
-import {mergeJSON} from '../../../utils/index';
+import {getQueryString, mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
 import {
     delMatchByIds,
@@ -11,7 +11,8 @@ import {
     uploaddocx_match,
     updateMatchScoreStatusById,
     getwxacodeunlimit,
-    getActivityMediaM3U8List
+    getActivityMediaM3U8List,
+    getActivityInfo
 } from "../../../axios";
 import {Form, message, notification} from "antd/lib/index";
 import FootBallMatchAddDialog from "../Match/FootBallMatchAddDialog"
@@ -61,13 +62,13 @@ class FootBallMatchTable extends React.Component {
             this.setState({pagination: {pageSize: 10, filters: {leagueId: this.props.leagueId}}});
             this.fetch({
                 pageSize: this.state.pagination.pageSize,
-                pageNum: 1,
+                pageNum: this.props.page ? this.props.page : 1,
                 leagueId: this.props.leagueId
             });
         } else {
             this.fetch({
                 pageSize: this.state.pagination.pageSize,
-                pageNum: 1,
+                pageNum: this.props.page ? this.props.page : 1,
             });
         }
     };
@@ -164,6 +165,7 @@ class FootBallMatchTable extends React.Component {
         pager.sortField = sorter.field;
         pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
         pager.filters = this.getTableFilters(pager, filters);
+        this.props.switchPage(pager.current);
         this.setState({
             pagination: pager,
         });
@@ -374,11 +376,11 @@ class FootBallMatchTable extends React.Component {
             if (data && data.code == 200) {
                 if (data.data) {
                     const map = data.data;
-                    for(let key in map){
-                        const name =  matchActivityMap[key];
+                    for (let key in map) {
+                        const name = matchActivityMap[key];
                         const urls = map[key];
                         let urlcontent = "";
-                        for(let urlKey in urls){
+                        for (let urlKey in urls) {
                             urlcontent = urlcontent + `${urls[urlKey]}\r\n\r\n`;
                         }
                         content = content + `${name}\r\n${urlcontent}\r\n\r\n`;
@@ -391,6 +393,37 @@ class FootBallMatchTable extends React.Component {
                 message.error('获取下载地址失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         })
+    }
+    handleExportPushUrlMulti = () => {
+        const selectedRowKeys = this.state.selectedRowKeys;
+        let content = "";
+        let ids = [];
+        let matchActivityMap = {}
+        selectedRowKeys.forEach(selectedItem => {
+            this.state.data && this.state.data.forEach(item => {
+                if (selectedItem == item.id && item.activityId != null) {
+                    ids.push(item.activityId);
+                    matchActivityMap[item.activityId] = item.name;
+                }
+            });
+        });
+        let requestList = [];
+        for (let id of ids) {
+            requestList.push(getActivityInfo(id));
+        }
+        Promise.all(requestList).then(values => {
+            const acitivitys = values.filter(data => {
+                return data && data.code == 200 && data.data != null;
+            }).map(data => {
+                return data.data
+            })
+            for (let acitivity of acitivitys) {
+                const name = matchActivityMap[acitivity.id];
+                const url = acitivity.pushStreamUrl;
+                content = content + `${name}\r\n${url}\r\n\r\n`;
+            }
+            this.download("推流地址（比赛）.txt", content);
+        });
     }
     handleScheduleMulti = () => {
         const selectedRowKeys = this.state.selectedRowKeys;
@@ -715,6 +748,13 @@ class FootBallMatchTable extends React.Component {
                                            {selectedRowKeys.length}
                                        </Button>
                                    </Tooltip>
+                                   <Tooltip title="导出推流码">
+                                       <Button type="primary" shape="circle" icon="video-camera"
+                                               hidden={this.state.selectedRowKeys.length > 0 ? false : true}
+                                               onClick={this.handleExportPushUrlMulti}>
+                                           {selectedRowKeys.length}
+                                       </Button>
+                                   </Tooltip>
                                    <Tooltip title="导出小程序地址">
                                        <Button type="primary" shape="circle" icon="export"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
@@ -831,6 +871,11 @@ class FootBallMatchTable extends React.Component {
                         <Link to={
                             `/football/comment/${this.state.record.id}`
                         }>评论管理</Link>
+                    </Button>,
+                    <Button key="comment" type="primary" className="pull-left">
+                        <Link to={
+                            `/football/match/heat?matchId=${this.state.record.id}`
+                        }>热度比拼</Link>
                     </Button>,
                     <Button key="delete" type="danger" className="pull-left"
                             onClick={this.handleDelete}>删除</Button>,

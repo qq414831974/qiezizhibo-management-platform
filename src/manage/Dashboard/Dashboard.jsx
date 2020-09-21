@@ -109,7 +109,13 @@ class Dashboard extends React.Component {
                 <Row gutter={10}>
                     <Col className="gutter-row" md={8}>
                         <div className="gutter-box">
-                            <Card title="新增功能" bordered={false} style={{height: 214,width:"100%"}}>
+                            <Card title="新增功能" bordered={false}
+                                  style={{height: 214, width: "100%", overflow: "scroll"}}>
+                                <div className="w-full">2020-09-15：新增球赛热度比拼查看、设置</div>
+                                <div className="w-full">2020-09-14：新增联赛热度比拼、粉丝团设置</div>
+                                <div className="w-full">2020-09-11：新增礼物系统</div>
+                                <div className="w-full">2020-09-10：新增经验系统</div>
+                                <div className="w-full">2020-09-07：新增批量导出比赛推流码</div>
                                 <div className="w-full">2020-08-31：新增批量导出比赛下载地址</div>
                                 <div className="w-full">2020-08-31：新增后台添加微信分享语句</div>
                                 <div className="w-full">2020-08-30：新增实际观看人数查看</div>

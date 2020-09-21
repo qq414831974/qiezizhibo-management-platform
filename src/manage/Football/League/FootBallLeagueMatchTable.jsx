@@ -1,7 +1,7 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip} from 'antd';
 import {getAllLeagueMatchSeries, getwxacodeunlimit} from '../../../axios/index';
-import {mergeJSON} from '../../../utils/index';
+import {getQueryString, mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
 import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch, chargeAllMatchByLeagueId} from "../../../axios";
 import {Form, message} from "antd/lib/index";
@@ -32,7 +32,7 @@ class FootBallLeagueMatchTable extends React.Component {
     componentDidMount() {
         this.fetch({
             pageSize: this.state.pagination.pageSize,
-            pageNum: 1,
+            pageNum: this.props.page ? this.props.page : 1,
         });
     };
 
@@ -131,6 +131,7 @@ class FootBallLeagueMatchTable extends React.Component {
         pager.sortField = sorter.field;
         pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
         pager.filters = this.getTableFilters(pager, filters);
+        this.props.switchPage(pager.current);
         this.setState({
             pagination: pager,
         });
@@ -275,6 +276,10 @@ class FootBallLeagueMatchTable extends React.Component {
             </Button>,
             <Button key="chargeall" type="primary" className="pull-left"
                     onClick={this.showChargeAllConfirm}>全部收费</Button>,
+            <Button key="heat" type="primary" className="pull-left"><Link to={
+                `/football/league/heat?leagueId=${this.state.record.id}`
+            }>热度比拼</Link>
+            </Button>,
             <Button key="delete" type="danger" className="pull-left"
                     onClick={this.handleLeagueDelete}>删除</Button>,
             <Button key="back" onClick={this.handleLeagueMatchModifyCancel}>取消</Button>,
@@ -328,6 +333,7 @@ class FootBallLeagueMatchTable extends React.Component {
         );
         obj.dispatchEvent(ev);
     }
+
     render() {
         const onNameClick = this.onNameClick;
         const genWxaCode = this.genWxaCode;

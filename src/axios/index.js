@@ -1049,19 +1049,211 @@ export const getShareSentenceList = () => get({url: `${config.system_service}/sy
     }).catch(function (error) {
         console.log(error)
     });
-export const createShareSentence = (params) => post({url: `${config.system_service}/system/share/sentence`, data: params})
+export const createShareSentence = (params) => post({
+    url: `${config.system_service}/system/share/sentence`,
+    data: params
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const updateShareSentence = (params) => put({url: `${config.system_service}/system/share/sentence`, data: params})
+export const updateShareSentence = (params) => put({
+    url: `${config.system_service}/system/share/sentence`,
+    data: params
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
 export const delShareSentenceById = (params) => del({url: `${config.system_service}/system/share/sentence?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getExp = () => get({url: `${config.user_service}/exp`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addExp = (param) => post({url: `${config.user_service}/exp`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateExp = (param) => put({url: `${config.user_service}/exp`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteExp = (param) => del({url: `${config.user_service}/exp?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getChargeGrowth = () => get({url: `${config.pay_service}/growth`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addChargeGrowth = (param) => post({url: `${config.pay_service}/growth`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateChargeGrowth = (param) => put({url: `${config.pay_service}/growth`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteChargeGrowth = (param) => del({url: `${config.pay_service}/growth?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getGifts = (param) => get({url: `${config.pay_service}/gift?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addGift = (param) => post({url: `${config.pay_service}/gift`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateGift = (param) => put({url: `${config.pay_service}/gift`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteGifts = (param) => del({url: `${config.pay_service}/gift?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueHeatRule = (param) => get({url: `${config.football_service}/heat/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueHeatRule = (param) => post({url: `${config.football_service}/heat/league`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueHeatRule = (param) => put({url: `${config.football_service}/heat/league`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteLeagueHeatRule = (param) => del({url: `${config.football_service}/heat/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const leagueHeatAllMatch = (param) => get({url: `${config.football_service}/heat/league/heatAll?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueFans = (param) => get({url: `${config.football_service}/league/fans?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueFans = (param) => post({
+    url: `${config.football_service}/league/fans?${unpack(param)}`,
+    data: null
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueFans = (param) => put({url: `${config.football_service}/league/fans`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteLeagueFans = (param) => post({
+    url: `${config.football_service}/league/fans/leave?${unpack(param)}`,
+    data: null
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getMatchHeatRule = (param) => get({url: `${config.football_service}/heat/match?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addMatchHeatRule = (param) => post({url: `${config.football_service}/heat/match`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateMatchHeatRule = (param) => put({url: `${config.football_service}/heat/match`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteMatchHeatRule = (param) => del({url: `${config.football_service}/heat/match?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getMatchTeamHeat = (param) => get({url: `${config.football_service}/heat/match/team?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getMatchPlayerHeat = (param) => get({url: `${config.football_service}/heat/match/player?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addMatchTeamHeat = (param) => post({url: `${config.football_service}/heat/match/team`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addMatchPlayerHeat = (param) => post({url: `${config.football_service}/heat/match/player`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getMatchGiftOrder = (id) => get({url: `${config.pay_service}/gift/order/match/${id}`, data: null})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
