@@ -237,7 +237,11 @@ class LeagueHeatForm extends React.Component {
                             </Button>
                         </FormItem>
                         <FormItem wrapperCol={{span: 12, offset: 6}}>
-                            <Button type="primary" onClick={this.props.heatAll}>应用到该联赛下的所有比赛</Button>
+                            <Button type="primary"
+                                    loading={this.props.heatAllLoading}
+                                    onClick={this.props.heatAll}>
+                                应用到该联赛下的所有比赛
+                            </Button>
                         </FormItem>
                     </div>
                 </Form>

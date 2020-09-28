@@ -46,6 +46,7 @@ class FootBallLeagueHeatManagement extends React.Component {
     }
     heatAll = () => {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
+        this.setState({heatAllLoading: true})
         leagueHeatAllMatch({leagueId: currentLeague}).then(data => {
             if (data && data.code == 200) {
                 if (data.data) {
@@ -54,6 +55,7 @@ class FootBallLeagueHeatManagement extends React.Component {
                 } else {
                     message.warn(data.message, 1);
                 }
+                this.setState({heatAllLoading: false})
             } else {
                 message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
@@ -120,6 +122,7 @@ class FootBallLeagueHeatManagement extends React.Component {
                                             record={this.state.data}
                                             handleSubmit={this.handleHeatSettingSubmit}
                                             heatAll={this.heatAll}
+                                            heatAllLoading={this.state.heatAllLoading}
                                             ref={this.saveHeatSettingRef}/>
                                     </TabPane>
                                     <TabPane tab="粉丝团" key="2">
