@@ -18,7 +18,7 @@ export const uploadmedia = `${config.system_service}/file/upload/media`;
 
 export const upload = `${config.system_service}/file/upload/image`;
 
-export const uploaddocx_team = `${config.system_service}/file/import/team`;
+export const uploaddocx_team = `${config.system_service}/file/import/team?areatype=2`;
 
 export const uploaddocx_match = `${config.system_service}/file/import/match`;
 

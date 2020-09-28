@@ -209,22 +209,22 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                         <div className="w-full center">
                             <div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
                                 <span>系列赛：</span>
-                                <Avatar src={leagueData.headimg ? leagueData.headimg : defultAvatar}/>
+                                <Avatar src={leagueData.headImg ? leagueData.headImg : defultAvatar}/>
                                 <span
                                     className="ml-s">{leagueData.name}{leagueData.englishName ? "(" + leagueData.englishName + ")" : ""}</span>
                             </div>
                         </div>
                         <FormItem {...formItemLayout} className="bs-form-item round-div ml-l mb-s">
-                            {getFieldDecorator('headimg', {
-                                initialValue: record.headimg,
+                            {getFieldDecorator('headImg', {
+                                initialValue: record.headImg,
                                 getValueFromEvent(e) {
-                                    return form.getFieldValue('headimg')
+                                    return form.getFieldValue('headImg')
                                 },
                                 onChange(e) {
                                     const file = e.file;
                                     if (file.response) {
                                         form.setFieldsValue({
-                                            headimg: file.response.data
+                                            headImg: file.response.data
                                         })
                                     }
                                 }
@@ -239,8 +239,8 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 >
                                     {
                                         <img
-                                            src={form.getFieldValue('headimg') ? form.getFieldValue('headimg') :
-                                                (record.headimg ? record.headimg : defultAvatar)}
+                                            src={form.getFieldValue('headImg') ? form.getFieldValue('headImg') :
+                                                (record.headImg ? record.headImg : defultAvatar)}
                                             alt="avatar"
                                             className="round-img"/>
                                     }
