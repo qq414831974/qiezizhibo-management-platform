@@ -14,6 +14,8 @@ import {
 } from "../../../../axios";
 import LeagueHeatForm from "../League/LeagueHeatForm";
 import LeagueFansManagement from "../League/LeagueFansManagement";
+import LeagueHeatTable from "../League/LeagueHeatTable";
+import LeagueGiftOrderTable from "../League/LeagueGiftOrderTable";
 
 const TabPane = Tabs.TabPane;
 
@@ -50,8 +52,8 @@ class FootBallLeagueHeatManagement extends React.Component {
         leagueHeatAllMatch({leagueId: currentLeague}).then(data => {
             if (data && data.code == 200) {
                 if (data.data) {
-                    this.refresh();
                     message.success('修改成功', 1);
+                    this.refresh();
                 } else {
                     message.warn(data.message, 1);
                 }
@@ -70,12 +72,14 @@ class FootBallLeagueHeatManagement extends React.Component {
                 return;
             }
             values.leagueId = currentLeague;
+            this.setState({modifyLoading: true})
             if (this.state.data && this.state.data.id) {
                 updateLeagueHeatRule(values).then(data => {
+                    this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
-                            this.refresh();
                             message.success('修改成功', 1);
+                            this.refresh();
                         } else {
                             message.warn(data.message, 1);
                         }
@@ -85,10 +89,11 @@ class FootBallLeagueHeatManagement extends React.Component {
                 })
             } else {
                 addLeagueHeatRule(values).then(data => {
+                    this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
+                            message.success('修改成功', 1);
                             this.refresh();
-                            message.success('添加成功', 1);
                         } else {
                             message.warn(data.message, 1);
                         }
@@ -123,9 +128,19 @@ class FootBallLeagueHeatManagement extends React.Component {
                                             handleSubmit={this.handleHeatSettingSubmit}
                                             heatAll={this.heatAll}
                                             heatAllLoading={this.state.heatAllLoading}
+                                            modifyLoading={this.state.modifyLoading}
                                             ref={this.saveHeatSettingRef}/>
                                     </TabPane>
-                                    <TabPane tab="粉丝团" key="2">
+                                    {this.state.data && this.state.data.id && (this.state.data.type == 2 || this.state.data.type == 3) ?
+                                        <TabPane tab="联赛热度比拼详情" key="2">
+                                            <LeagueHeatTable
+                                                leagueId={currentLeague}
+                                                heatRule={this.state.data}/>
+                                        </TabPane> : null}
+                                    <TabPane tab="送礼物详情" key="3">
+                                        <LeagueGiftOrderTable leagueId={currentLeague}/>
+                                    </TabPane>
+                                    <TabPane tab="粉丝团" key="4">
                                         <LeagueFansManagement
                                             visible={true}
                                             leagueId={currentLeague}/>

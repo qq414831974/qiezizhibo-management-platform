@@ -433,6 +433,7 @@ class FootBallMatchAddDialog extends React.Component {
         const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (this.state.currentLeague && this.state.currentLeague.isLiveCharge);
         const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (this.state.currentLeague && this.state.currentLeague.isRecordCharge);
         const isMonopolyCharge = this.state.isMonopolyCharge != null ? this.state.isMonopolyCharge : (this.state.currentLeague && this.state.currentLeague.isMonopolyCharge);
+        const giftWatchRecordEnable = this.state.giftWatchRecordEnable != null ? this.state.giftWatchRecordEnable : (this.state.currentLeague && this.state.currentLeague.giftWatchRecordEnable);
 
         const content_create = <div>
             <Divider className="mb-n" orientation="right">
@@ -883,6 +884,53 @@ class FootBallMatchAddDialog extends React.Component {
                             </FormItem>
                         </div> : null}
                         <div className="center w-full">
+                            <span>刷礼物观看直播：</span>
+                            <FormItem {...formItemLayout} className="bs-form-item">
+                                {getFieldDecorator('giftWatchLiveEnable', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.giftWatchLiveEnable : null,
+                                    valuePropName: 'checked',
+                                    onChange: (e) => {
+                                        this.setState({giftWatchLiveEnable: e.target.checked})
+                                    }
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                        </div>
+                        {isRecordCharge ? <div className="center w-full">
+                            <span>刷礼物观看直播：</span>
+                            <FormItem {...formItemLayout} className="bs-form-item">
+                                {getFieldDecorator('giftWatchRecordEnable', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.giftWatchRecordEnable : null,
+                                    valuePropName: 'checked',
+                                    onChange: (e) => {
+                                        this.setState({giftWatchRecordEnable: e.target.checked})
+                                    }
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                        </div> : null}
+                        {isRecordCharge && giftWatchRecordEnable ? <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('giftWatchRecordPrice', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.giftWatchRecordPrice : null,
+                                })(
+                                    <Input addonBefore="一个月" addonAfter="分" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="一个月"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s">-</span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('giftWatchRecordEternalPrice', {
+                                    initialValue: this.state.currentLeague ? this.state.currentLeague.giftWatchRecordEternalPrice : null,
+                                })(
+                                    <Input addonBefore="永久" addonAfter="分" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="永久"/>
+                                )}
+                            </FormItem>
+                        </div> : null}
+                        <div className="center w-full">
                             <span>开启买断：</span>
                             <FormItem {...formItemLayout} className="bs-form-item">
                                 {getFieldDecorator('isMonopolyCharge', {
@@ -896,7 +944,7 @@ class FootBallMatchAddDialog extends React.Component {
                                 )}
                             </FormItem>
                             {isMonopolyCharge ? <FormItem {...formItemLayout}
-                                                        className="bs-form-item">
+                                                          className="bs-form-item">
                                 {getFieldDecorator('monopolyPrice', {
                                     initialValue: this.state.currentLeague ? this.state.currentLeague.monopolyPrice : null,
                                     rules: [{required: true, message: '请输入价格'}],

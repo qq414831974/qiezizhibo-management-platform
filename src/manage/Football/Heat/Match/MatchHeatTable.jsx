@@ -44,11 +44,11 @@ class MatchHeatTable extends React.Component {
     }
     fetchMatchPlayerHeat = () => {
         this.setState({loading: true});
-        getMatchPlayerHeat({matchId: this.props.matchId}).then((data) => {
+        getMatchPlayerHeat({matchId: this.props.matchId, pageNum: 1, pageSize: 200}).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     loading: false,
-                    data: data.data ? data.data : [],
+                    data: data.data ? data.data.records : [],
                 });
             } else {
                 message.error('获取比赛球员热度列表失败：' + (data ? data.code + ":" + data.message : data), 3);

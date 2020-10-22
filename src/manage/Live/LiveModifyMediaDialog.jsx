@@ -16,7 +16,7 @@ import 'moment/locale/zh-cn';
 import {receiveData} from "../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {upload, getActivityMediaList, updateActivityMedia, getActivityMedia} from "../../axios";
+import {upload, getActivityMediaList, updateActivityMedia, getActivityMedia, getActivityMediaFileId} from "../../axios";
 import imgcover from '../../static/imgcover.jpg';
 
 moment.locale('zh-cn');
@@ -51,6 +51,7 @@ class LiveModifyMediaDialog extends React.Component {
         getActivityMedia(this.props.record.id, {activityId: this.props.activityId}).then(activityMediaData => {
             if (activityMediaData && activityMediaData.code == 200) {
                 if (activityMediaData.data) {
+                    this.getActivityMediaFileId(this.props.activityId, this.props.record.id);
                     this.setState({
                         activityMediaData: activityMediaData ? activityMediaData.data : {},
                     });
@@ -73,6 +74,15 @@ class LiveModifyMediaDialog extends React.Component {
                 }
             } else {
                 message.error('获取直播信息失败：' + (activityMediaData ? activityMediaData.code + ":" + activityMediaData.message : activityMediaData), 3);
+            }
+        })
+    }
+    getActivityMediaFileId = (id, mediaId) => {
+        getActivityMediaFileId({id: id, mediaId: mediaId}).then(data => {
+            if (data && data.code == 200) {
+                this.setState({fileId: data.data});
+            } else {
+                message.error('获取媒体文件id失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         })
     }
@@ -201,6 +211,9 @@ class LiveModifyMediaDialog extends React.Component {
                         </div>
                         <div className="w-full center">
                             <span>实际观看人数：{record.viewreal}</span>
+                        </div>
+                        <div className="w-full center">
+                            <span>媒体文件id：{this.state.fileId}</span>
                         </div>
                         <FormItem {...formItemLayout} label="地址" className="bs-form-item">
                             {getFieldDecorator('path', {

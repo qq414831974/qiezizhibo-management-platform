@@ -139,7 +139,12 @@ export const deleteActivityIngest = (id) => del({
     }).catch(function (error) {
         console.log(error)
     });
-
+export const getActivityMediaFileId = (params) => get({url: `${config.live_service}/activity/${params.id}/getFileId?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const getAllPlayers = (params) => get({url: `${config.football_service}/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
@@ -372,7 +377,15 @@ export const updateFormation = (params) => put({url: `${config.football_service}
         console.log(error)
     });
 
-
+export const createMedia = (params) => post({
+    url: `${config.media_service}/media`,
+    data: params
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const createActivityMedia = (params) => post({
     url: `${config.media_service}/media/activity`,
     data: params
@@ -1241,6 +1254,18 @@ export const getMatchPlayerHeat = (param) => get({url: `${config.football_servic
     }).catch(function (error) {
         console.log(error)
     });
+export const getLeaguePlayerHeat = (param) => get({url: `${config.football_service}/heat/league/player?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueTeamHeat = (param) => get({url: `${config.football_service}/heat/league/team?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const addMatchTeamHeat = (param) => post({url: `${config.football_service}/heat/match/team`, data: param})
     .then(function (response) {
         return response.data;
@@ -1253,7 +1278,25 @@ export const addMatchPlayerHeat = (param) => post({url: `${config.football_servi
     }).catch(function (error) {
         console.log(error)
     });
+export const addLeaguePlayerHeat = (param) => post({url: `${config.football_service}/heat/league/player`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueTeamHeat = (param) => post({url: `${config.football_service}/heat/league/team`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const getMatchGiftOrder = (id) => get({url: `${config.pay_service}/gift/order/match/${id}`, data: null})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueGiftOrder = (id) => get({url: `${config.pay_service}/gift/order/league/${id}`, data: null})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

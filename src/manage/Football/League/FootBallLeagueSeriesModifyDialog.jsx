@@ -195,6 +195,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
         const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (record && record.isLiveCharge);
         const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (record && record.isRecordCharge);
         const isMonopolyCharge = this.state.isMonopolyCharge != null ? this.state.isMonopolyCharge : (record && record.isMonopolyCharge);
+        const giftWatchRecordEnable = this.state.giftWatchRecordEnable != null ? this.state.giftWatchRecordEnable : (record && record.giftWatchRecordEnable);
         return (
             visible ?
                 <div>
@@ -332,6 +333,46 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 )}
                             </FormItem>
                         </div> : null}
+                        <FormItem {...formItemLayout} label="刷礼物观看直播" className="bs-form-item">
+                            {getFieldDecorator('giftWatchLiveEnable', {
+                                initialValue: record.giftWatchLiveEnable,
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({giftWatchLiveEnable: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem>
+                        {isRecordCharge ? <FormItem {...formItemLayout} label="刷礼物观看录播" className="bs-form-item">
+                            {getFieldDecorator('giftWatchRecordEnable', {
+                                initialValue: record.giftWatchRecordEnable,
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({giftWatchRecordEnable: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem> : null}
+                        {isRecordCharge && giftWatchRecordEnable ?<div className="center w-full" style={{fontWeight: 'bold'}}>刷礼物观看录播</div>:null}
+                        {isRecordCharge && giftWatchRecordEnable ?<div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('giftWatchRecordPrice', {
+                                    initialValue: record.giftWatchRecordPrice,
+                                })(
+                                    <Input addonBefore="一个月" addonAfter="分" style={{minWidth: 60, textAlign: "center"}} placeholder="一个月"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s">-</span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('giftWatchRecordEternalPrice', {
+                                    initialValue: record.giftWatchRecordEternalPrice,
+                                })(
+                                    <Input addonBefore="永久" addonAfter="分" style={{minWidth: 60, textAlign: "center"}} placeholder="永久"/>
+                                )}
+                            </FormItem>
+                        </div>:null}
                         <FormItem {...formItemLayout} label="开启买断" className="bs-form-item">
                             {getFieldDecorator('isMonopolyCharge', {
                                 initialValue: record.isMonopolyCharge,

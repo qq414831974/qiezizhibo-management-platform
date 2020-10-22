@@ -86,6 +86,7 @@ class MatchHeatForm extends React.Component {
                             <Select placeholder="请选择类型!">
                                 <Option value={0}>球队热度比拼</Option>
                                 <Option value={1}>球员热度比拼</Option>
+                                <Option value={2}>联赛球员热度比拼</Option>
                             </Select>
                         )}
                     </FormItem>
@@ -123,7 +124,7 @@ class MatchHeatForm extends React.Component {
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
                                     {getFieldDecorator('heatBaseMin', {
-                                        initialValue: record.heatBaseMin ? record.heatBaseMin : null,
+                                        initialValue: record.heatBaseMin != null ? record.heatBaseMin : null,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" hidden placeholder='请输入数值!'/>
@@ -133,7 +134,7 @@ class MatchHeatForm extends React.Component {
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
                                     {getFieldDecorator('heatBaseMax', {
-                                        initialValue: record.heatBaseMax ? record.heatBaseMax : null,
+                                        initialValue: record.heatBaseMax != null ? record.heatBaseMax : null,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -147,7 +148,7 @@ class MatchHeatForm extends React.Component {
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
                                     {getFieldDecorator('heatExpandMin', {
-                                        initialValue: record.heatExpandMin ? record.heatExpandMin : null,
+                                        initialValue: record.heatExpandMin != null ? record.heatExpandMin : null,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" hidden placeholder='请输入数值!'/>
@@ -157,7 +158,7 @@ class MatchHeatForm extends React.Component {
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
                                     {getFieldDecorator('heatExpandMax', {
-                                        initialValue: record.heatExpandMax ? record.heatExpandMax : null,
+                                        initialValue: record.heatExpandMax != null ? record.heatExpandMax : null,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" placeholder='请输入数值!'/>

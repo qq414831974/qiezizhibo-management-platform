@@ -320,6 +320,42 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 )}
                             </FormItem>
                         </div>: null}
+                        <FormItem {...formItemLayout} label="刷礼物观看直播" className="bs-form-item">
+                            {getFieldDecorator('giftWatchLiveEnable', {
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({giftWatchLiveEnable: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem>
+                        {this.state.isRecordCharge ? <FormItem {...formItemLayout} label="刷礼物观看录播" className="bs-form-item">
+                            {getFieldDecorator('giftWatchRecordEnable', {
+                                valuePropName: 'checked',
+                                onChange: (e) => {
+                                    this.setState({giftWatchRecordEnable: e.target.checked})
+                                }
+                            })(
+                                <Checkbox/>
+                            )}
+                        </FormItem> : null}
+                        {this.state.isRecordCharge && this.state.giftWatchRecordEnable ?<div className="center w-full" style={{fontWeight: 'bold'}}>刷礼物观看录播</div>:null}
+                        {this.state.isRecordCharge && this.state.giftWatchRecordEnable ?<div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('giftWatchRecordPrice', {
+                                })(
+                                    <Input addonBefore="一个月" addonAfter="分" style={{minWidth: 60, textAlign: "center"}} placeholder="一个月"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s">-</span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('giftWatchRecordEternalPrice', {
+                                })(
+                                    <Input addonBefore="永久" addonAfter="分" style={{minWidth: 60, textAlign: "center"}} placeholder="永久"/>
+                                )}
+                            </FormItem>
+                        </div>:null}
                         <FormItem {...formItemLayout} label="开启买断" className="bs-form-item">
                             {getFieldDecorator('isMonopolyCharge', {
                                 valuePropName: 'checked',

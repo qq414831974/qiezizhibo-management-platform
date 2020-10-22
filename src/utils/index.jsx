@@ -193,12 +193,25 @@ export const distinctById = (arr) => {
     let map = new Map();
     let array = [];  // 数组用于返回结果
     for (let i = 0; i < arr.length; i++) {
-        if(map.has(arr[i].id)) {  // 如果有该key值
+        if (map.has(arr[i].id)) {  // 如果有该key值
             map.set(arr[i].id, true);
         } else {
             map.set(arr[i].id, false);   // 如果没有该key值
             array.push(arr[i]);
         }
     }
-    return array ;
+    return array;
+}
+export const uuid = () => {
+    var s = [];
+    var hexDigits = "0123456789abcdef";
+    for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    }
+    s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+    s[8] = s[13] = s[18] = s[23] = "";
+
+    var uuid = s.join("");
+    return uuid;
 }

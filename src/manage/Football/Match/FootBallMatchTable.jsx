@@ -425,6 +425,41 @@ class FootBallMatchTable extends React.Component {
             this.download("推流地址（比赛）.txt", content);
         });
     }
+    handleExportPullPushUrlMulti = () => {
+        const selectedRowKeys = this.state.selectedRowKeys;
+        let content = "";
+        let ids = [];
+        let matchActivityMap = {}
+        selectedRowKeys.forEach(selectedItem => {
+            this.state.data && this.state.data.forEach(item => {
+                if (selectedItem == item.id && item.activityId != null) {
+                    ids.push(item.activityId);
+                    matchActivityMap[item.activityId] = item.name;
+                }
+            });
+        });
+        let requestList = [];
+        for (let id of ids) {
+            requestList.push(getActivityInfo(id));
+        }
+        Promise.all(requestList).then(values => {
+            const acitivitys = values.filter(data => {
+                return data && data.code == 200 && data.data != null;
+            }).map(data => {
+                return data.data
+            })
+            for (let acitivity of acitivitys) {
+                const name = matchActivityMap[acitivity.id];
+                const pushurl = acitivity.pushStreamUrl;
+                const pullUrl = acitivity.pullStreamUrls.rtmp;
+                const viewUrl = acitivity.pullStreamUrls.hls;
+                content = content + `${name}\r\n推流地址：\r\n${pushurl}\r\n\r\n`;
+                content = content + `拉流地址：\r\n${pullUrl}\r\n\r\n`;
+                content = content + `监看地址：\r\n${viewUrl}\r\n\r\n\r\n\r\n`;
+            }
+            this.download("推流拉流监看地址（比赛）.txt", content);
+        });
+    }
     handleScheduleMulti = () => {
         const selectedRowKeys = this.state.selectedRowKeys;
         const param = [];
@@ -741,6 +776,13 @@ class FootBallMatchTable extends React.Component {
                                    {/*        </Tooltip>*/}
                                    {/*    }*/}
                                    {/*</Upload>*/}
+                                   <Tooltip title="导出拉流推流监看地址">
+                                       <Button type="primary" shape="circle" icon="video-camera"
+                                               hidden={this.state.selectedRowKeys.length > 0 ? false : true}
+                                               onClick={this.handleExportPullPushUrlMulti}>
+                                           {selectedRowKeys.length}
+                                       </Button>
+                                   </Tooltip>
                                    <Tooltip title="导出下载地址">
                                        <Button type="primary" shape="circle" icon="download"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
