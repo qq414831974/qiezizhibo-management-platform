@@ -56,6 +56,7 @@ class LeagueGiftOrderTable extends React.Component {
             width: '10%',
         }, {
             title: '订单号',
+            dataIndex: 'orderId',
             key: 'orderId',
             width: '15%',
             align: 'center',
