@@ -1,8 +1,15 @@
 import React from 'react';
-import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Avatar} from 'antd';
-import {getMatchTeamHeat, getMatchPlayerHeat, addMatchTeamHeat, addMatchPlayerHeat} from '../../../../axios/index';
+import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Avatar, Row, Col} from 'antd';
+import {
+    getMatchTeamHeat,
+    getMatchPlayerHeat,
+    addMatchTeamHeat,
+    addMatchPlayerHeat,
+    addFakeGiftOrder, getMatchById
+} from '../../../../axios/index';
 import {Form, message} from "antd/lib/index";
 import MatchHeatAddDialog from './MatchHeatAddDialog';
+import MatchHeatFakeAddDialog from "./MatchHeatFakeAddDialog";
 import {receiveData} from "../../../../action";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -20,6 +27,13 @@ class MatchHeatTable extends React.Component {
 
     componentDidMount() {
         this.fetch();
+        getMatchById(this.props.matchId).then(data => {
+            if (data && data.code == 200) {
+                this.setState({leagueId: data.data.leaguematchId})
+            } else {
+                message.error('获取比赛信息失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
     };
 
     fetch = () => {
@@ -65,9 +79,38 @@ class MatchHeatTable extends React.Component {
         } else {
             target = this.getPlayer(record.playerId);
         }
-        this.setState({record: record, heatRule: this.props.heatRule, target: target});
-        this.showMatchHeatAddDialog();
+        this.setState({record: record, heatRule: this.props.heatRule, target: target, dialogChoiceVisible: true});
     }
+    saveMatchHeatFakeAddDialogRef = (form) => {
+        this.formFakeAdd = form;
+    }
+    showMatchHeatFakeAddDialog = () => {
+        this.setState({dialogFakeAddVisible: true});
+    };
+    handleMatchHeatFakeAddCancel = () => {
+        this.setState({dialogFakeAddVisible: false});
+    };
+
+    handleMatchHeatFakeAddCreate = () => {
+        const form = this.formFakeAdd;
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            addFakeGiftOrder(values).then(data => {
+                if (data && data.code == 200) {
+                    if (data.data) {
+                        this.refresh();
+                        this.setState({dialogChoiceVisible: false});
+                        message.success('添加成功', 3);
+                    }
+                } else {
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
+                }
+            })
+            this.setState({dialogFakeAddVisible: false});
+        });
+    };
     saveMatchHeatAddDialogRef = (form) => {
         this.formAdd = form;
     }
@@ -92,6 +135,9 @@ class MatchHeatTable extends React.Component {
             form.resetFields();
             this.setState({dialogAddVisible: false});
         });
+    };
+    handleChoiceCancel = () => {
+        this.setState({dialogChoiceVisible: false});
     };
     addTeamHeat = (matchId, teamId, heat) => {
         addMatchTeamHeat({matchId, teamId, heat}).then((data) => {
@@ -148,6 +194,8 @@ class MatchHeatTable extends React.Component {
         const onNameClick = this.onNameClick;
 
         const AddDialog = Form.create()(MatchHeatAddDialog);
+        const FakeAddDialog = Form.create()(MatchHeatFakeAddDialog);
+
         const getTeam = this.getTeam;
         const getPlayer = this.getPlayer;
 
@@ -216,6 +264,45 @@ class MatchHeatTable extends React.Component {
                            target={this.state.target}
                            heatRule={this.props.heatRule}
                            ref={this.saveMatchHeatAddDialogRef}/>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="刷票"
+                visible={this.state.dialogFakeAddVisible}
+                footer={[
+                    <Button key="back" onClick={this.handleMatchHeatFakeAddCancel}>取消</Button>,
+                    <Button key="submit" type="primary" onClick={this.handleMatchHeatFakeAddCreate}>确定</Button>,
+                ]}
+                onCancel={this.handleMatchHeatFakeAddCancel}>
+                <FakeAddDialog visible={this.state.dialogFakeAddVisible}
+                               record={this.state.record}
+                               leagueId={this.state.leagueId}
+                               target={this.state.target}
+                               heatRule={this.props.heatRule}
+                               ref={this.saveMatchHeatFakeAddDialogRef}/>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="请选择"
+                visible={this.state.dialogChoiceVisible}
+                footer={[
+                    <Button key="back" onClick={this.handleChoiceCancel}>取消</Button>,
+                ]}
+                onCancel={this.handleChoiceCancel}>
+                <Row gutter={10}>
+                    <Col span={12}>
+                        <Button
+                            type="primary"
+                            className="w-full h-full center"
+                            onClick={this.showMatchHeatAddDialog}>添加热度</Button>
+                    </Col>
+                    <Col span={12}>
+                        <Button
+                            type="primary"
+                            className="w-full h-full center"
+                            onClick={this.showMatchHeatFakeAddDialog}>刷票</Button>
+                    </Col>
+                </Row>
             </Modal>
         </div>
     }

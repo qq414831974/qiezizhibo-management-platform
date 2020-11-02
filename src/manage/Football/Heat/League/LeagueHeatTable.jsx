@@ -1,8 +1,15 @@
 import React from 'react';
-import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Avatar} from 'antd';
-import {getLeaguePlayerHeat, getLeagueTeamHeat, addLeaguePlayerHeat, addLeagueTeamHeat} from '../../../../axios/index';
+import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Avatar, Row, Col} from 'antd';
+import {
+    getLeaguePlayerHeat,
+    getLeagueTeamHeat,
+    addLeaguePlayerHeat,
+    addLeagueTeamHeat,
+    addFakeGiftOrder
+} from '../../../../axios/index';
 import {Form, message} from "antd/lib/index";
 import LeagueHeatAddDialog from './LeagueHeatAddDialog';
+import LeagueHeatFakeAddDialog from './LeagueHeatFakeAddDialog';
 import {receiveData} from "../../../../action";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
@@ -138,12 +145,42 @@ class LeagueHeatTable extends React.Component {
         let target = null
         if (this.props.heatRule && this.props.heatRule.type == 2) {
             target = this.getPlayer(record.player);
-        }else if(this.props.heatRule && this.props.heatRule.type == 3) {
+        } else if (this.props.heatRule && this.props.heatRule.type == 3) {
             target = this.getTeam(record.team);
         }
-        this.setState({record: record, heatRule: this.props.heatRule, target: target});
-        this.showLeagueHeatAddDialog();
+        this.setState({record: record, heatRule: this.props.heatRule, target: target, dialogChoiceVisible: true});
     }
+    saveLeagueHeatFakeAddDialogRef = (form) => {
+        this.formFakeAdd = form;
+    }
+    showLeagueHeatFakeAddDialog = () => {
+        this.setState({dialogFakeAddVisible: true});
+    };
+    handleLeagueHeatFakeAddCancel = () => {
+        this.setState({dialogFakeAddVisible: false});
+    };
+
+    handleLeagueHeatFakeAddCreate = () => {
+        const form = this.formFakeAdd;
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            addFakeGiftOrder(values).then(data => {
+                if (data && data.code == 200) {
+                    if (data.data) {
+                        this.refresh();
+                        this.setState({dialogChoiceVisible: false});
+                        message.success('添加成功', 3);
+                    }
+                } else {
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
+                }
+            })
+            this.setState({dialogFakeAddVisible: false});
+        });
+    };
+
     saveLeagueHeatAddDialogRef = (form) => {
         this.formAdd = form;
     }
@@ -153,7 +190,6 @@ class LeagueHeatTable extends React.Component {
     handleLeagueHeatAddCancel = () => {
         this.setState({dialogAddVisible: false});
     };
-
     handleLeagueHeatAddCreate = () => {
         const form = this.formAdd;
         form.validateFields((err, values) => {
@@ -162,12 +198,15 @@ class LeagueHeatTable extends React.Component {
             }
             if (this.props.heatRule && this.props.heatRule.type == 2) {
                 this.addPlayerHeat(values.leagueId, values.playerId, values.heat);
-            }else if (this.props.heatRule && this.props.heatRule.type == 3) {
+            } else if (this.props.heatRule && this.props.heatRule.type == 3) {
                 this.addTeamHeat(values.leagueId, values.teamId, values.heat);
             }
             form.resetFields();
             this.setState({dialogAddVisible: false});
         });
+    };
+    handleChoiceCancel = () => {
+        this.setState({dialogChoiceVisible: false});
     };
     addPlayerHeat = (leagueId, playerId, heat) => {
         addLeaguePlayerHeat({leagueId, playerId, heat}).then((data) => {
@@ -210,6 +249,7 @@ class LeagueHeatTable extends React.Component {
         const onNameClick = this.onNameClick;
 
         const AddDialog = Form.create()(LeagueHeatAddDialog);
+        const FakeAddDialog = Form.create()(LeagueHeatFakeAddDialog);
         const getPlayer = this.getPlayer;
         const getTeam = this.getTeam;
 
@@ -300,6 +340,44 @@ class LeagueHeatTable extends React.Component {
                            target={this.state.target}
                            heatRule={this.props.heatRule}
                            ref={this.saveLeagueHeatAddDialogRef}/>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="刷票"
+                visible={this.state.dialogFakeAddVisible}
+                footer={[
+                    <Button key="back" onClick={this.handleLeagueHeatFakeAddCancel}>取消</Button>,
+                    <Button key="submit" type="primary" onClick={this.handleLeagueHeatFakeAddCreate}>确定</Button>,
+                ]}
+                onCancel={this.handleLeagueHeatFakeAddCancel}>
+                <FakeAddDialog visible={this.state.dialogFakeAddVisible}
+                               record={this.state.record}
+                               target={this.state.target}
+                               heatRule={this.props.heatRule}
+                               ref={this.saveLeagueHeatFakeAddDialogRef}/>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="请选择"
+                visible={this.state.dialogChoiceVisible}
+                footer={[
+                    <Button key="back" onClick={this.handleChoiceCancel}>取消</Button>,
+                ]}
+                onCancel={this.handleChoiceCancel}>
+                <Row gutter={10}>
+                    <Col span={12}>
+                        <Button
+                            type="primary"
+                            className="w-full h-full center"
+                            onClick={this.showLeagueHeatAddDialog}>添加热度</Button>
+                    </Col>
+                    <Col span={12}>
+                        <Button
+                            type="primary"
+                            className="w-full h-full center"
+                            onClick={this.showLeagueHeatFakeAddDialog}>刷票</Button>
+                    </Col>
+                </Row>
             </Modal>
         </div>
     }

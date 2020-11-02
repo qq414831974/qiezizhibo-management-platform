@@ -274,7 +274,7 @@ class FootBallLeagueMatchTable extends React.Component {
                     `/football/footballMatch?leagueId=${this.state.record.id}`
                 }>浏览比赛</Link>
             </Button>,
-            <Button key="chargeall" type="primary" className="pull-left"
+            <Button key="chargeall" type="primary" className="pull-left" loading={this.state.chargeAllLoading}
                     onClick={this.showChargeAllConfirm}>全部收费</Button>,
             <Button key="heat" type="primary" className="pull-left"><Link to={
                 `/football/league/heat?leagueId=${this.state.record.id}`
@@ -295,7 +295,9 @@ class FootBallLeagueMatchTable extends React.Component {
         this.setState({chargeAllVisible: true})
     }
     chargeAll = () => {
+        this.setState({chargeAllLoading: true})
         chargeAllMatchByLeagueId(this.state.record.id).then(data => {
+            this.setState({chargeAllLoading: false})
             if (data && data.code == 200) {
                 if (data.data) {
                     this.setState({chargeAllVisible: false})

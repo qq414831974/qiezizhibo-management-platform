@@ -1,6 +1,6 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Row, Col, Avatar} from 'antd';
-import {getLeagueGiftOrder} from '../../../../axios/index';
+import {getGiftOrder} from '../../../../axios/index';
 import {Form, message} from "antd/lib/index";
 import {receiveData} from "../../../../action";
 import {connect} from "react-redux";
@@ -25,24 +25,70 @@ class LeagueGiftOrderTable extends React.Component {
     };
 
     componentDidMount() {
-        this.fetch();
+        this.fetch({
+            pageSize: this.state.pagination.pageSize,
+            pageNum: 1,
+        });
     };
 
-    fetch = () => {
+    fetch = (params) => {
         this.setState({loading: true});
-        getLeagueGiftOrder(this.props.leagueId).then((data) => {
+        getGiftOrder({leagueId: this.props.leagueId, ...params}).then((data) => {
             if (data && data.code == 200) {
+                const pagination = {...this.state.pagination};
+                pagination.total = data.data ? data.data.total : 0;
+                pagination.current = data.data ? data.data.current : 1;
                 this.setState({
                     loading: false,
-                    data: data.data ? data.data : [],
+                    data: data.data ? data.data.records : "",
+                    pagination,
                 });
             } else {
                 message.error('获取礼物订单列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
     }
+    handleTableChange = (pagination, filters, sorter) => {
+        const pager = {...this.state.pagination};
+        pager.current = pagination.current;
+        pager.sortField = sorter.field;
+        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
+        pager.filters = this.getTableFilters(pager, filters);
+        this.setState({
+            pagination: pager,
+        });
+        this.fetch({
+            pageSize: pager.pageSize,
+            pageNum: pager.current,
+            sortField: pager.sortField,
+            sortOrder: pager.sortOrder,
+            ...pager.filters,
+        });
+    }
+    getTableFilters = (pager, filters) => {
+        const {searchText} = this.state;
+        pager.filters = {};
+        if (searchText != null && searchText != '') {
+            pager.filters["name"] = searchText;
+        }
+        if (filters) {
+            for (let param in filters) {
+                if (filters[param] != null && (filters[param] instanceof Array && filters[param].length > 0)) {
+                    pager.filters[param] = filters[param][0];
+                }
+            }
+        }
+        return pager.filters;
+    }
     refresh = () => {
-        this.fetch();
+        const pager = {...this.state.pagination};
+        this.fetch({
+            pageSize: pager.pageSize,
+            pageNum: pager.current,
+            sortField: pager.sortField,
+            sortOrder: pager.sortOrder,
+            ...pager.filters,
+        });
     }
 
     render() {
@@ -60,6 +106,14 @@ class LeagueGiftOrderTable extends React.Component {
             key: 'orderId',
             width: '15%',
             align: 'center',
+            render: function (text, record, index) {
+                if (record.orderId == null && record.type == 1) {
+                    return <div>后台刷票</div>
+                } else if (record.orderId == null) {
+                    return <div>免费票</div>
+                }
+                return <div>{record.orderId}</div>;
+            },
         }, {
             title: '用户',
             dataIndex: 'userNo',
@@ -75,10 +129,14 @@ class LeagueGiftOrderTable extends React.Component {
             },
         }, {
             title: '礼物',
-            dataIndex: 'giftId',
-            key: 'giftId',
+            key: 'type',
             align: 'center',
             width: '20%',
+            filterMultiple: false,
+            filters: [
+                {text: '免费', value: 0},
+                {text: '收费', value: 1},
+            ],
             render: function (text, record, index) {
                 if (record.gift) {
                     return <div className="center"><Avatar src={record.gift.pic ? record.gift.pic : logo}/>
@@ -93,11 +151,11 @@ class LeagueGiftOrderTable extends React.Component {
             align: 'center',
             width: '20%',
             render: function (text, record, index) {
-                if (record.targetType == 0) {
+                if (record.targetType == 0 || record.targetType == 3) {
                     return <div className="center"><Avatar
                         src={record.team && record.team.headImg ? record.team.headImg : logo}/>
                         <span className="ml-s">{record.team ? record.team.name : "未知"}</span></div>;
-                } else if (record.targetType == 1) {
+                } else if (record.targetType == 1 || record.targetType == 2) {
                     return <div className="center"><Avatar
                         src={record.player && record.player.headImg ? record.player.headImg : logo}/>
                         <span className="ml-s">
@@ -120,6 +178,8 @@ class LeagueGiftOrderTable extends React.Component {
                            dataSource={this.state.data}
                            loading={this.state.loading}
                            bordered
+                           pagination={this.state.pagination}
+                           onChange={this.handleTableChange}
                            title={() =>
                                <div style={{minHeight: 32}}>
                                    <Tooltip title="刷新">

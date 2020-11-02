@@ -1290,13 +1290,13 @@ export const addLeagueTeamHeat = (param) => post({url: `${config.football_servic
     }).catch(function (error) {
         console.log(error)
     });
-export const getMatchGiftOrder = (id) => get({url: `${config.pay_service}/gift/order/match/${id}`, data: null})
+export const getGiftOrder = (param) => get({url: `${config.pay_service}/gift/order?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getLeagueGiftOrder = (id) => get({url: `${config.pay_service}/gift/order/league/${id}`, data: null})
+export const addFakeGiftOrder = (param) => post({url: `${config.pay_service}/gift/order/fake`, data: param})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
