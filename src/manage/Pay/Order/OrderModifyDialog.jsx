@@ -109,6 +109,16 @@ class OrderModifyDialog extends React.Component {
                             <Input disabled/>
                         )}
                     </FormItem>
+                    <FormItem {...formItemLayout} label="支付方式" className="bs-form-item">
+                        {getFieldDecorator('payType', {
+                            initialValue: record.payType,
+                        })(
+                            <Select disabled>
+                                <Option value={0}>微信支付</Option>
+                                <Option value={1}>余额支付</Option>
+                            </Select>
+                        )}
+                    </FormItem>
                     <FormItem {...formItemLayout} label="描述" className="bs-form-item">
                         {getFieldDecorator('description', {
                             initialValue: record.description,

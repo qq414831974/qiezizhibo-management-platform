@@ -10,14 +10,13 @@ import {
     Button,
     Row,
     Col,
-    Collapse, Progress, Switch
+    Collapse, Progress, Switch, message
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
 import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {message} from "antd/lib/index";
 import {upload} from "../../../../axios";
 import imgcover from "../../../../static/imgcover.jpg";
 
@@ -55,13 +54,8 @@ class MatchHeatForm extends React.Component {
             return;
         }
         if (info.file.status === 'done') {
-            this.getBase64(info.file.originFileObj, avatarUrl => this.setState({
-                avatarUrl,
-                uploading: false,
-            }));
-            setTimeout(() => {
-                this.setState({isupload: false});
-            }, 2000)
+            this.setState({isupload: false});
+            message.success("上传成功", 3);
         }
     }
     onPosterChange = (form, e) => {
@@ -221,9 +215,6 @@ class MatchHeatForm extends React.Component {
                                onChange={this.onPosterChange.bind(this, form)}
                                value={form.getFieldValue('awardPic') ? form.getFieldValue('awardPic') : record.awardPic}/>
                     </div>
-                    {this.state.isupload ? <div className="center w-full">
-                        <Progress style={{width: 160}} percent={this.state.uploading ? 0 : 100}/>
-                    </div> : null}
                     {record.id ? <FormItem {...formItemLayout} hidden className="bs-form-item">
                         {getFieldDecorator('id', {
                             initialValue: record.id,

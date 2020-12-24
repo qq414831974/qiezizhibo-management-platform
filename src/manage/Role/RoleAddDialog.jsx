@@ -39,7 +39,7 @@ class RoleAddDialog extends React.Component {
     }
 
     fetch = (searchText, pageNum) => {
-        getPermissionList({pageSize: 10, pageNum: pageNum, permissionName: searchText}).then((data) => {
+        getPermissionList({pageSize: 100, pageNum: pageNum, permissionName: searchText}).then((data) => {
             if (data && data.code == 200 && data.data.records) {
                 this.setState({
                     data: pageNum == 1 ? (data.data ? data.data.records : []) :

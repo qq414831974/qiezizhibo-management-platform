@@ -30,12 +30,17 @@ import ProductManagement from "../manage/Pay/Product/ProductManagement";
 import OrderManagement from "../manage/Pay/Order/OrderManagement";
 import ImportLYSYManagement from "../manage/Football/Import/LYSY/ImportLYSYManagement";
 import FreeTicketManagement from "../manage/Pay/FreeTicket/FreeTicketManagement";
+import DepositManagement from "../manage/Pay/Deposit/DepositManagement";
 import MatchMonopolyManagement from "../manage/Pay/Monopoly/MatchMonopolyManagement";
 import ShareSentenceManagement from "../manage/Setting/ShareSentence/ShareSentenceManagement";
 import GiftManagement from "../manage/Pay/Gift/GiftManagement";
 import FootBallLeagueHeatManagement from "../manage/Football/Heat/League/FootBallLeagueHeatManagement";
 import FootBallMatchHeatManagement from "../manage/Football/Heat/Match/FootBallMatchHeatManagement";
-
+import FootBallLeagueBetManagement from "../manage/Football/Bet/League/FootBallLeagueBetManagement";
+import FootBallMatchBetManagement from "../manage/Football/Bet/Match/FootBallMatchBetManagement";
+import UserBetManagement from "../manage/Football/Bet/UserBetManagement";
+import FootBallLeagueClipManagement from "../manage/Football/Clip/League/FootBallLeagueClipManagement";
+import FootBallMatchClipManagement from "../manage/Football/Clip/Match/FootBallMatchClipManagement";
 
 export default class CRouter extends Component {
     requireAuth = (permission, component) => {
@@ -72,10 +77,16 @@ export default class CRouter extends Component {
                 <Route exact path="/pay/freeTicket" component={FreeTicketManagement}/>
                 <Route exact path="/pay/monopoly" component={MatchMonopolyManagement}/>
                 <Route exact path="/pay/gift" component={GiftManagement}/>
+                <Route exact path="/pay/deposit" component={DepositManagement}/>
                 <Route exact path="/football/import" component={ImportManagement}/>
                 <Route exact path="/football/import/lysy" component={ImportLYSYManagement}/>
                 <Route exact path="/football/league/heat" component={FootBallLeagueHeatManagement}/>
                 <Route exact path="/football/match/heat" component={FootBallMatchHeatManagement}/>
+                <Route exact path="/football/league/bet" component={FootBallLeagueBetManagement}/>
+                <Route exact path="/football/match/bet" component={FootBallMatchBetManagement}/>
+                <Route exact path="/football/league/clip" component={FootBallLeagueClipManagement}/>
+                <Route exact path="/football/match/clip" component={FootBallMatchClipManagement}/>
+                <Route exact path="/pay/bet" component={UserBetManagement}/>
                 <Route path="/football/comment/:id" component={CommentManagement}/>
                 <Route path="/live/:id" component={LiveDetailManagement}/>
                 <Route path="/football/footballTeam/:id" component={TeamDetailManagement}/>

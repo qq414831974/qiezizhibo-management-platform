@@ -13,7 +13,15 @@ import {
 import {receiveData} from "../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {getAllMatchs, getAreasList, getArticleList, getMatchById, upload} from "../../axios";
+import {
+    getAllLeagueMatchs,
+    getAllMatchs,
+    getAreasList,
+    getArticleList,
+    getMatchById,
+    getLeagueMatchById,
+    upload
+} from "../../axios";
 import imgcover from '../../static/imgcover.jpg';
 import defultAvatar from "../../static/avatar.jpg";
 
@@ -36,9 +44,14 @@ class BulletinModifyDialog extends React.Component {
     state = {
         loading: false,
         data: [],
-        match: {}
+        match: {},
+        leagueData: [],
+        leagueLoading: false,
+        league: {}
     }
     isCompositions = true;
+    isLeagueCompositions = true;
+
     componentDidMount() {
         getAreasList().then((data) => {
             if (data && data.code) {
@@ -52,8 +65,14 @@ class BulletinModifyDialog extends React.Component {
         });
         if (this.props.record.scene && this.props.record.scene.type == "match") {
             this.fetchMatch(this.props.record.scene.id);
+        } else if (this.props.record.scene && this.props.record.scene.type == "league") {
+            this.fetchLeague(this.props.record.scene.id);
         }
-        this.setState({curtain: this.props.record.curtain, isMatch: this.props.record.scene && this.props.record.scene.type == "match"})
+
+        this.setState({
+            curtain: this.props.record.curtain,
+            senceType: this.props.record.scene.type
+        })
     }
 
     fetch = (searchText, pageNum) => {
@@ -75,6 +94,25 @@ class BulletinModifyDialog extends React.Component {
             }
         });
     }
+    fetchLeagues = (searchText, pageNum) => {
+        this.setState({
+            leagueLoading: true,
+        });
+        getAllLeagueMatchs({pageSize: 20, pageNum: pageNum, name: searchText}).then((data) => {
+            if (data && data.code == 200 && data.data) {
+                this.setState({
+                    leagueData: pageNum == 1 ? (data.data ? data.data.records : []) :
+                        (data ? this.state.leagueData.concat(data.data.records) : []),
+                    leagueLoading: false,
+                    leaguePageNum: data.data.current,
+                    leaguePageSize: data.data.size,
+                    leaguePageTotal: data.data.total,
+                });
+            } else {
+                message.error('获取联赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        });
+    }
     fetchMatch = (params) => {
         this.setState({
             matchLoaded: false,
@@ -87,6 +125,21 @@ class BulletinModifyDialog extends React.Component {
                 });
             } else {
                 message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        });
+    }
+    fetchLeague = (params) => {
+        this.setState({
+            leagueLoaded: false,
+        });
+        getLeagueMatchById(params).then((data) => {
+            if (data && data.code == 200) {
+                this.setState({
+                    leagueLoaded: true,
+                    league: data.data,
+                });
+            } else {
+                message.error('获取联赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -134,7 +187,7 @@ class BulletinModifyDialog extends React.Component {
         if (e.target.value == false) {
             form.setFieldsValue({scene: {type: "home"}})
         }
-        this.setState({isMatch: e.target.value})
+        this.setState({sceneType: e.target.value})
     }
     getArticleList = (params) => {
         this.setState({
@@ -231,6 +284,48 @@ class BulletinModifyDialog extends React.Component {
         this.isCompositions = true;
         this.fetch(this.state.searchText, 1);
     }
+    handleLeagueChange = (value) => {
+        const {form} = this.props;
+        form.setFieldsValue({scene: {type: "league", id: `${value}`}})
+    }
+    handleLeagueShowMore = (e) => {
+        const num = Math.floor(e.target.scrollTop / 50);
+        if (num + 5 >= this.state.leagueData.length) {
+            this.handleOnLeagueLoadMore(e);
+        }
+    }
+    handleOnLeagueLoadMore = (e) => {
+        let data = this.state.leagueData;
+        e.target.scrollTop = data.length * 50;
+        if (this.state.leagueLoading) {
+            return;
+        }
+        if (data.length > this.state.leaguePageTotal) {
+            this.setState({
+                leagueHasMore: false,
+                leagueLoading: false,
+            });
+            return;
+        }
+        this.fetchLeagues(this.state.leagueSearchText, this.state.leaguePageNum + 1);
+    }
+    handleLeagueSearch = (e) => {
+        const value = e.target.value;
+        this.setState({leagueSearchText: value});
+        // setTimeout(()=>{
+        if (this.isLeagueCompositions) {
+            this.fetchLeagues(value, 1);
+        }
+        // },100);
+    }
+    //中文输入中的状态 参考 https://blog.csdn.net/qq1194222919/article/details/80747192
+    onLeagueInputCompositionStart = () => {
+        this.isLeagueCompositions = false;
+    }
+    onLeagueInputCompositionEnd = () => {
+        this.isLeagueCompositions = true;
+        this.fetchLeagues(this.state.leagueSearchText, 1);
+    }
 
     render() {
         const {visible, form, record} = this.props;
@@ -296,6 +391,15 @@ class BulletinModifyDialog extends React.Component {
                     </div>}
             </Tooltip>
         </Option>);
+        const currentLeague = this.state.league;
+        const leagueOptions = this.state.leagueData.map(d => <Option style={{height: 50}} key={d.id} value={d.id}>
+            <Tooltip title={d.name + "-" + d.dateBegin}>
+                <div className="center">
+                    <Avatar src={d.headImg ? d.headImg : defultAvatar}/>
+                    <p className="ml-s">{d.name ? d.name : ""}</p>
+                </div>
+            </Tooltip>
+        </Option>);
         return (
             visible ?
                 <Form>
@@ -310,19 +414,20 @@ class BulletinModifyDialog extends React.Component {
                         )}
                     </FormItem>
                     {this.state.curtain ? <FormItem {...formItemLayout} label="位置" className="bs-form-item">
-                        {getFieldDecorator('isMatch', {
-                            initialValue: record.scene && record.scene.type == "match",
+                        {getFieldDecorator('senceType', {
+                            initialValue: record.scene ? record.scene.type : "home",
                             hidden: true,
                         })(
                             <RadioGroup onChange={this.onMatchRadioChange}>
-                                <Radio value={false}>首页</Radio>
-                                <Radio value={true}>比赛</Radio>
+                                <Radio value="home">首页</Radio>
+                                <Radio value="league">联赛</Radio>
+                                <Radio value="match">比赛</Radio>
                             </RadioGroup>
                         )}
                     </FormItem> : null}
-                    {this.state.isMatch ? <FormItem {...formItemLayout} className="bs-form-item">
+                    {this.state.sceneType != "home" ? <FormItem {...formItemLayout} className="bs-form-item">
                         {getFieldDecorator('scene', {
-                            rules: [{required: true, message: '请选择关联比赛!'}],
+                            rules: [{required: true, message: '请选择关联比赛或联赛!'}],
                             initialValue: record.scene,
                         })(
                             <Input hidden={true}/>
@@ -334,7 +439,7 @@ class BulletinModifyDialog extends React.Component {
                             <Input hidden={true}/>
                         )}
                     </FormItem>}
-                    {this.state.isMatch ?
+                    {this.state.sceneType == "match" ?
                         <div>
                             <div className="center w-full">
                                 <span style={{fontSize: 16, fontWeight: 'bold'}}>关联比赛</span>
@@ -380,6 +485,43 @@ class BulletinModifyDialog extends React.Component {
                             </div>
                         </div>
                         : null}
+                    {this.state.sceneType == "league" ? <div>
+                        <div className="center w-full">
+                            <span style={{fontSize: 16, fontWeight: 'bold'}}>关联联赛</span>
+                        </div>
+                        <Select
+                            showSearch
+                            style={{minWidth: 300}}
+                            placeholder="按名称搜索并选择"
+                            defaultActiveFirstOption={false}
+                            showArrow={false}
+                            filterOption={false}
+                            onChange={this.handleLeagueChange}
+                            onPopupScroll={this.handleLeagueShowMore}
+                            notFoundContent={null}
+                            // mode="tags"
+                            // loading={this.state.loading}
+                            getInputElement={() => (
+                                <input onInput={this.handleLeagueSearch}
+                                       onCompositionStart={this.onLeagueInputCompositionStart}
+                                       onCompositionEnd={this.onLeagueInputCompositionEnd}/>)}
+                        >
+                            {leagueOptions}
+                        </Select>
+                        <div className="center w-full">
+                            <Icon className="ml-s" style={{fontSize: 16}} type="loading"
+                                  hidden={!this.state.leagueLoading}/>
+                        </div>
+                        <div className="center w-full">
+                            <Tooltip title={currentLeague.name + "-" + currentLeague.dateBegin}>
+                                <div className="center">
+                                    <Avatar
+                                        src={currentLeague.headImg ? currentLeague.headImg : defultAvatar}/>
+                                    <p className="ml-s">{currentLeague.name ? currentLeague.name : ""}</p>
+                                </div>
+                            </Tooltip>
+                        </div>
+                    </div> : null}
                     <FormItem {...formItemLayout} label="跳转类型" className="bs-form-item">
                         {getFieldDecorator('type', {
                             initialValue: record.type,

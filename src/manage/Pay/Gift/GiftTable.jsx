@@ -33,6 +33,8 @@ class GiftTable extends React.Component {
         this.fetch({
             pageSize: this.state.pagination.pageSize,
             pageNum: 1,
+            sortField: "sortIndex",
+            sortOrder: "asc",
         });
     };
 
@@ -43,6 +45,8 @@ class GiftTable extends React.Component {
                 const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
                 pagination.current = data.data ? data.data.current : 1;
+                pagination.sortField = params.sortField;
+                pagination.sortOrder = params.sortOrder;
                 this.setState({
                     loading: false,
                     data: data.data ? data.data.records : "",
@@ -126,8 +130,8 @@ class GiftTable extends React.Component {
     handleTableChange = (pagination, filters, sorter) => {
         const pager = {...this.state.pagination};
         pager.current = pagination.current;
-        pager.sortField = sorter.field;
-        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
+        pager.sortField = sorter.field ? sorter.field : pager.sortField;
+        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : pager.sortOrder;
         pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
@@ -395,6 +399,9 @@ class GiftTable extends React.Component {
                             case 3:
                                 type = "球员热度";
                                 break;
+                            case 4:
+                                type = "免费竞猜";
+                                break;
                         }
                         growthToolTip.push(<p key={domKey}>{`${type}+${value.growth}`}</p>)
                     })
@@ -406,13 +413,31 @@ class GiftTable extends React.Component {
             key: 'description',
             dataIndex: 'description',
             align: 'center',
-            width: '15%',
+            width: '10%',
         }, {
             title: '描述2',
             key: 'description2',
             dataIndex: 'description2',
             align: 'center',
-            width: '15%',
+            width: '10%',
+        }, {
+            title: '启用',
+            key: 'available',
+            dataIndex: 'available',
+            align: 'center',
+            width: '5%',
+            render: function (text, record, index) {
+                if (record.available) {
+                    return <div className="center">启用</div>;
+                }
+                return <span>禁用</span>;
+            },
+        }, {
+            title: '排序',
+            key: 'sortIndex',
+            dataIndex: 'sortIndex',
+            align: 'center',
+            width: '5%',
         }
         ];
         const columns_moblie = [{

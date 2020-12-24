@@ -139,10 +139,20 @@ class BulletinSetting extends React.Component {
             width: '10%',
             align: 'center',
             render: function (text, record, index) {
-                if (record.curtain) {
-                    return <span>广告牌</span>
+                let sceneString = ""
+                const sceneType = record.scene.type;
+                if(sceneType == "home"){
+                    sceneString = "-首页";
+                }else if(sceneType == "league"){
+                    sceneString = "-联赛";
                 }
-                return <span>公告栏</span>
+                else if(sceneType == "match"){
+                    sceneString = "-比赛";
+                }
+                if (record.curtain) {
+                    return <span>广告牌{sceneString}</span>
+                }
+                return <span>公告栏{sceneString}</span>
             }
         }, {
             title: '跳转类型',

@@ -115,6 +115,7 @@ class GiftModifyDialog extends React.Component {
                                     <Option value={1}>用户经验</Option>
                                     <Option value={2}>球队热度</Option>
                                     <Option value={3}>球员热度</Option>
+                                    <Option value={4}>免费竞猜</Option>
                                 </Select>
                             )}
                         </FormItem>
@@ -242,6 +243,17 @@ class GiftModifyDialog extends React.Component {
                             </Upload>
                         )}
                     </FormItem>
+                    <FormItem {...formItemLayout} label="是否启用" className="bs-form-item">
+                        {getFieldDecorator('available', {
+                            initialValue: record.available,
+                            rules: [{required: true, message: '请选择!'}],
+                        })(
+                            <Select placeholder="请选择!">
+                                <Option value={true}>启用</Option>
+                                <Option value={false}>禁用</Option>
+                            </Select>
+                        )}
+                    </FormItem>
                     <FormItem {...formItemLayout} label="名字" className="bs-form-item">
                         {getFieldDecorator('name', {
                             initialValue: record.name,
@@ -295,6 +307,14 @@ class GiftModifyDialog extends React.Component {
                                              placeholder='请输入价格!'/>
                             )}
                         </FormItem>}
+                    <FormItem {...formItemLayout} label={<Tooltip title="从小到大">排序</Tooltip>} className="bs-form-item">
+                        {getFieldDecorator('sortIndex', {
+                            initialValue: record.sortIndex
+                            // rules: [{required: true, message: '请输入描述!'}],
+                        })(
+                            <Input placeholder='请输入排序!'/>
+                        )}
+                    </FormItem>
                     <FormItem {...formItemLayout} label="描述" className="bs-form-item">
                         {getFieldDecorator('description', {
                             initialValue: record.description

@@ -191,19 +191,19 @@ class LeagueHeatTable extends React.Component {
         this.setState({dialogAddVisible: false});
     };
     handleLeagueHeatAddCreate = () => {
-        const form = this.formAdd;
-        form.validateFields((err, values) => {
-            if (err) {
-                return;
-            }
-            if (this.props.heatRule && this.props.heatRule.type == 2) {
-                this.addPlayerHeat(values.leagueId, values.playerId, values.heat);
-            } else if (this.props.heatRule && this.props.heatRule.type == 3) {
-                this.addTeamHeat(values.leagueId, values.teamId, values.heat);
-            }
-            form.resetFields();
-            this.setState({dialogAddVisible: false});
-        });
+        // const form = this.formAdd;
+        // form.validateFields((err, values) => {
+        //     if (err) {
+        //         return;
+        //     }
+        //     if (this.props.heatRule && this.props.heatRule.type == 2) {
+        //         this.addPlayerHeat(values.leagueId, values.playerId, values.heat);
+        //     } else if (this.props.heatRule && this.props.heatRule.type == 3) {
+        //         this.addTeamHeat(values.leagueId, values.teamId, values.heat);
+        //     }
+        //     form.resetFields();
+        //     this.setState({dialogAddVisible: false});
+        // });
     };
     handleChoiceCancel = () => {
         this.setState({dialogChoiceVisible: false});
@@ -364,20 +364,20 @@ class LeagueHeatTable extends React.Component {
                     <Button key="back" onClick={this.handleChoiceCancel}>取消</Button>,
                 ]}
                 onCancel={this.handleChoiceCancel}>
-                <Row gutter={10}>
-                    <Col span={12}>
-                        <Button
-                            type="primary"
-                            className="w-full h-full center"
-                            onClick={this.showLeagueHeatAddDialog}>添加热度</Button>
-                    </Col>
-                    <Col span={12}>
+                {/*<Row gutter={10}>*/}
+                {/*    <Col span={12}>*/}
+                {/*        <Button*/}
+                {/*            type="primary"*/}
+                {/*            className="w-full h-full center"*/}
+                {/*            onClick={this.showLeagueHeatAddDialog}>添加热度</Button>*/}
+                {/*    </Col>*/}
+                {/*    <Col span={12}>*/}
                         <Button
                             type="primary"
                             className="w-full h-full center"
                             onClick={this.showLeagueHeatFakeAddDialog}>刷票</Button>
-                    </Col>
-                </Row>
+                {/*    </Col>*/}
+                {/*</Row>*/}
             </Modal>
         </div>
     }

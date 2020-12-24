@@ -423,12 +423,20 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                                 onClick={this.showChargeAllConfirm}>全部收费</Button>,
                         <Button key="heat" type="primary" className="pull-left"><Link to={
                             `/football/league/heat?leagueId=${this.state.record.id}`
-                        }>热度比拼</Link></Button>,
+                        }>热度</Link></Button>,
+                        <Button key="bet" type="primary" className="pull-left"><Link to={
+                            `/football/league/bet?leagueId=${this.state.record.id}`
+                        }>竞猜</Link>
+                        </Button>,
+                        <Button key="bet" type="primary" className="pull-left"><Link to={
+                            `/football/league/clip?leagueId=${this.state.record.id}`
+                        }>剪辑</Link>
+                        </Button>,
                         <Button key="delete" type="danger" className="pull-left"
                                 onClick={this.handleLeagueDelete}>删除</Button>,
                         <Button key="delete2" type="danger" className="pull-left"
                                 onClick={this.handleLeagueSeriesDelete}>从系列赛移除</Button>,
-                        <Button key="back" onClick={this.handleLeagueMatchModifyCancel}>取消</Button>,
+                        // <Button key="back" onClick={this.handleLeagueMatchModifyCancel}>取消</Button>,
                         <Button key="submit" type="primary" onClick={this.handleLeagueMatchModifyCreate}>
                             确定
                         </Button>

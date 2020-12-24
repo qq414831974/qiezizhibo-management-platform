@@ -912,16 +912,24 @@ class FootBallMatchTable extends React.Component {
                     <Button key="comment" type="primary" className="pull-left">
                         <Link to={
                             `/football/comment/${this.state.record.id}`
-                        }>评论管理</Link>
+                        }>评论</Link>
                     </Button>,
                     <Button key="comment" type="primary" className="pull-left">
                         <Link to={
                             `/football/match/heat?matchId=${this.state.record.id}`
-                        }>热度比拼</Link>
+                        }>热度</Link>
+                    </Button>,
+                    <Button key="bet" type="primary" className="pull-left"><Link to={
+                        `/football/match/bet?matchId=${this.state.record.id}`
+                    }>竞猜</Link>
+                    </Button>,
+                    <Button key="bet" type="primary" className="pull-left"><Link to={
+                        `/football/match/clip?matchId=${this.state.record.id}`
+                    }>剪辑</Link>
                     </Button>,
                     <Button key="delete" type="danger" className="pull-left"
                             onClick={this.handleDelete}>删除</Button>,
-                    <Button key="back" onClick={this.handleMatchModifyCancel}>取消</Button>,
+                    // <Button key="back" onClick={this.handleMatchModifyCancel}>取消</Button>,
                     <Button key="submit" type="primary" onClick={this.handleMatchModifyCreate}>
                         确定
                     </Button>

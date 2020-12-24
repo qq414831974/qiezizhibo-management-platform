@@ -335,13 +335,31 @@ class OrderTable extends React.Component {
             key: 'createTime',
             dataIndex: 'createTime',
             align: 'center',
-            width: '20%',
+            width: '15%',
+        },{
+            title: '支付方式',
+            key: 'payType',
+            dataIndex: 'payType',
+            align: 'center',
+            width: '10%',
+            render: function (text, record, index) {
+                let statusString = "微信支付"
+                switch (record.payType) {
+                    case 0:
+                        statusString = "微信支付"
+                        break;
+                    case 1:
+                        statusString = "余额支付"
+                        break;
+                }
+                return <span>{statusString}</span>;
+            },
         }, {
             title: '描述',
             key: 'description',
             dataIndex: 'description',
             align: 'center',
-            width: '35%',
+            width: '30%',
             render: function (text, record, index) {
                 if (record.match) {
                     const match = record.match;

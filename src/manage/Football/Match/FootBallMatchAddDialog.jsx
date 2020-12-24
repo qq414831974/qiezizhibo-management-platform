@@ -67,10 +67,7 @@ const typeData = [
     }, {
         title: '聊天室',
         value: 4,
-    }, {
-        title: '集锦',
-        value: 5,
-    },
+    }
 ];
 
 class FootBallMatchAddDialog extends React.Component {
@@ -898,7 +895,7 @@ class FootBallMatchAddDialog extends React.Component {
                             </FormItem>
                         </div>
                         {isRecordCharge ? <div className="center w-full">
-                            <span>刷礼物观看直播：</span>
+                            <span>刷礼物观看录播：</span>
                             <FormItem {...formItemLayout} className="bs-form-item">
                                 {getFieldDecorator('giftWatchRecordEnable', {
                                     initialValue: this.state.currentLeague ? this.state.currentLeague.giftWatchRecordEnable : null,
@@ -959,7 +956,7 @@ class FootBallMatchAddDialog extends React.Component {
                         <div className="center w-full">
                             <FormItem {...formItemLayout} className="bs-form-item">
                                 {getFieldDecorator('type', {
-                                    initialValue: [1, 2, 3, 4, 5],
+                                    initialValue: [1, 2, 3, 4],
                                 })(
                                     <TreeSelect treeData={typeData}
                                                 style={{minWidth: 300, maxWidth: 300, textAlign: "center"}}

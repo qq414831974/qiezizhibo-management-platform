@@ -1302,6 +1302,138 @@ export const addFakeGiftOrder = (param) => post({url: `${config.pay_service}/gif
     }).catch(function (error) {
         console.log(error)
     });
+export const getLeagueBetRule = (param) => get({url: `${config.football_service}/bet/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueBetRule = (param) => post({url: `${config.football_service}/bet/league`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueBetRule = (param) => put({url: `${config.football_service}/bet/league`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteLeagueBetRule = (param) => del({url: `${config.football_service}/bet/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const leagueBetAllMatch = (param) => get({url: `${config.football_service}/bet/league/betAll?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getMatchBetRule = (param) => get({url: `${config.football_service}/bet/match?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addMatchBetRule = (param) => post({url: `${config.football_service}/bet/match`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateMatchBetRule = (param) => put({url: `${config.football_service}/bet/match`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteMatchBetRule = (param) => del({url: `${config.football_service}/bet/match?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getUserBets = (param) => get({url: `${config.football_service}/bet?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateUserBet = (param) => put({url: `${config.football_service}/bet`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getUserDeposits = (param) => get({url: `${config.pay_service}/deposit/list?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueClipRule = (param) => get({url: `${config.football_service}/league/${param.leagueId}/clip?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueClipRule = (param) => post({url: `${config.football_service}/league/${param.leagueId}/clip`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueClipRule = (param) => put({url: `${config.football_service}/league/${param.leagueId}/clip`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const leagueClipAllMatch = (param) => get({url: `${config.football_service}/league/${param.leagueId}/clipAll?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getMatchClipRule = (param) => get({url: `${config.football_service}/match/${param.matchId}/clip?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addMatchClipRule = (param) => post({url: `${config.football_service}/match/${param.matchId}/clip`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateMatchClipRule = (param) => put({url: `${config.football_service}/match/${param.matchId}/clip`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getClipsByMatchId = (param) => get({url: `${config.media_service}/media/clip?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateClipsByMatchId = (param) => put({url: `${config.media_service}/media/clip`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteClipsByMatchId = (param) => del({url: `${config.media_service}/media/clip?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 //47.92.82. 5
 //129.204.161. 196
 //www.qiezizhibo. com
