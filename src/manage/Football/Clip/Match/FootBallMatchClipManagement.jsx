@@ -27,6 +27,13 @@ class FootBallMatchClipManagement extends React.Component {
     refresh = () => {
         const currentMatch = getQueryString(this.props.location.search, "matchId");
         this.fetch({matchId: currentMatch})
+        if (this.props.location.search) {
+            let currentTab = getQueryString(this.props.location.search, "tab");
+            if (currentTab == null) {
+                currentTab = 1;
+            }
+            this.setState({currentTab: currentTab.toString()});
+        }
     }
     fetch = (params = {}) => {
         getMatchClipRule(params).then((data) => {
@@ -105,7 +112,10 @@ class FootBallMatchClipManagement extends React.Component {
                     <Col className="gutter-row">
                         <div className="gutter-box">
                             <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false}>
-                                <Tabs>
+                                <Tabs activeKey={this.state.currentTab} onChange={(value) => {
+                                    this.setState({currentTab: value});
+                                    this.props.history.replace(`/football/match/clip?matchId=${currentMatch}&tab=${value}`)
+                                }}>
                                     <TabPane tab="自动剪辑设置" key="1">
                                         <div className="w-full center" style={{
                                             fontSize: 16,

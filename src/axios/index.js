@@ -1428,7 +1428,31 @@ export const updateClipsByMatchId = (param) => put({url: `${config.media_service
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteClipsByMatchId = (param) => del({url: `${config.media_service}/media/clip?${unpack(param)}`})
+export const deleteClips = (param) => del({url: `${config.media_service}/media/clip?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const mergeClips = (param) => post({url: `${config.media_service}/media/clip/merge`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getClipCollectionsByMatchId = (param) => get({url: `${config.media_service}/media/clipCollection?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateClipCollectionsByMatchId = (param) => put({url: `${config.media_service}/media/clipCollection`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteClipCollections = (param) => del({url: `${config.media_service}/media/clipCollection?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

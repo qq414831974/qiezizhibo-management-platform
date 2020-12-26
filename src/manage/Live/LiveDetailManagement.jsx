@@ -27,7 +27,10 @@ class LiveDetailManagement extends React.Component {
         }
         this.fetch();
         if (this.props.location.search) {
-            const currentTab = getQueryString(this.props.location.search, "tab");
+            let currentTab = getQueryString(this.props.location.search, "tab");
+            if (currentTab == null) {
+                currentTab = 1;
+            }
             this.setState({currentTab: currentTab.toString()});
         }
     };

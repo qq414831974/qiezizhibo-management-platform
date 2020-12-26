@@ -64,9 +64,6 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
             }
         });
     }
-    refresh = () => {
-        this.fetch();
-    }
     fetchHostTeam = (params = {}) => {
         this.setState({
             hostloading: true,

@@ -111,20 +111,12 @@ class Dashboard extends React.Component {
                         <div className="gutter-box">
                             <Card title="新增功能" bordered={false}
                                   style={{height: 214, width: "100%", overflow: "scroll"}}>
-                                <div className="w-full">2020-12-17：新增免费竞猜</div>
-                                <div className="w-full">2020-11-17：新增竞猜管理</div>
-                                <div className="w-full">2020-11-17：新增礼物排序</div>
-                                <div className="w-full">2020-11-02：新增刷票功能</div>
-                                <div className="w-full">2020-10-19：新增联赛，比赛送礼物观看视频设置</div>
-                                <div className="w-full">2020-10-19：新增联赛球队，球员热度比拼详情查看、设置</div>
-                                <div className="w-full">2020-10-17：新增导入录播视频</div>
-                                <div className="w-full">2020-09-14：新增联赛粉丝团设置</div>
+                                <div className="w-full">2020-12-26：新增自动剪辑系统</div>
+                                <div className="w-full">2020-11-17：新增竞猜系统</div>
+                                <div className="w-full">2020-10-19：新增热度比拼系统</div>
+                                <div className="w-full">2020-09-14：新增粉丝团系统</div>
                                 <div className="w-full">2020-09-11：新增礼物系统</div>
                                 <div className="w-full">2020-09-10：新增经验系统</div>
-                                <div className="w-full">2020-09-07：新增批量导出比赛推流码</div>
-                                <div className="w-full">2020-08-31：新增批量导出比赛下载地址</div>
-                                <div className="w-full">2020-08-31：新增后台添加微信分享语句</div>
-                                <div className="w-full">2020-08-30：新增实际观看人数查看</div>
                             </Card>
                         </div>
                     </Col>
