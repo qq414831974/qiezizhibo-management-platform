@@ -67,6 +67,9 @@ const typeData = [
     }, {
         title: '聊天室',
         value: 4,
+    }, {
+        title: '集锦',
+        value: 5,
     }
 ];
 
