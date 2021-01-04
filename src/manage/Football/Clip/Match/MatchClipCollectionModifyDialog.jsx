@@ -118,6 +118,13 @@ class MatchClipCollectionModifyDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem style={{margin: 0}}>
+                            {getFieldDecorator('teamId', {
+                                initialValue: record.teamId,
+                            })(
+                                <Input hidden={true}/>
+                            )}
+                        </FormItem>
+                        <FormItem style={{margin: 0}}>
                             {getFieldDecorator('matchId', {
                                 initialValue: record.matchId,
                             })(
