@@ -352,7 +352,7 @@ class UserBetTable extends React.Component {
                 width: '5%',
                 render: function (text, record, index) {
                     let statusString = "收费竞猜"
-                    switch (record.payType) {
+                    switch (record.type) {
                         case 0:
                             statusString = "免费竞猜"
                             break;
