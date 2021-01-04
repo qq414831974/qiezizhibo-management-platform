@@ -10,7 +10,7 @@ import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import moment from "moment";
-import {getTeamInLeague, getAllUser} from "../../../../axios";
+import {getTeamInLeague, getAllAdminUser} from "../../../../axios";
 import defultAvatar from "../../../../static/avatar.jpg";
 import logo from "../../../../static/logo.png";
 
@@ -77,7 +77,7 @@ class LeagueFansAddDialog extends React.Component {
         this.setState({
             userloading: true,
         });
-        getAllUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 1}).then((data) => {
+        getAllAdminUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 1}).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
                     userdata: pageNum == 1 ? (data.data ? data.data.records : []) :

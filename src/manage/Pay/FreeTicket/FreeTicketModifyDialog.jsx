@@ -13,8 +13,8 @@ import moment from "moment";
 import {
     getAllMatchs,
     getAllLeagueMatchs,
-    getAllUser,
-    getUserInfo,
+    getAllAdminUser,
+    getAdminUserInfo,
     getLeagueMatchById,
     getMatchById
 } from "../../../axios";
@@ -69,7 +69,7 @@ class FreeTicketModifyDialog extends React.Component {
     }
     fetchUser = () => {
         const {record} = this.props
-        getUserInfo({id: record.userNo, type: "userNo"}).then(userData => {
+        getAdminUserInfo({id: record.userNo, type: "userNo"}).then(userData => {
             if (userData && userData.code == 200) {
                 this.setState({user: userData.data})
             } else {
@@ -238,7 +238,7 @@ class FreeTicketModifyDialog extends React.Component {
         this.setState({
             userloading: true,
         });
-        getAllUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 1}).then((data) => {
+        getAllAdminUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 1}).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
                     userdata: pageNum == 1 ? (data.data ? data.data.records : []) :

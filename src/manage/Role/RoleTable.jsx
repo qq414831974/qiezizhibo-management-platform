@@ -140,7 +140,7 @@ class RoleTable extends React.Component {
         const {searchText} = this.state;
         pager.filters = {};
         if (searchText != null && searchText != '') {
-            pager.filters["roleName"] = searchText;
+            pager.filters["name"] = searchText;
         }
         if (filters) {
             for (let param in filters) {
@@ -243,7 +243,7 @@ class RoleTable extends React.Component {
     getRoleTip = (param) => {
         let dom = [];
         param.permissions.forEach((item, index) => {
-            dom.push(<p key={item.id + item.permissionCode}>{item.permissionName}</p>);
+            dom.push(<p key={`permission-${item.id}`}>{item.name}</p>);
         });
         return dom;
     }
@@ -273,8 +273,14 @@ class RoleTable extends React.Component {
         };
 
         const columns = [{
+            title: 'id',
+            dataIndex: 'id',
+            key: 'id',
+            width: '20%',
+            align: 'center',
+        }, {
             title: '名字',
-            key: 'role_name',
+            key: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
@@ -294,20 +300,15 @@ class RoleTable extends React.Component {
                     filterDropdownVisible: visible,
                 }, () => this.searchInput && this.searchInput.focus());
             },
-            width: '20%',
+            width: '80%',
             align: 'center',
             render: function (text, record, index) {
                 return <Tooltip placement="rightTop" title={
                     getRoleTip(record)
                 }>
-                    <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.roleName}</a>
+                    <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.name}</a>
                 </Tooltip>;
             },
-        }, {
-            title: '权限码',
-            dataIndex: 'roleCode',
-            key: 'role_code',
-            align: 'center',
         },
             // {
             //     title: '',
@@ -321,7 +322,7 @@ class RoleTable extends React.Component {
         ];
         const columns_moblie = [{
             title: '名字',
-            key: 'role_name',
+            key: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
@@ -345,12 +346,12 @@ class RoleTable extends React.Component {
             align: 'center',
             render: function (text, record, index) {
                 if (isMobile) {
-                    return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.roleName}</a>;
+                    return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.name}</a>;
                 }
                 return <Tooltip placement="rightTop" title={
                     getRoleTip(record)
                 }>
-                    <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.roleName}</a>
+                    <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.name}</a>
                 </Tooltip>;
             },
         },

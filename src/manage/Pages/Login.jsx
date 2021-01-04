@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {fetchData, receiveData} from '../../action/index';
 import logo from '../../static/logo.png';
-import {login, getCurrentUserInfo, getUserInfo} from "../../axios/index";
+import {login, getCurrentAdminUserInfo, getAdminUserInfo} from "../../axios/index";
 import {message} from "antd/lib/index";
 import moment from 'moment'
 import 'moment/locale/zh-cn';
@@ -43,7 +43,7 @@ class Login extends React.Component {
     }
 
     getUserInfo = (remember) => {
-        getCurrentUserInfo().then(userAuth => {
+        getCurrentAdminUserInfo().then(userAuth => {
             if (userAuth && userAuth.code == 200 && userAuth.data) {
                 setUser({rememberMe: remember, ...userAuth.data})
                 setRole(userAuth.data.roles)
@@ -71,6 +71,9 @@ class Login extends React.Component {
             }
         });
     };
+    onForgetPassword = () => {
+        alert("请联系工作人员");
+    }
 
     render() {
         const {getFieldDecorator} = this.props.form;
@@ -110,7 +113,8 @@ class Login extends React.Component {
                                 })(
                                     <Checkbox>记住我</Checkbox>
                                 )}
-                                <a className="login-form-forgot" href="" style={{float: 'right'}}>忘记密码</a>
+                                <span className="login-form-forgot cursor-hand" onClick={this.onForgetPassword}
+                                   style={{float: 'right'}}>忘记密码</span>
                                 <Button type="primary" htmlType="submit" className="login-form-button"
                                         loading={this.state.loginLoading}
                                         style={{width: '100%'}}>

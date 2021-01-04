@@ -1,9 +1,9 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip, Radio} from 'antd';
-import {getAllRoles, getAllUser} from '../../axios/index';
+import {getAllRoles, getAllAdminUser} from '../../axios/index';
 import {mergeJSON} from '../../utils/index';
 import {Avatar} from 'antd';
-import {delUserByIds, updateUserById, createUser} from "../../axios";
+import {delAdminUserByIds, updateAdminUserById, createAdminUser} from "../../axios";
 import {Form, message} from "antd/lib/index";
 import UserAddDialog from './UserAddDialog';
 import UserModifyDialog from './UserModifyDialog';
@@ -37,7 +37,7 @@ class UserTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
-        getAllUser(params).then((data) => {
+        getAllAdminUser(params).then((data) => {
             if (data && data.code == 200 && data.data.records) {
                 const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
@@ -64,7 +64,7 @@ class UserTable extends React.Component {
         });
     }
     deleteUser = () => {
-        delUserByIds({userNos: [this.state.record.userNo]}).then((data) => {
+        delAdminUserByIds({userNos: [this.state.record.userNo]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -79,7 +79,7 @@ class UserTable extends React.Component {
         });
     }
     deleteUsers = () => {
-        delUserByIds({userNos: this.state.selectedRowKeys}).then((data) => {
+        delAdminUserByIds({userNos: this.state.selectedRowKeys}).then((data) => {
             this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -184,7 +184,7 @@ class UserTable extends React.Component {
                     return r;
                 })
             }
-            createUser(values).then((data) => {
+            createAdminUser(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
@@ -213,7 +213,7 @@ class UserTable extends React.Component {
                     return r;
                 })
             }
-            updateUserById(values).then((data) => {
+            updateAdminUserById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();

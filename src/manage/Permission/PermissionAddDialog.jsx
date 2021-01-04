@@ -41,7 +41,7 @@ class PermissionAddDialog extends React.Component {
             visible ?
                 <Form>
                     <FormItem {...formItemLayout} label="名字" className="bs-form-item">
-                        {getFieldDecorator('permissionName', {
+                        {getFieldDecorator('name', {
                             rules: [{required: true, message: '请输入名字!'}],
                         })(
                             <Input placeholder='请输入名字!'/>
@@ -54,21 +54,9 @@ class PermissionAddDialog extends React.Component {
                             <Input placeholder='请输入url!'/>
                         )}
                     </FormItem>
-                    <FormItem {...formItemLayout} label="方法" className="bs-form-item">
-                        {getFieldDecorator('method', {
-                            rules: [{required: true, message: '请选择方法!'}],
-                        })(
-                            <Select placeholder="请选择方法!">
-                                <Option value="get">get</Option>
-                                <Option value="post">post</Option>
-                                <Option value="put">put</Option>
-                                <Option value="delete">delete</Option>
-                            </Select>
-                        )}
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="描述" className="bs-form-item">
-                        {getFieldDecorator('descritpion', {})(
-                            <Input placeholder='请输入描述!'/>
+                    <FormItem {...formItemLayout} label="排序" className="bs-form-item">
+                        {getFieldDecorator('sortIndex', {})(
+                            <Input placeholder='请输入排序!'/>
                         )}
                     </FormItem>
                 </Form>

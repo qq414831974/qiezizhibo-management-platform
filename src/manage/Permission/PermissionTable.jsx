@@ -23,13 +23,15 @@ class PermissionTable extends React.Component {
         dialogModifyVisible: false,
         dialogAddVisible: false,
         record: {},
-        nameRadioValue: "permissionName",
+        nameRadioValue: "name",
     };
 
     componentDidMount() {
         this.fetch({
             pageSize: this.state.pagination.pageSize,
             pageNum: 1,
+            sortOrder: "asc",
+            sortField: "sortIndex"
         });
     };
 
@@ -40,6 +42,8 @@ class PermissionTable extends React.Component {
                 const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
                 pagination.current = data.data ? data.data.current : 1;
+                pagination.sortField = params.sortField;
+                pagination.sortOrder = params.sortOrder;
                 this.setState({
                     loading: false,
                     data: data.data ? data.data.records : "",
@@ -123,8 +127,8 @@ class PermissionTable extends React.Component {
     handleTableChange = (pagination, filters, sorter) => {
         const pager = {...this.state.pagination};
         pager.current = pagination.current;
-        pager.sortField = sorter.field;
-        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
+        pager.sortField = sorter.field ? sorter.field : pager.sortField;
+        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : pager.sortOrder;
         pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,
@@ -246,6 +250,7 @@ class PermissionTable extends React.Component {
             nameRadioValue: e.target.value,
         });
     }
+
     render() {
         const onNameClick = this.onNameClick;
         const {selectedRowKeys} = this.state;
@@ -269,57 +274,63 @@ class PermissionTable extends React.Component {
             onSelection: this.onSelection,
         };
 
-        const columns = [{
-            title: '名字',
-            key: 'permissionName',
-            filterDropdown: (
-                <div className="custom-filter-dropdown">
-                    <div>
-                        <Input
-                            ref={ele => this.searchInput = ele}
-                            placeholder="搜索"
-                            value={this.state.searchText}
-                            onChange={this.onInputChange}
-                            onPressEnter={this.onSearch}
-                        />
-                        <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+        const columns = [
+            {
+                title: 'id',
+                dataIndex: 'id',
+                key: 'id',
+                align: 'center',
+            }, {
+                title: '名字',
+                key: 'name',
+                filterDropdown: (
+                    <div className="custom-filter-dropdown">
+                        <div>
+                            <Input
+                                ref={ele => this.searchInput = ele}
+                                placeholder="搜索"
+                                value={this.state.searchText}
+                                onChange={this.onInputChange}
+                                onPressEnter={this.onSearch}
+                            />
+                            <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                        </div>
+                        <div className="custom-filter-dropdown-radio">
+                            <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.nameRadioValue}>
+                                <Radio value={"name"}>按名称</Radio>
+                                <Radio value={"url"}>按url</Radio>
+                            </Radio.Group>
+                        </div>
                     </div>
-                    <div className="custom-filter-dropdown-radio">
-                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.nameRadioValue}>
-                            <Radio value={"permissionName"}>按名称</Radio>
-                            <Radio value={"url"}>按url</Radio>
-                        </Radio.Group>
-                    </div>
-                </div>
-            ),
-            filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,
-            filterDropdownVisible: this.state.filterDropdownVisible,
-            onFilterDropdownVisibleChange: (visible) => {
-                this.setState({
-                    filterDropdownVisible: visible,
-                }, () => this.searchInput && this.searchInput.focus());
-            },
-            width: '20%',
-            align: 'center',
-            render: function (text, record, index) {
-                return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.permissionName}</a>;
-            },
-        },{
-            title: 'url / 方法',
-            key: 'url',
-            align: 'left',
-            render: function (text, record, index) {
-                return <div>
-                    <span className="mr-s">{`${record.url}`}</span>
-                    <Tag>{`${record.method}`}</Tag>
-                </div>;
-            },
-        },{
-            title: '描述',
-            dataIndex: 'descritpion',
-            key: 'descritpion',
-            align: 'center',
-        }
+                ),
+                filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,
+                filterDropdownVisible: this.state.filterDropdownVisible,
+                onFilterDropdownVisibleChange: (visible) => {
+                    this.setState({
+                        filterDropdownVisible: visible,
+                    }, () => this.searchInput && this.searchInput.focus());
+                },
+                width: '20%',
+                align: 'center',
+                render: function (text, record, index) {
+                    return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.name}</a>;
+                },
+            }, {
+                title: 'url',
+                key: 'url',
+                align: 'left',
+                render: function (text, record, index) {
+                    return <div>
+                        <span className="mr-s">{`${record.url}`}</span>
+                    </div>;
+                },
+            }, {
+                title: '排序',
+                dataIndex: 'sortIndex',
+                key: 'sortIndex',
+                align: 'center',
+                sorter: true,
+            }
             // {
             //     title: '',
             //     key: '操作',
@@ -332,7 +343,7 @@ class PermissionTable extends React.Component {
         ];
         const columns_moblie = [{
             title: '名字',
-            key: 'permissionName',
+            key: 'name',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input

@@ -3,7 +3,7 @@ import {
     Form,
     Input,
     Icon,
-    TreeSelect, Tooltip, Select,
+    TreeSelect, Tooltip, Select, Checkbox,
 } from 'antd';
 import 'moment/locale/zh-cn';
 import {receiveData} from "../../action";
@@ -39,7 +39,13 @@ class RoleModifyDialog extends React.Component {
     }
 
     fetch = (searchText, pageNum) => {
-        getPermissionList({pageSize: 100, pageNum: pageNum, permissionName: searchText}).then((data) => {
+        getPermissionList({
+            pageSize: 100,
+            pageNum: pageNum,
+            name: searchText,
+            sortOrder: "asc",
+            sortField: "sortIndex"
+        }).then((data) => {
             if (data && data.code == 200 && data.data.records) {
                 this.setState({
                     data: pageNum == 1 ? (data.data ? data.data.records : []) :
@@ -61,11 +67,11 @@ class RoleModifyDialog extends React.Component {
         let recordData = this.props.record && this.props.record.permissions ? this.props.record.permissions : [];
         data = distinctById(data.concat(recordData));
         data.forEach((item, index) => {
-            dom.push(<Option value={item.id} style={{height: 50}} key={item.permissionCode}>
+            dom.push(<Option value={item.id} style={{height: 50}} key={`permission-${item.id}`}>
                 <Tooltip placement="rightTop" title={
                     this.getPermissionTip(item)
                 }>
-                    <p className="mb-n">{item.permissionName}</p>
+                    <p className="mb-n">{item.name}</p>
                 </Tooltip>
             </Option>)
         });
@@ -73,9 +79,7 @@ class RoleModifyDialog extends React.Component {
     }
     getPermissionTip = (item) => {
         return <div>
-            <p key={item.id + item.permissionCode + "url"}>{`url: ${item.url}`}</p>
-            <p key={item.id + item.permissionCode + "method"}>{`method: ${item.method}`}</p>
-            <p key={item.id + item.permissionCode + "des"}>{`描述: ${item.descritpion}`}</p>
+            <p key={item.id + "name"}>{`${item.name}`}</p>
         </div>;
     }
     handleSearch = (e) => {
@@ -126,10 +130,18 @@ class RoleModifyDialog extends React.Component {
         return (
             visible ?
                 <Form>
+                    <FormItem {...formItemLayout} label="直播人员" className="bs-form-item">
+                        {getFieldDecorator('isAnchor', {
+                            initialValue: record.isAnchor,
+                            valuePropName: 'checked',
+                        })(
+                            <Checkbox/>
+                        )}
+                    </FormItem>
                     <FormItem {...formItemLayout} label="名字" className="bs-form-item">
-                        {getFieldDecorator('roleName', {
+                        {getFieldDecorator('name', {
                             rules: [{required: true, message: '请输入名字!'}],
-                            initialValue: record.roleName
+                            initialValue: record.name
                         })(
                             <Input placeholder='请输入名字!'/>
                         )}
