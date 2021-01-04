@@ -52,10 +52,12 @@ export default class CRouter extends Component {
         if (permissions) {
             let vaild = false;
             for (let permission of permissions) {
-                var pattern = new UrlPattern(permission);
-                if (pattern.match(url)) {
-                    vaild = true;
-                    break;
+                if(permission){
+                    var pattern = new UrlPattern(permission);
+                    if (pattern.match(url)) {
+                        vaild = true;
+                        break;
+                    }
                 }
             }
             if (vaild) {

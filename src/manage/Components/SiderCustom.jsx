@@ -66,6 +66,7 @@ class SiderCustom extends Component {
             const subMenus = [];
             menu.sub.map(subMenu => {
                 if (subMenu.public) {
+                    delete subMenu.public
                     subMenus.push(subMenu);
                 } else if (this.ifMenuIsAvailable(subMenu)) {
                     subMenus.push(subMenu);
@@ -82,9 +83,13 @@ class SiderCustom extends Component {
                     const submenu = subMenuAvailable(menu);
                     if (submenu) {
                         menu.sub = submenu;
+                        //删除public属性
+                        delete menu.public
                         menus.push(menu);
                     }
                 } else {
+                    //删除public属性
+                    delete menu.public
                     menus.push(menu);
                 }
             } else if (menu.sub) {
@@ -141,8 +146,6 @@ class SiderCustom extends Component {
 }
 
 const mapStateToProps = state => {
-    console.log("mapStateToProps")
-    console.log(state)
     const {responsive = {data: {}}, auth = {data: {}}, role = {data: []}, permission = {data: []}} = state.httpData;
     return {responsive, auth, role, permission};
 };

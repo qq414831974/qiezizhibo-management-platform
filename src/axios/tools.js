@@ -10,6 +10,10 @@ import * as config from "./config";
 axios.defaults.withCredentials = true
 axios.defaults.retry = 0;
 axios.interceptors.response.use(undefined, (err) => {
+    if (err.response == null) {
+        message.error("未能连接到服务器");
+        return Promise.reject(err);
+    }
     const {refreshToken} = getToken();
     const {data, status} = err.response;
     var config = err.config;
@@ -31,7 +35,6 @@ axios.interceptors.response.use(undefined, (err) => {
     //         resolve();
     //     }, 1);
     // });
-    console.log(config)
 
     if (status != 200 || data.code != 200) {
         if ((status == 401 || data.code == 401) && refreshToken) {
@@ -45,7 +48,12 @@ axios.interceptors.response.use(undefined, (err) => {
                 return axios(config);
                 // });
             });
-        } else {
+        } else if(status == 401 || data.code == 401){
+            message.error("登录失效，请重新登录");
+            toLogin();
+        }else if(status == 403 || data.code == 403){
+            message.error("没有相关权限");
+        }else{
             message.error(data.message);
         }
     }

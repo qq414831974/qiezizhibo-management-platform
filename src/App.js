@@ -86,8 +86,6 @@ class App extends Component {
 
     render() {
         const {auth, responsive, permission} = this.props;
-        console.log("permission")
-        console.log(permission)
         if(permission.data == null || permission.data.length == 0){
             return <div/>
         }

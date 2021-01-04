@@ -22,18 +22,18 @@ class Dashboard extends React.Component {
 
     fetch = () => {
         //获取近期的比赛
-        getRecentMatches().then((res) => {
-            if (res && res.code == 200) {
-                const data = res.data;
-                if (data && data.total > 0) {
-                    this.setState({
-                        matchData: data.records,
-                    });
-                }
-            } else {
-                message.error('获取近期比赛信息失败：' + (res ? res.code + ":" + res.message : res), 3);
-            }
-        });
+        // getRecentMatches().then((res) => {
+        //     if (res && res.code == 200) {
+        //         const data = res.data;
+        //         if (data && data.total > 0) {
+        //             this.setState({
+        //                 matchData: data.records,
+        //             });
+        //         }
+        //     } else {
+        //         message.error('获取近期比赛信息失败：' + (res ? res.code + ":" + res.message : res), 3);
+        //     }
+        // });
     }
     //获取比赛详细
     getMatchDetail = () => {
