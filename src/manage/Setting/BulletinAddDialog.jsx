@@ -378,7 +378,8 @@ class BulletinAddDialog extends React.Component {
                             </RadioGroup>
                         )}
                     </FormItem> : null}
-                    {this.state.sceneType != "home" ? <FormItem {...formItemLayout} className="bs-form-item">
+                    {this.state.sceneType != "home" && form.getFieldValue("curtain") ?
+                        <FormItem {...formItemLayout} className="bs-form-item">
                         {getFieldDecorator('scene', {
                             rules: [{required: true, message: '请选择关联比赛或联赛!'}],
                         })(
