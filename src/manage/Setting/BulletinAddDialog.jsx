@@ -378,19 +378,20 @@ class BulletinAddDialog extends React.Component {
                             </RadioGroup>
                         )}
                     </FormItem> : null}
-                    {this.state.sceneType != "home" ? <FormItem {...formItemLayout} className="bs-form-item">
-                        {getFieldDecorator('scene', {
-                            rules: [{required: true, message: '请选择关联比赛或联赛!'}],
-                        })(
-                            <Input hidden={true}/>
-                        )}
-                    </FormItem> : <FormItem {...formItemLayout} className="bs-form-item">
-                        {getFieldDecorator('scene', {
-                            initialValue: {type: "home"},
-                        })(
-                            <Input hidden={true}/>
-                        )}
-                    </FormItem>}
+                    {this.state.sceneType != "home" && form.getFieldValue("curtain") ?
+                        <FormItem {...formItemLayout} className="bs-form-item">
+                            {getFieldDecorator('scene', {
+                                rules: [{required: true, message: '请选择关联比赛或联赛!'}],
+                            })(
+                                <Input hidden={true}/>
+                            )}
+                        </FormItem> : <FormItem {...formItemLayout} className="bs-form-item">
+                            {getFieldDecorator('scene', {
+                                initialValue: {type: "home"},
+                            })(
+                                <Input hidden={true}/>
+                            )}
+                        </FormItem>}
                     {this.state.sceneType == "match" ?
                         <div>
                             <div className="center w-full">

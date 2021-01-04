@@ -12,6 +12,7 @@ import {
 } from "../../../../axios";
 import MatchClipForm from "./MatchClipForm";
 import MatchClipPanel from "./MatchClipPanel";
+import FootBallMatchPlayersMediaPanel from "../../Match/FootBallMatchPlayersMediaPanel";
 
 const TabPane = Tabs.TabPane;
 
@@ -122,13 +123,21 @@ class FootBallMatchClipManagement extends React.Component {
                                             fontWeight: 'bold'
                                         }}>{this.state.data && this.state.data.id ? "已开启自动剪辑" : "未开启自动剪辑"}</div>
                                         <ClipSetting
-                                            visible={true}
+                                            visible={this.state.currentTab == 1 ? true : false}
                                             record={this.state.data}
                                             handleSubmit={this.handleClipSettingSubmit}
                                             ref={this.saveClipSettingRef}/>
                                     </TabPane>
                                     <TabPane tab="剪辑列表" key="2">
-                                        {this.state.matchLoading ? null : <MatchClipPanel visible={true} matchId={currentMatch} match={this.state.match}/>}
+                                        {this.state.matchLoading ? null : <MatchClipPanel
+                                            visible={this.state.currentTab == 2 ? true : false}
+                                            matchId={currentMatch}
+                                            match={this.state.match}/>}
+                                    </TabPane>
+                                    <TabPane tab="视频列表" key="3">
+                                        {this.state.matchLoading ? null : <FootBallMatchPlayersMediaPanel
+                                            visible={this.state.currentTab == 3 ? true : false}
+                                            matchId={currentMatch}/>}
                                     </TabPane>
                                 </Tabs>
                             </Card>
