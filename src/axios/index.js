@@ -28,7 +28,7 @@ export const login = (params) => post({url: `${config.auth_service}/auth`, data:
     }).catch(function (error) {
         console.log(error)
     });
-export const getAuthUserDetail = (params) => post({url: `${config.auth_service}/auth/user`})
+export const getCurrentUserInfo = () => get({url: `${config.user_service}/user/info`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

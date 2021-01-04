@@ -60,6 +60,51 @@ class SiderCustom extends Component {
             firstHide: false,
         })
     };
+    getMenu = () => {
+        const menus = [];
+        const subMenuAvailable = (menu) => {
+            const subMenus = [];
+            menu.sub.map(subMenu => {
+                if (subMenu.public) {
+                    subMenus.push(subMenu);
+                } else if (this.ifMenuIsAvailable(subMenu)) {
+                    subMenus.push(subMenu);
+                }
+            })
+            if (subMenus.length > 0) {
+                return subMenus;
+            }
+            return null;
+        }
+        menus_admin.map(menu => {
+            if (menu.public) {
+                if (menu.sub) {
+                    const submenu = subMenuAvailable(menu);
+                    if (submenu) {
+                        menu.sub = submenu;
+                        menus.push(menu);
+                    }
+                } else {
+                    menus.push(menu);
+                }
+            } else if (menu.sub) {
+                const submenu = subMenuAvailable(menu);
+                if (submenu) {
+                    menu.sub = submenu;
+                    menus.push(menu);
+                }
+            } else if (this.ifMenuIsAvailable(menu)) {
+                menus.push(menu);
+            }
+        });
+        return menus;
+    }
+    ifMenuIsAvailable = (menu) => {
+        if (this.props.permission.data) {
+            return this.props.permission.data.indexOf(menu.key) > -1
+        }
+        return false;
+    }
 
     render() {
         const {responsive, path} = this.props;
@@ -74,7 +119,7 @@ class SiderCustom extends Component {
             >
                 <div className="logo center"><img src={logo} height={50} width={50}/></div>
                 <SiderMenu
-                    menus={this.props.auth.data.role && this.props.auth.data.role[0] && this.props.auth.data.role[0].roleCode == "role-258f0b2db03c49218e929ac421f127ad" ? menus_admin : menus}
+                    menus={this.getMenu()}
                     onClick={this.menuClick}
                     theme="dark"
                     mode="inline"
@@ -96,8 +141,10 @@ class SiderCustom extends Component {
 }
 
 const mapStateToProps = state => {
-    const {responsive = {data: {}},auth = {data: {}}} = state.httpData;
-    return {responsive,auth};
+    console.log("mapStateToProps")
+    console.log(state)
+    const {responsive = {data: {}}, auth = {data: {}}, role = {data: []}, permission = {data: []}} = state.httpData;
+    return {responsive, auth, role, permission};
 };
 
 export default withRouter(connect(mapStateToProps)(SiderCustom));

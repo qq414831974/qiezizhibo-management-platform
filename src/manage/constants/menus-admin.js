@@ -1,8 +1,17 @@
 export const menus_admin = [
-    {key: '/index', title: '首页', icon: 'home',},
-    {key: '/user', title: '用户管理', icon: 'user',},
+    {key: '/index', title: '首页', icon: 'home', public: true},
+    {
+        key: '/user', title: '用户管理', icon: 'user',
+        public: true,
+        sub: [
+            {key: '/user/user', title: '用户管理', icon: 'user',},
+            {key: '/user/admin', title: '后台用户管理', icon: 'crown',},
+        ]
+
+    },
     {
         key: '/exp', title: '经验系统', icon: 'thunderbolt',
+        public: true,
         sub: [
             {key: '/exp/exp', title: '经验系统', icon: 'thunderbolt',},
             {key: '/exp/growth', title: '充值成长', icon: 'property-safety',},
@@ -10,6 +19,7 @@ export const menus_admin = [
     },
     {
         key: '/role', title: '权限管理', icon: 'idcard',
+        public: true,
         sub: [
             {key: '/role/role', title: '角色管理', icon: 'user',},
             {key: '/role/permission', title: '权限管理', icon: 'audit',},
@@ -18,6 +28,7 @@ export const menus_admin = [
     {key: '/area', title: '地区管理', icon: 'environment',},
     {
         key: '/football', title: '球赛管理', icon: 'dribbble',
+        public: true,
         sub: [
             {key: '/football/footballLeagueMatch', title: '联赛', icon: 'trophy',},
             {key: '/football/footballMatch', title: '球赛', icon: 'dribbble',},
@@ -28,6 +39,7 @@ export const menus_admin = [
     },
     {
         key: '/pay', title: '交易管理', icon: 'dollar',
+        public: true,
         sub: [
             {key: '/pay/order', title: '订单管理', icon: 'shopping-cart',},
             {key: '/pay/product', title: '产品管理', icon: 'shopping',},
@@ -41,6 +53,7 @@ export const menus_admin = [
     {key: '/live', title: '直播管理', icon: 'video-camera',},
     {
         key: '/setting', title: '设置', icon: 'setting',
+        public: true,
         sub: [
             {key: '/setting/banner', title: '轮播图', icon: 'picture',},
             {key: '/setting/bulletin', title: '广告/公告', icon: 'notification',},

@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {fetchData, receiveData} from '../../action/index';
 import logo from '../../static/logo.png';
-import {login, getAuthUserDetail, getUserInfo} from "../../axios/index";
+import {login, getCurrentUserInfo, getUserInfo} from "../../axios/index";
 import {message} from "antd/lib/index";
 import moment from 'moment'
 import 'moment/locale/zh-cn';
@@ -31,7 +31,7 @@ class Login extends React.Component {
         console.log(roles)
         let isAnchor = false;
         roles.forEach((item, index) => {
-            if (item.authority == "role-e2063edfcb024e0dbc78fc592d2bcf46") {
+            if (item.isAnchor) {
                 isAnchor = true;
             }
         });
@@ -43,18 +43,11 @@ class Login extends React.Component {
     }
 
     getUserInfo = (remember) => {
-        getAuthUserDetail().then(userAuth => {
-            if (userAuth && userAuth.code == 200 && userAuth.data.user) {
-                const authData = userAuth.data.user;
-                getUserInfo({id: authData.username, type: "userName"}).then(userData => {
-                    if (userData && userData.code == 200) {
-                        setUser({rememberMe: remember, ...userData.data})
-                        setRole(userAuth.data.authorities)
-                        this.toHome();
-                    } else {
-                        message.error('获取用户信息失败：' + (userData ? userData.code + ":" + userData.message : userData), 3);
-                    }
-                })
+        getCurrentUserInfo().then(userAuth => {
+            if (userAuth && userAuth.code == 200 && userAuth.data) {
+                setUser({rememberMe: remember, ...userAuth.data})
+                setRole(userAuth.data.roles)
+                this.toHome();
             } else {
                 message.error('获取用户信息失败：' + (userAuth ? userAuth.code + ":" + userAuth.message : userAuth), 3);
             }
@@ -102,9 +95,9 @@ class Login extends React.Component {
                                 )}
                             </FormItem>
                             <FormItem>
-                                {getFieldDecorator('passWord', {
+                                {getFieldDecorator('password', {
                                     rules: [{required: true, message: '请输入密码!'}],
-                                    initialValue: user ? user.passWord : null,
+                                    initialValue: user ? user.password : null,
                                 })(
                                     <Input prefix={<Icon type="lock" style={{fontSize: 13}}/>} type="password"
                                            placeholder="请输入密码"/>

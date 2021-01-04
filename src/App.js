@@ -8,11 +8,12 @@ import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
-import {getUser} from './utils/tools';
+import {getRole, getUser} from './utils/tools';
 import DocumentTitle from 'react-document-title';
 
 moment.locale('zh-cn');
 const {Content, Footer} = Layout;
+
 // document.domain = "manage.qiezizhibo.com";
 
 class App extends Component {
@@ -23,7 +24,17 @@ class App extends Component {
     componentWillMount() {
         const {receiveData} = this.props;
         const user = getUser();
-        user && receiveData(user, 'auth');
+        receiveData(user, 'auth');
+        const roles = getRole();
+        receiveData(roles, 'role');
+        let permissionList = [];
+        for (let roleKey in roles) {
+            if (roles[roleKey]) {
+                const permissions = roles[roleKey].permissions
+                permissionList = permissionList.concat(permissions);
+            }
+        }
+        receiveData(permissionList, 'permission');
         // receiveData({a: 213}, 'auth');
         // fetchData({funcName: 'admin', stateName: 'auth'});
         this.getClientWidth();
@@ -74,7 +85,12 @@ class App extends Component {
     };
 
     render() {
-        const {auth, responsive} = this.props;
+        const {auth, responsive, permission} = this.props;
+        console.log("permission")
+        console.log(permission)
+        if(permission.data == null || permission.data.length == 0){
+            return <div/>
+        }
         return (
             <DocumentTitle title="茄子TV后台管理系统">
                 <Layout>
@@ -89,7 +105,7 @@ class App extends Component {
                             <HeaderCustom toggle={this.toggle} collapsed={this.state.collapsed} user={auth.data || {}}/>
                             <Content style={{margin: '0 16px', overflow: 'initial',}}
                                      hidden={responsive.data.isMobile && !this.state.collapsed ? true : false}>
-                                <Routes auth={auth}/>
+                                <Routes auth={auth} permissions={permission.data}/>
                             </Content>
                             <Footer style={{textAlign: 'center'}}>
                                 Qiezizhibo-Admin ©2020
@@ -114,8 +130,8 @@ class App extends Component {
 }
 
 const mapStateToProps = state => {
-    const {auth = {data: {}}, responsive = {data: {}}} = state.httpData;
-    return {auth, responsive};
+    const {auth = {data: {}}, responsive = {data: {}}, role = {data: []}, permission = {data: []}} = state.httpData;
+    return {auth, responsive, role, permission};
 };
 const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
