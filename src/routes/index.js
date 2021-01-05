@@ -41,6 +41,7 @@ import FootBallMatchBetManagement from "../manage/Football/Bet/Match/FootBallMat
 import UserBetManagement from "../manage/Football/Bet/UserBetManagement";
 import FootBallLeagueClipManagement from "../manage/Football/Clip/League/FootBallLeagueClipManagement";
 import FootBallMatchClipManagement from "../manage/Football/Clip/Match/FootBallMatchClipManagement";
+import FootballLeagueMatchBillAnalysis from "../manage/Football/League/FootballLeagueMatchBillAnalysis";
 
 export default class CRouter extends Component {
     requireAuth = (permission, component) => {
@@ -95,6 +96,7 @@ export default class CRouter extends Component {
                 <Route path="/football/footballLeagueSeries/:id" component={FootBallLeagueMatchSeriesManagement}/>
                 <Route path="/football/footballPlayer/:id" component={FootballPlayerDetailManagement}/>
                 <Route path="/football/schedule" component={FootballMatchSchedule}/>
+                <Route path="/analysis/bill" component={FootballLeagueMatchBillAnalysis}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )
