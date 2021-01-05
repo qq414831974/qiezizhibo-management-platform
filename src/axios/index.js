@@ -1456,6 +1456,18 @@ export const deleteClipCollections = (param) => del({url: `${config.media_servic
     }).catch(function (error) {
         console.log(error)
     });
+export const getLeagueBillAnalysisGift = (param) => get({url: `${config.pay_service}/analysis/bill/gift?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueBillAnalysisCharge = (param) => get({url: `${config.pay_service}/analysis/bill/charge?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 //47.92.82. 5
 //129.204.161. 196
 //www.qiezizhibo. com

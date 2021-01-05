@@ -294,6 +294,7 @@ class MatchClipPanel extends React.Component {
         }
         mergeClips({
             matchId: this.props.matchId,
+            teamId: this.state.autoPreffixTeamId,
             playerId: this.state.autoPreffixPlayerId,
             autoPreffix: this.state.autoPreffixChecked,
             clipIds: this.state.selectIds,
@@ -321,8 +322,28 @@ class MatchClipPanel extends React.Component {
         }
         return dom;
     }
+    getTeamOption = () => {
+        let dom = [];
+        const hostteam = this.props.match.hostteam;
+        const guestteam = this.props.match.guestteam;
+        if (hostteam) {
+            dom.push(<Option key={hostteam.id} value={hostteam.id}>{hostteam.name}</Option>)
+        }
+        if (guestteam) {
+            dom.push(<Option key={guestteam.id} value={guestteam.id}>{guestteam.name}</Option>)
+        }
+        return dom;
+    }
     onAutoPreffixPlayerSelect = (value) => {
         this.setState({autoPreffixPlayerId: value})
+    }
+    onAutoPreffixTeamSelect = (value) => {
+        this.setState({autoPreffixTeamId: value})
+    }
+    toActivityMedia = () => {
+        if (this.props.match && this.props.match.activityId) {
+            window.open(`https://manage.qiezizhibo.com/manage/live/${this.props.match.activityId}?tab=2`);
+        }
     }
 
     render() {
@@ -446,7 +467,7 @@ class MatchClipPanel extends React.Component {
                                 {/*onClick={this.handleMediaDelete.bind(this, item)}/>*/}
                             </div>
                             <div className="video-list-item-bottom center">
-                                <p className="video-list-item-bottom-text">{this.getClipCollectionStatus(item.statu)}</p>
+                                <p className="video-list-item-bottom-text">{this.getClipCollectionStatus(item.status)}</p>
                             </div>
                         </div>
                     </List.Item>)}
@@ -544,6 +565,15 @@ class MatchClipPanel extends React.Component {
                     </Col>
                 </Row>
                 <Row className="mt-l">
+                    <Col span={6}><span>选择队伍：</span></Col>
+                    <Col span={16}>
+                        <Select className="w-full" onChange={this.onAutoPreffixTeamSelect}
+                                value={this.state.autoPreffixTeamId}>
+                            {this.getTeamOption()}
+                        </Select>
+                    </Col>
+                </Row>
+                <Row className="mt-l">
                     <Col span={6}><span>选择球员：</span></Col>
                     <Col span={16}>
                         <Select className="w-full" onChange={this.onAutoPreffixPlayerSelect}
@@ -552,7 +582,8 @@ class MatchClipPanel extends React.Component {
                         </Select>
                     </Col>
                 </Row>
-                <span className="w-full center danger mt-l">请在比赛结束，录播视频生成之后再做合并，否则无效</span>
+                <span onClick={this.toActivityMedia}
+                      className="w-full center danger mt-l cursor-hand">请在比赛结束，录播视频生成之后再做合并，否则无效，点击查看</span>
             </Modal>
         </div>
     }

@@ -251,6 +251,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
         );
         obj.dispatchEvent(ev);
     }
+
     render() {
         const isMobile = this.props.responsive.data.isMobile;
         const onNameClick = this.onNameClick;
@@ -298,7 +299,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             title: '联系电话',
             align: 'center',
             dataIndex: 'phoneNumber',
-            width: '10%',
+            width: '9%',
             render: function (text, record, index) {
                 return <p>{record.phoneNumber ? record.phoneNumber : "-"}</p>
             }
@@ -307,7 +308,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                 title: "备注",
                 align: 'center',
                 dataIndex: 'remark',
-                width: '10%',
+                width: '8%',
             },
             {
                 title: <span>轮播id</span>,
@@ -323,9 +324,19 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             {
                 title: "小程序码",
                 align: 'center',
-                width: '5%',
+                width: '4%',
                 render: function (text, record, index) {
                     return <span onClick={genWxaCode.bind(this, record)}>生成</span>
+                }
+            },
+            {
+                title: "收益",
+                align: 'center',
+                width: '4%',
+                render: function (text, record, index) {
+                    return <Link to={
+                        `/analysis/bill?leagueId=${record.id}`
+                    }><span className="cursor-hand">查看</span></Link>
                 }
             },
         ];

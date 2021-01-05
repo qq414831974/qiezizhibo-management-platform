@@ -41,6 +41,7 @@ import FootBallMatchBetManagement from "../manage/Football/Bet/Match/FootBallMat
 import UserBetManagement from "../manage/Football/Bet/UserBetManagement";
 import FootBallLeagueClipManagement from "../manage/Football/Clip/League/FootBallLeagueClipManagement";
 import FootBallMatchClipManagement from "../manage/Football/Clip/Match/FootBallMatchClipManagement";
+import FootballLeagueMatchBillAnalysis from "../manage/Football/League/FootballLeagueMatchBillAnalysis";
 import Unauthorized from '../manage/Pages/Unauthorized';
 
 var UrlPattern = require('url-pattern');
@@ -112,6 +113,7 @@ export default class CRouter extends Component {
                 <Route path="/football/footballLeagueSeries/:id" component={this.requireAuth("/football/footballLeagueSeries/:id",FootBallLeagueMatchSeriesManagement)}/>
                 <Route path="/football/footballPlayer/:id" component={this.requireAuth("/football/footballPlayer/:id",FootballPlayerDetailManagement)}/>
                 <Route path="/football/schedule" component={this.requireAuth("/football/schedule",FootballMatchSchedule)}/>
+                <Route path="/analysis/bill" component={this.requireAuth("/analysis/bill",FootballLeagueMatchBillAnalysis)}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )

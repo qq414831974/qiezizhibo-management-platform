@@ -347,6 +347,7 @@ class FootBallLeagueMatchTable extends React.Component {
     render() {
         const onNameClick = this.onNameClick;
         const genWxaCode = this.genWxaCode;
+        const onBillAnalysisClick = this.onBillAnalysisClick;
         const {selectedRowKeys} = this.state;
         const AddDialog = Form.create()(FootBallLeagueMatchAddDialog);
         const ModifyDialog = Form.create()(FootBallLeagueMatchModifyDialog);
@@ -417,7 +418,7 @@ class FootBallLeagueMatchTable extends React.Component {
             title: '类型',
             align: 'center',
             dataIndex: 'isparent',
-            width: '8%',
+            width: '6%',
             render: function (text, record, index) {
                 return <p>{(record.isparent ? "系列赛" : "联赛")}</p>
             }
@@ -458,9 +459,24 @@ class FootBallLeagueMatchTable extends React.Component {
             {
                 title: "小程序码",
                 align: 'center',
-                width: '6%',
+                width: '4%',
                 render: function (text, record, index) {
                     return <span onClick={genWxaCode.bind(this, record)}>生成</span>
+                }
+            }, {
+                title: "收益",
+                align: 'center',
+                width: '4%',
+                render: function (text, record, index) {
+                    if (record.isparent) {
+                        return <span onClick={() => {
+                            message.warn("请前往系列赛中查看", 1);
+                        }
+                        } className="cursor-hand">查看</span>
+                    }
+                    return <Link to={
+                        `/analysis/bill?leagueId=${record.id}`
+                    }><span className="cursor-hand">查看</span></Link>
                 }
             },
         ];
