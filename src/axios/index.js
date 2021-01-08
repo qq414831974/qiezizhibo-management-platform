@@ -34,12 +34,6 @@ export const getCurrentAdminUserInfo = () => get({url: `${config.user_service}/a
     }).catch(function (error) {
         console.log(error);
     });
-export const getAdminUserInfo = (params) => get({url: `${config.user_service}/admin/user/${params.id}?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error);
-    });
 export const getAllAdminUser = (params) => get({url: `${config.user_service}/admin/user?${unpack(params)}`})
     .then(function (response) {
         return response.data;
@@ -59,6 +53,18 @@ export const delAdminUserByIds = (params) => del({url: `${config.user_service}/a
         console.log(error);
     });
 export const updateAdminUserById = (params) => put({url: `${config.user_service}/admin/user`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateAdminUserPassword = (params) => post({url: `${config.user_service}/admin/user/password/update`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const resetAdminUserPassword = (params) => post({url: `${config.user_service}/admin/user/password/reset`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -113,13 +119,49 @@ export const delRoleByIds = (params) => del({url: `${config.user_service}/admin/
     }).catch(function (error) {
         console.log(error)
     });
-export const getVisit = () => get({url: `${config.user_service}/user/visit`})
+export const getAllUser = (params) => get({url: `${config.user_service}/user?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const getUserByUserNo = (params) => get({url: `${config.user_service}/user/${params.userNo}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const delUserByIds = (params) => del({url: `${config.user_service}/user?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const updateUserById = (params) => put({url: `${config.user_service}/user`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const getAllDefaultUser = () => get({url: `${config.user_service}/user/defaultUser`})
+export const getAllDefaultUser = () => get({url: `${config.user_service}/user/default`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const createDefaultUser = (params) => post({url: `${config.user_service}/user/default`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getVisit = () => get({url: `${config.user_service}/visit`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getAllSysLog = (params) => get({url: `${config.system_service}/sys/log?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

@@ -37,6 +37,46 @@ class UserModifyDialog extends React.Component {
     state = {}
 
     componentDidMount() {
+        this.props.visible && this.fetch();
+    }
+
+    fetch = () => {
+        this.setState({loading: true});
+        getAllRoles({pageSize: 100, pageNum: 1,}).then((data) => {
+            if (data && data.code == 200 && data.data.records) {
+                this.setState({
+                    data: data.data.records,
+                    loading: false,
+                });
+            } else {
+                message.error('获取权限信息失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        });
+    }
+    getRoleOption = () => {
+        let dom = [];
+        this.state.data && this.state.data.forEach((item, index) => {
+            dom.push(<Option value={item.id} data={item} key={`role-${item.id}`}>
+                <Tooltip placement="rightTop" title={
+                    this.getRoleTip(item)
+                }>
+                    <p className="mb-n">{item.name}</p>
+                </Tooltip>
+            </Option>)
+        });
+        return dom;
+    }
+    getRoleTip = (param) => {
+        let dom = [];
+        param.permissions && param.permissions.forEach((item, index) => {
+            dom.push(<p key={`permission-${item.id}`}>{item.name}</p>);
+        });
+        return <div>{dom}</div>;
+    }
+    onRoleSelect = (e, op) => {
+        this.setState({
+            role: op.props.data,
+        });
     }
     handleAvatarChange = (info) => {
         if (info.file.status === 'uploading') {
@@ -103,28 +143,39 @@ class UserModifyDialog extends React.Component {
                     <FormItem {...formItemLayout} label="用户名" className="bs-form-item">
                         {getFieldDecorator('userName', {
                             initialValue: record.userName,
+                            rules: [{required: true, message: '请输入用户名!'}],
                         })(
                             <Input disabled placeholder='请输入用户名!'/>
                         )}
                     </FormItem>
-                    <FormItem {...formItemLayout} label="性别" className="bs-form-item">
-                        {getFieldDecorator('gender', {
-                            initialValue: record.gender,
+                    <FormItem {...formItemLayout} label="权限" className="bs-form-item-nowrap">
+                        {getFieldDecorator('roles', {
+                            initialValue: record.roles ? record.roles.flatMap(role=>role.id) : null,
+                            rules: [{required: true, message: '请选择权限!'}],
                         })(
-                            <Select placeholder='请选择性别!'>
-                                <Option value={1} key={"gender-2"}>男</Option>
-                                <Option value={0} key={"gender-1"}>女</Option>
+                            // <Select onSelect={onRoleSelect} disabled={this.state.loading}>
+                            //     {this.state.data ? getRoleOption() : null}
+                            // </Select>
+                            <Select
+                                showSearch
+                                placeholder="请选择"
+                                defaultActiveFirstOption={false}
+                                showArrow={false}
+                                filterOption={false}
+                                notFoundContent={null}
+                                mode="multiple"
+                                loading={this.state.loading}
+                            >
+                                {this.state.data ? getRoleOption() : null}
                             </Select>
                         )}
+                        <Icon className="ml-s" style={{fontSize: 16}} type="loading" hidden={!this.state.loading}/>
                     </FormItem>
-                    <FormItem {...formItemLayout} label="预设用户" className="bs-form-item">
-                        {getFieldDecorator('isDefault', {
-                            initialValue: record.isDefault,
+                    <FormItem {...formItemLayout} label="部门" className="bs-form-item">
+                        {getFieldDecorator('unit', {
+                            initialValue: record.unit,
                         })(
-                            <Select disabled placeholder='请选择是否预设用户!'>
-                                <Option value={true} key={"isDefault-1"}>是</Option>
-                                <Option value={false} key={"isDefault-2"}>否</Option>
-                            </Select>
+                            <Input placeholder='请输入部门!'/>
                         )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="状态" className="bs-form-item">
@@ -137,29 +188,11 @@ class UserModifyDialog extends React.Component {
                             </Select>
                         )}
                     </FormItem>
-                    <FormItem {...formItemLayout} label="微信类型" className="bs-form-item">
-                        {getFieldDecorator('wechatType', {
-                            initialValue: record.wechatType,
-                        })(
-                            <Select disabled placeholder='请选择微信类型!'>
-                                <Option value={1} key={"wechatType-1"}>茄子TV</Option>
-                                <Option value={2} key={"wechatType-2"}>茄子FC</Option>
-                                <Option value={3} key={"wechatType-3"}>青少年</Option>
-                            </Select>
-                        )}
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="openid" className="bs-form-item">
-                        {getFieldDecorator('wechatOpenid', {
-                            initialValue: record.wechatOpenid,
-                        })(
-                            <Input disabled placeholder='请输入openid!'/>
-                        )}
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="手机号" className="bs-form-item">
+                    <FormItem {...formItemLayout} label="手机" className="bs-form-item">
                         {getFieldDecorator('phone', {
                             initialValue: record.phone,
                         })(
-                            <Input placeholder='请输入手机号!'/>
+                            <Input placeholder='请输入手机!'/>
                         )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="邮箱" className="bs-form-item">
@@ -197,23 +230,9 @@ class UserModifyDialog extends React.Component {
                             <Input.TextArea placeholder='备注'/>
                         )}
                     </FormItem>
-                    <FormItem {...formItemLayout} label="创建时间" className="bs-form-item">
-                        {getFieldDecorator('createTime', {
-                            initialValue: record.createTime,
-                        })(
-                            <Input disabled placeholder='创建时间'/>
-                        )}
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="最后登录时间" className="bs-form-item">
-                        {getFieldDecorator('loginTime', {
-                            initialValue: record.loginTime,
-                        })(
-                            <Input disabled placeholder='最后登录时间'/>
-                        )}
-                    </FormItem>
                     <FormItem {...formItemLayout} label="用户id" className="bs-form-item">
-                        {getFieldDecorator('userNo', {
-                            initialValue: record.userNo,
+                        {getFieldDecorator('id', {
+                            initialValue: record.id,
                         })(
                             <Input disabled/>
                         )}

@@ -14,7 +14,7 @@ import {
     getAllMatchs,
     getAllLeagueMatchs,
     getAllAdminUser,
-    getAdminUserInfo,
+    getUserByUserNo,
     getLeagueMatchById,
     getMatchById
 } from "../../../axios";
@@ -69,7 +69,7 @@ class FreeTicketModifyDialog extends React.Component {
     }
     fetchUser = () => {
         const {record} = this.props
-        getAdminUserInfo({id: record.userNo, type: "userNo"}).then(userData => {
+        getUserByUserNo({userNo: record.userNo}).then(userData => {
             if (userData && userData.code == 200) {
                 this.setState({user: userData.data})
             } else {

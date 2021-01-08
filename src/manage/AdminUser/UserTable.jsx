@@ -1,9 +1,9 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip, Radio} from 'antd';
-import {getAllRoles, getAllUser} from '../../axios/index';
+import {getAllRoles, getAllAdminUser} from '../../axios/index';
 import {mergeJSON} from '../../utils/index';
 import {Avatar} from 'antd';
-import {delUserByIds, updateUserById, createDefaultUser} from "../../axios";
+import {delAdminUserByIds, updateAdminUserById, createAdminUser, resetAdminUserPassword} from "../../axios";
 import {Form, message} from "antd/lib/index";
 import UserAddDialog from './UserAddDialog';
 import UserModifyDialog from './UserModifyDialog';
@@ -37,7 +37,7 @@ class UserTable extends React.Component {
 
     fetch = (params = {}) => {
         this.setState({loading: true});
-        getAllUser(params).then((data) => {
+        getAllAdminUser(params).then((data) => {
             if (data && data.code == 200 && data.data.records) {
                 const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
@@ -64,7 +64,7 @@ class UserTable extends React.Component {
         });
     }
     deleteUser = () => {
-        delUserByIds({userNo: [this.state.record.userNo]}).then((data) => {
+        delAdminUserByIds({adminId: [this.state.record.id]}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -79,7 +79,7 @@ class UserTable extends React.Component {
         });
     }
     deleteUsers = () => {
-        delUserByIds({userNo: this.state.selectedRowKeys}).then((data) => {
+        delAdminUserByIds({adminId: this.state.selectedRowKeys}).then((data) => {
             this.setState({deleteVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -93,6 +93,22 @@ class UserTable extends React.Component {
             }
         });
     };
+    resetAdminUserPassword = () => {
+        resetAdminUserPassword({id: this.state.record.id}).then(data => {
+            this.setState({resetVisible: false});
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.refresh();
+                    message.success('重置密码成功', 1);
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('重置密码失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        })
+    }
+
     onInputChange = (e) => {
         this.setState({searchText: e.target.value});
     }
@@ -177,7 +193,14 @@ class UserTable extends React.Component {
             if (err) {
                 return;
             }
-            createDefaultUser(values).then((data) => {
+            if (values.roles) {
+                values.roles = values.roles.flatMap(role => {
+                    const r = {};
+                    r["id"] = role
+                    return r;
+                })
+            }
+            createAdminUser(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
@@ -199,7 +222,14 @@ class UserTable extends React.Component {
             if (err) {
                 return;
             }
-            updateUserById(values).then((data) => {
+            if (values.roles) {
+                values.roles = values.roles.flatMap(role => {
+                    const r = {};
+                    r["id"] = role
+                    return r;
+                })
+            }
+            updateAdminUserById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
                         this.refresh();
@@ -222,6 +252,11 @@ class UserTable extends React.Component {
             deleteCols: 1,
         });
     }
+    handleUserPasswordReset = () => {
+        this.setState({
+            resetVisible: true,
+        });
+    }
     handleUsersDelete = () => {
         this.setState({
             deleteVisible: true,
@@ -232,6 +267,18 @@ class UserTable extends React.Component {
     handleDeleteCancel = () => {
         this.setState({deleteVisible: false});
     }
+    handleResetCancel = () => {
+        this.setState({resetVisible: false});
+    }
+    getMenuList = (param) => {
+        let dom = [];
+        param.forEach(role => {
+            role.permissions && role.permissions.forEach((item, index) => {
+                dom.push(<p key={`permission-${item.id}`}>{item.name}</p>);
+            });
+        })
+        return dom;
+    }
     onNameDropDownRadioChange = (e) => {
         this.setState({
             nameRadioValue: e.target.value,
@@ -239,6 +286,7 @@ class UserTable extends React.Component {
     }
 
     render() {
+        const getMenuList = this.getMenuList;
         const onNameClick = this.onNameClick;
         const {selectedRowKeys} = this.state;
 
@@ -278,9 +326,9 @@ class UserTable extends React.Component {
                     </div>
                     <div className="custom-filter-dropdown-radio">
                         <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.nameRadioValue}>
-                            <Radio value={"userNo"}>按用户id</Radio>
                             <Radio value={"name"}>按昵称</Radio>
-                            <Radio value={"phone"}>按手机号</Radio>
+                            <Radio value={"userName"}>按用户名</Radio>
+                            <Radio value={"phone"}>按电话</Radio>
                         </Radio.Group>
                     </div>
                 </div>
@@ -296,7 +344,21 @@ class UserTable extends React.Component {
             align: 'center',
             render: function (text, record, index) {
                 return <div className="center"><Avatar src={record.avatar ? record.avatar : logo}/>
-                    <a className="ml-s" onClick={onNameClick.bind(this, record)}>{`${record.name}${record.isDefault?"(预设用户)":""}`}</a></div>;
+                    <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.name}</a></div>;
+            },
+        }, {
+            title: '角色',
+            key: 'roleName',
+            width: '15%',
+            align: 'center',
+            render: function (text, record, index) {
+                if (record.roles == null) {
+                    return "无";
+                }
+                // return <Tooltip title={getMenuList(record.roles)}>
+                //     {record.roles ? record.roles.flatMap((role) => role.name).toString() : "未知"}
+                // </Tooltip>;
+                return <span>{record.roles ? record.roles.flatMap((role) => role.name).toString() : "未知"}</span>
             },
         }, {
             title: '状态',
@@ -325,16 +387,6 @@ class UserTable extends React.Component {
                 return status;
             },
         }, {
-            title: '手机号',
-            dataIndex: 'phone',
-            width: '12%',
-            align: 'center',
-        }, {
-            title: '邮箱',
-            dataIndex: 'email',
-            width: '13%',
-            align: 'center',
-        }, {
             title: '地区',
             dataIndex: 'country',
             width: '10%',
@@ -353,34 +405,24 @@ class UserTable extends React.Component {
                 return address;
             },
         }, {
-            title: '小程序',
-            dataIndex: 'wechatType',
+            title: '部门',
+            dataIndex: 'unit',
             width: '10%',
             align: 'center',
-            render: function (text, record, index) {
-                let type = "未知"
-                switch (record.wechatType) {
-                    case 1 :
-                        type = "茄子tv";
-                        break;
-                    case 2 :
-                        type = "茄子FC";
-                        break;
-                    case 3 :
-                        type = "青少年";
-                        break;
-                }
-                return type;
-            },
         }, {
-            title: '最后登录时间',
-            dataIndex: 'loginTime',
-            width: '15%',
+            title: '电话',
+            dataIndex: 'phone',
+            width: '13%',
+            align: 'center',
+        }, {
+            title: '邮箱',
+            dataIndex: 'email',
+            width: '13%',
             align: 'center',
         }, {
             title: '备注',
             dataIndex: 'remark',
-            width: '10%',
+            width: '9%',
             align: 'center',
         },
         ];
@@ -401,9 +443,9 @@ class UserTable extends React.Component {
                     </div>
                     <div className="custom-filter-dropdown-radio">
                         <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.nameRadioValue}>
-                            <Radio value={"userNo"}>按用户id</Radio>
                             <Radio value={"name"}>按昵称</Radio>
-                            <Radio value={"phone"}>按手机号</Radio>
+                            <Radio value={"userName"}>按用户名</Radio>
+                            <Radio value={"phone"}>按电话</Radio>
                         </Radio.Group>
                     </div>
                 </div>
@@ -424,7 +466,7 @@ class UserTable extends React.Component {
         },
         ];
         return <div><Table columns={isMobile ? columns_moblie : columns}
-                           rowKey={record => record.userNo}
+                           rowKey={record => record.id}
                            rowSelection={isMobile ? null : rowSelection}
                            dataSource={this.state.data}
                            pagination={this.state.pagination}
@@ -433,7 +475,7 @@ class UserTable extends React.Component {
                            bordered
                            title={() =>
                                <div>
-                                   <Tooltip title="添加预设用户">
+                                   <Tooltip title="添加">
                                        <Button type="primary" shape="circle" icon="plus"
                                                onClick={this.showUserAddDialog}/></Tooltip>
                                    <Tooltip title="删除">
@@ -452,7 +494,7 @@ class UserTable extends React.Component {
         />
             <Modal
                 className={isMobile ? "top-n" : ""}
-                title="添加预设用户"
+                title="添加用户"
                 visible={this.state.dialogAddVisible}
                 footer={[
                     <Button key="back" onClick={this.handleUserAddCancel}>取消</Button>,
@@ -469,6 +511,8 @@ class UserTable extends React.Component {
                 footer={[
                     <Button key="delete" type="danger" className="pull-left"
                             onClick={this.handleUserDelete}>删除</Button>,
+                    <Button key="reset" type="delete" className="pull-left"
+                            onClick={this.handleUserPasswordReset}>重置密码</Button>,
                     <Button key="back" onClick={this.handleUserModifyCancel}>取消</Button>,
                     <Button key="submit" type="primary" onClick={this.handleUserModifyCreate}>确定</Button>,
                 ]}
@@ -485,6 +529,17 @@ class UserTable extends React.Component {
                 zIndex={1001}
             >
                 <p className="mb-n" style={{fontSize: 14}}>是否确认删除{this.state.deleteCols}条数据？</p>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="确认重置密码"
+                visible={this.state.resetVisible}
+                onOk={this.resetAdminUserPassword}
+                onCancel={this.handleResetCancel}
+                zIndex={1001}
+            >
+                <div><span className="mb-n" style={{fontSize: 16}}>是否确认重置密码？</span></div>
+                <div><span className="mt-s danger" style={{fontSize: 13}}>密码将重置为默认密码</span></div>
             </Modal>
         </div>
     }

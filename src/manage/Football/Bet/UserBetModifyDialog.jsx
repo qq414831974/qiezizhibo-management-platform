@@ -11,7 +11,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import moment from "moment";
 import {
-    getAdminUserInfo,
+    getUserByUserNo,
     getMatchById,
     updateUserBet
 } from "../../../axios";
@@ -65,7 +65,7 @@ class UserBetModifyDialog extends React.Component {
     }
     fetchUser = () => {
         const {record} = this.props
-        getAdminUserInfo({id: record.userNo, type: "userNo"}).then(userData => {
+        getUserByUserNo({userNo: record.userNo}).then(userData => {
             if (userData && userData.code == 200) {
                 this.setState({user: userData.data})
             } else {

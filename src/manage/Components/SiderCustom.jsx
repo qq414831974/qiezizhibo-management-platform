@@ -4,7 +4,6 @@
 import React, {Component} from 'react';
 import {Layout, Avatar} from 'antd';
 import {withRouter} from 'react-router-dom';
-import {menus} from '../constants/menus';
 import {menus_admin} from '../constants/menus-admin';
 import SiderMenu from './SiderMenu';
 import {connect} from 'react-redux';

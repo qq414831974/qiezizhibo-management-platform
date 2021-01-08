@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 // import { Router, Route, hashHistory, IndexRedirect } from 'react-router';
 import {Route, Redirect, Switch} from 'react-router-dom';
+import AdminUserManagement from '../manage/AdminUser/UserManagement';
 import UserManagement from '../manage/User/UserManagement';
 import ExpManagement from '../manage/Exp/ExpManagement';
 import GrowthManagement from '../manage/Growth/GrowthManagement';
@@ -43,6 +44,7 @@ import FootBallLeagueClipManagement from "../manage/Football/Clip/League/FootBal
 import FootBallMatchClipManagement from "../manage/Football/Clip/Match/FootBallMatchClipManagement";
 import FootballLeagueMatchBillAnalysis from "../manage/Football/League/FootballLeagueMatchBillAnalysis";
 import Unauthorized from '../manage/Pages/Unauthorized';
+import LogManagement from '../manage/Log/LogManagement';
 
 var UrlPattern = require('url-pattern');
 
@@ -74,7 +76,8 @@ export default class CRouter extends Component {
         return (
             <Switch>
                 <Route exact path="/index" component={Dashboard}/>
-                <Route exact path="/user/admin" component={this.requireAuth("/user/admin",UserManagement)}/>
+                <Route exact path="/user/user" component={this.requireAuth("/user/user" ,UserManagement)}/>
+                <Route exact path="/user/admin" component={this.requireAuth("/user/admin",AdminUserManagement)}/>
                 <Route exact path="/exp/exp" component={this.requireAuth("/exp/exp",ExpManagement)}/>
                 <Route exact path="/exp/growth" component={this.requireAuth("/exp/growth",GrowthManagement)}/>
                 <Route exact path="/role/role" component={this.requireAuth("/role/role",RoleManagement)}/>
@@ -114,6 +117,7 @@ export default class CRouter extends Component {
                 <Route path="/football/footballPlayer/:id" component={this.requireAuth("/football/footballPlayer/:id",FootballPlayerDetailManagement)}/>
                 <Route path="/football/schedule" component={this.requireAuth("/football/schedule",FootballMatchSchedule)}/>
                 <Route path="/analysis/bill" component={this.requireAuth("/analysis/bill",FootballLeagueMatchBillAnalysis)}/>
+                <Route path="/sys/log" component={this.requireAuth("/sys/log",LogManagement)}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )

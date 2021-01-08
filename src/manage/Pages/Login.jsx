@@ -4,7 +4,7 @@ import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {fetchData, receiveData} from '../../action/index';
 import logo from '../../static/logo.png';
-import {login, getCurrentAdminUserInfo, getAdminUserInfo} from "../../axios/index";
+import {login, getCurrentAdminUserInfo, getUserByUserNo} from "../../axios/index";
 import {message} from "antd/lib/index";
 import moment from 'moment'
 import 'moment/locale/zh-cn';
