@@ -155,6 +155,66 @@ export const createDefaultUser = (params) => post({url: `${config.user_service}/
     }).catch(function (error) {
         console.log(error)
     });
+export const getUserAddress = (params) => get({url: `${config.user_service}/user/address?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const createUserAddress = (params) => post({url: `${config.user_service}/user/address`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const updateUserAddress = (params) => put({url: `${config.user_service}/user/address`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const delUserAddress = (params) => del({url: `${config.user_service}/user/address?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const getUserAbility = (params) => get({url: `${config.user_service}/user/ability?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const createUserAbility = (params) => post({url: `${config.user_service}/user/ability`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const updateUserAbility = (params) => put({url: `${config.user_service}/user/ability`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const delUserAbility = (params) => del({url: `${config.user_service}/user/ability?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const getUserExp = (params) => get({url: `${config.user_service}/user/exp?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const addUserExp = (params) => post({url: `${config.user_service}/user/exp`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
 export const getVisit = () => get({url: `${config.user_service}/visit`})
     .then(function (response) {
         return response.data;
@@ -1126,25 +1186,25 @@ export const delShareSentenceById = (params) => del({url: `${config.system_servi
     }).catch(function (error) {
         console.log(error)
     });
-export const getExp = () => get({url: `${config.user_service}/exp`})
+export const getExp = () => get({url: `${config.system_service}/sys/exp`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const addExp = (param) => post({url: `${config.user_service}/exp`, data: param})
+export const addExp = (param) => post({url: `${config.system_service}/sys/exp`, data: param})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const updateExp = (param) => put({url: `${config.user_service}/exp`, data: param})
+export const updateExp = (param) => put({url: `${config.system_service}/sys/exp`, data: param})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const deleteExp = (param) => del({url: `${config.user_service}/exp?${unpack(param)}`})
+export const deleteExp = (param) => del({url: `${config.system_service}/sys/exp?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

@@ -52,7 +52,7 @@ export const menus_admin = [
     },
     {key: '/live', title: '直播管理', icon: 'video-camera',},
     {
-        key: '/setting', title: '设置', icon: 'setting',
+        key: '/setting', title: '系统设置', icon: 'setting',
         public: 1,
         sub: [
             {key: '/setting/banner', title: '轮播图', icon: 'picture',},

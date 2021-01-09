@@ -11,6 +11,7 @@ import {receiveData} from "../../action";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import logo from '../../static/logo.png';
+import {Link} from "react-router-dom";
 
 
 class UserTable extends React.Component {
@@ -467,6 +468,11 @@ class UserTable extends React.Component {
                 title="修改用户"
                 visible={this.state.dialogModifyVisible}
                 footer={[
+                    <Button key="more" type="primary" className="pull-left">
+                        <Link to={
+                            "/user/user/" + this.state.record.userNo
+                        }>详细设置</Link>
+                    </Button>,
                     <Button key="delete" type="danger" className="pull-left"
                             onClick={this.handleUserDelete}>删除</Button>,
                     <Button key="back" onClick={this.handleUserModifyCancel}>取消</Button>,

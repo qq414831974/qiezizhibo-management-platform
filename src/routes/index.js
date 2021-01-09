@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import {Route, Redirect, Switch} from 'react-router-dom';
 import AdminUserManagement from '../manage/AdminUser/UserManagement';
 import UserManagement from '../manage/User/UserManagement';
+import UserDetailManagement from '../manage/User/UserDetailManagement';
 import ExpManagement from '../manage/Exp/ExpManagement';
 import GrowthManagement from '../manage/Growth/GrowthManagement';
 import FootBallPlayerManagement from "../manage/Football/Player/FootBallPlayerManagement";
@@ -110,6 +111,7 @@ export default class CRouter extends Component {
                 <Route exact path="/pay/bet" component={this.requireAuth("/pay/bet",UserBetManagement)}/>
                 <Route path="/football/comment/:id" component={this.requireAuth("/football/comment/:id",CommentManagement)}/>
                 <Route path="/live/:id" component={this.requireAuth("/live/:id",LiveDetailManagement)}/>
+                <Route path="/user/user/:id" component={this.requireAuth("/user/user/:id" ,UserDetailManagement)}/>
                 <Route path="/football/footballTeam/:id" component={this.requireAuth("/football/footballTeam/:id",TeamDetailManagement)}/>
                 <Route path="/football/footballMatch/:id" component={this.requireAuth("/football/footballMatch/:id",MatchDetailManagement)}/>
                 <Route path="/football/footballLeagueMatch/:id" component={this.requireAuth("/football/footballLeagueMatch/:id",FootballLeagueMatchDetailManagement)}/>

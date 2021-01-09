@@ -242,7 +242,7 @@ class RoleTable extends React.Component {
     }
     getRoleTip = (param) => {
         let dom = [];
-        param.permissions.forEach((item, index) => {
+        param.permissions && param.permissions.forEach((item, index) => {
             dom.push(<p key={`permission-${item.id}`}>{item.name}</p>);
         });
         return dom;

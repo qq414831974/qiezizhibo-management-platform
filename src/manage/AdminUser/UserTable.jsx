@@ -509,10 +509,10 @@ class UserTable extends React.Component {
                 title="修改用户"
                 visible={this.state.dialogModifyVisible}
                 footer={[
+                    <Button key="reset" type="primary" className="pull-left"
+                            onClick={this.handleUserPasswordReset}>重置密码</Button>,
                     <Button key="delete" type="danger" className="pull-left"
                             onClick={this.handleUserDelete}>删除</Button>,
-                    <Button key="reset" type="delete" className="pull-left"
-                            onClick={this.handleUserPasswordReset}>重置密码</Button>,
                     <Button key="back" onClick={this.handleUserModifyCancel}>取消</Button>,
                     <Button key="submit" type="primary" onClick={this.handleUserModifyCreate}>确定</Button>,
                 ]}
