@@ -1,12 +1,11 @@
 import React from 'react';
 import {Row, Col, Divider, message, Card, Button, Table, Modal, Tooltip} from 'antd';
-import BreadcrumbCustom from '../Components/BreadcrumbCustom';
-import BannerUpload from './BannerUpload';
+import BreadcrumbCustom from '../../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
-import {receiveData} from "../../action";
+import {receiveData} from "../../../action";
 import {connect} from "react-redux";
-import {getBulletin, setBulletin,updateBulletin, deleteBulletin, delAreaById, createArea} from "../../axios";
-import ScoreBoard from './ScoreBoard';
+import {getBulletin, setBulletin, updateBulletin, delBulletinById} from "../../../axios";
+import ScoreBoard from '../ScoreBoard/ScoreBoard';
 import {Form} from "antd/lib/index";
 import BulletinAddDialog from "./BulletinAddDialog";
 import BulletinModifyDialog from "./BulletinModifyDialog";
@@ -31,7 +30,7 @@ class BulletinSetting extends React.Component {
         this.fetch();
     }
     deleteBullet = () => {
-        deleteBulletin({id: this.state.record.id}).then((data) => {
+        delBulletinById({id: this.state.record.id}).then((data) => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -124,29 +123,37 @@ class BulletinSetting extends React.Component {
             title: '内容',
             key: 'content',
             dataIndex: 'content',
-            width: '35%',
+            width: '40%',
             align: 'center',
+            render: function (text, record, index) {
+                if(record.curtain){
+                    return <span>图片</span>
+                }
+                return <span>{record.content}</span>
+            }
         }, {
             title: '链接',
             dataIndex: 'url',
             key: 'url',
-            width: '25%',
+            width: '8%',
             align: 'center',
+            render: function (text, record, index) {
+                return <Tooltip title={record.url}><span>查看</span></Tooltip>
+            }
         }, {
             title: '类型',
             dataIndex: 'curtain',
             key: 'curtain',
-            width: '10%',
+            width: '12%',
             align: 'center',
             render: function (text, record, index) {
                 let sceneString = ""
-                const sceneType = record.scene.type;
-                if(sceneType == "home"){
+                const sceneType = record.sceneType;
+                if (sceneType == "home") {
                     sceneString = "-首页";
-                }else if(sceneType == "league"){
+                } else if (sceneType == "league") {
                     sceneString = "-联赛";
-                }
-                else if(sceneType == "match"){
+                } else if (sceneType == "match") {
                     sceneString = "-比赛";
                 }
                 if (record.curtain) {
@@ -164,26 +171,26 @@ class BulletinSetting extends React.Component {
                 if (record.type == 'website') {
                     return <span>网站</span>
                 }
+                if (record.type == 'page') {
+                    return <span>页面</span>
+                }
                 return <span>页面</span>
             }
         }, {
             title: '地区',
-            dataIndex: 'areatype',
-            key: 'areatype',
+            dataIndex: 'areaType',
+            key: 'areaType',
             width: '10%',
             align: 'center',
             render: function (text, record, index) {
                 let area = "默认";
-                if (record.areatype) {
-                    switch (record.areatype) {
+                if (record.areaType) {
+                    switch (record.areaType) {
                         case 0:
                             area = "默认";
                             break;
                         case 1:
                             area = "全国";
-                            break;
-                        case 2:
-                            area = "全国青少年";
                             break;
                     }
                 }
@@ -195,6 +202,26 @@ class BulletinSetting extends React.Component {
             key: 'province',
             width: '10%',
             align: 'center',
+        }, {
+            title: '微信类型',
+            dataIndex: 'wechatType',
+            key: 'wechatType',
+            width: '10%',
+            align: 'center',
+            render: function (text, record, index) {
+                let type = "茄子tv";
+                if (record.wechatType) {
+                    switch (record.wechatType) {
+                        case 0:
+                            type = "茄子tv";
+                            break;
+                        case 1:
+                            type = "青少年";
+                            break;
+                    }
+                }
+                return <span>{type}</span>
+            }
         }];
         return (
             <div>

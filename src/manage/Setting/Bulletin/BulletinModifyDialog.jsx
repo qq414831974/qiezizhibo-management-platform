@@ -8,15 +8,22 @@ import {
     Upload,
     Button,
     Modal,
-    List, Icon, Tooltip, Avatar
+    List, Tooltip, Avatar, Icon, InputNumber
 } from 'antd';
-import {receiveData} from "../../action";
+import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {getAreasList, upload, getArticleList, getActivityInfoList, getAllMatchs, getAllLeagueMatchs} from "../../axios";
-import imgcover from '../../static/imgcover.jpg';
-import {parseTimeStringWithOutYear} from "../../utils";
-import defultAvatar from "../../static/avatar.jpg";
+import {
+    getAllLeagueMatchs,
+    getAllMatchs,
+    getAreasList,
+    getArticleList,
+    getMatchById,
+    getLeagueMatchById,
+    upload
+} from "../../../axios";
+import imgcover from '../../../static/imgcover.jpg';
+import defultAvatar from "../../../static/avatar.jpg";
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -33,7 +40,7 @@ const formItemLayout = {
     },
 };
 
-class BulletinAddDialog extends React.Component {
+class BulletinModifyDialog extends React.Component {
     state = {
         loading: false,
         data: [],
@@ -47,7 +54,7 @@ class BulletinAddDialog extends React.Component {
 
     componentDidMount() {
         getAreasList().then((data) => {
-            if (data && data.code == 200) {
+            if (data && data.code) {
                 this.setState({
                     areaLoading: false,
                     areas: data.data,
@@ -56,6 +63,16 @@ class BulletinAddDialog extends React.Component {
                 message.error('获取地区列表失败：' + (data ? data.code + ":" + data.message : data), 3);
             }
         });
+        if (this.props.record.sceneType && this.props.record.sceneType == "match") {
+            this.fetchMatch(this.props.record.sceneId);
+        } else if (this.props.record.sceneType && this.props.record.sceneType == "league") {
+            this.fetchLeague(this.props.record.sceneId);
+        }
+
+        this.setState({
+            curtain: this.props.record.curtain,
+            senceType: this.props.record.sceneType
+        })
     }
 
     fetch = (searchText, pageNum) => {
@@ -93,6 +110,36 @@ class BulletinAddDialog extends React.Component {
                 });
             } else {
                 message.error('获取联赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        });
+    }
+    fetchMatch = (params) => {
+        this.setState({
+            matchLoaded: false,
+        });
+        getMatchById(params).then((data) => {
+            if (data && data.code == 200) {
+                this.setState({
+                    matchLoaded: true,
+                    match: data.data,
+                });
+            } else {
+                message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        });
+    }
+    fetchLeague = (params) => {
+        this.setState({
+            leagueLoaded: false,
+        });
+        getLeagueMatchById(params).then((data) => {
+            if (data && data.code == 200) {
+                this.setState({
+                    leagueLoaded: true,
+                    league: data.data,
+                });
+            } else {
+                message.error('获取联赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
@@ -137,8 +184,8 @@ class BulletinAddDialog extends React.Component {
     }
     onMatchRadioChange = (e) => {
         const {form} = this.props;
-        if (e.target.value == "home") {
-            form.setFieldsValue({scene: {type: "home"}})
+        if (e.target.value == false) {
+            form.setFieldsValue({sceneType: "home", sceneId: null})
         }
         this.setState({sceneType: e.target.value})
     }
@@ -197,7 +244,7 @@ class BulletinAddDialog extends React.Component {
     }
     handleChange = (value) => {
         const {form} = this.props;
-        form.setFieldsValue({scene: {type: "match", id: `${value}`}})
+        form.setFieldsValue({sceneType: "match", sceneId: `${value}`})
     }
     handleShowMore = (e) => {
         const num = Math.floor(e.target.scrollTop / 50);
@@ -239,7 +286,7 @@ class BulletinAddDialog extends React.Component {
     }
     handleLeagueChange = (value) => {
         const {form} = this.props;
-        form.setFieldsValue({scene: {type: "league", id: `${value}`}})
+        form.setFieldsValue({sceneType: "league", sceneId: `${value}`})
     }
     handleLeagueShowMore = (e) => {
         const num = Math.floor(e.target.scrollTop / 50);
@@ -358,7 +405,7 @@ class BulletinAddDialog extends React.Component {
                 <Form>
                     <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                         {getFieldDecorator('curtain', {
-                            initialValue: false,
+                            initialValue: record.curtain,
                         })(
                             <RadioGroup onChange={this.onRadioChange}>
                                 <Radio value={false}>公告栏</Radio>
@@ -368,8 +415,7 @@ class BulletinAddDialog extends React.Component {
                     </FormItem>
                     {this.state.curtain ? <FormItem {...formItemLayout} label="位置" className="bs-form-item">
                         {getFieldDecorator('senceType', {
-                            initialValue: "home",
-                            hidden: true,
+                            initialValue: record.senceType,
                         })(
                             <RadioGroup onChange={this.onMatchRadioChange}>
                                 <Radio value="home">首页</Radio>
@@ -380,18 +426,19 @@ class BulletinAddDialog extends React.Component {
                     </FormItem> : null}
                     {this.state.sceneType != "home" && form.getFieldValue("curtain") ?
                         <FormItem {...formItemLayout} className="bs-form-item">
-                        {getFieldDecorator('scene', {
-                            rules: [{required: true, message: '请选择关联比赛或联赛!'}],
-                        })(
-                            <Input hidden={true}/>
-                        )}
-                    </FormItem> : <FormItem {...formItemLayout} className="bs-form-item">
-                        {getFieldDecorator('scene', {
-                            initialValue: {type: "home"},
-                        })(
-                            <Input hidden={true}/>
-                        )}
-                    </FormItem>}
+                            {getFieldDecorator('sceneId', {
+                                rules: [{required: true, message: '请选择关联比赛或联赛!'}],
+                                initialValue: record.sceneId,
+                            })(
+                                <Input hidden={true}/>
+                            )}
+                        </FormItem> : <FormItem {...formItemLayout} className="bs-form-item">
+                            {getFieldDecorator('sceneId', {
+                                initialValue: record.sceneId,
+                            })(
+                                <Input hidden={true}/>
+                            )}
+                        </FormItem>}
                     {this.state.sceneType == "match" ?
                         <div>
                             <div className="center w-full">
@@ -418,7 +465,7 @@ class BulletinAddDialog extends React.Component {
                             </Select>
                             <div className="center w-full">
                                 <Icon className="ml-s" style={{fontSize: 16}} type="loading"
-                                      hidden={!this.state.loading}/>
+                                      hidden={this.state.matchLoaded}/>
                             </div>
                             <div className="center w-full">
                                 {(currentMatch.hostteam == null || currentMatch.guestteam == null) ?
@@ -477,8 +524,8 @@ class BulletinAddDialog extends React.Component {
                     </div> : null}
                     <FormItem {...formItemLayout} label="跳转类型" className="bs-form-item">
                         {getFieldDecorator('type', {
+                            initialValue: record.type,
                             rules: [{required: true, message: '请选择!'}],
-                            initialValue: "page",
                         })(
                             <RadioGroup>
                                 <Radio value="page">跳转页面</Radio>
@@ -487,18 +534,36 @@ class BulletinAddDialog extends React.Component {
                         )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="地区" className="bs-form-item">
-                        {getFieldDecorator('areatype', {
-                            initialValue: 0
+                        {getFieldDecorator('areaType', {
+                            initialValue: record.areaType
                         })(
                             <RadioGroup>
                                 <Radio value={0}>默认</Radio>
                                 <Radio value={1}>全国</Radio>
-                                <Radio value={2}>全国青少年</Radio>
                             </RadioGroup>
                         )}
                     </FormItem>
+                    <FormItem {...formItemLayout} label="小程序" className="bs-form-item">
+                        {getFieldDecorator('wechatType', {
+                            initialValue: record.wechatType
+                        })(
+                            <RadioGroup>
+                                <Radio value={0}>茄子tv</Radio>
+                                <Radio value={1}>青少年</Radio>
+                            </RadioGroup>
+                        )}
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="顺序" className="bs-form-item">
+                        {getFieldDecorator('sequence', {
+                            initialValue: record.sequence
+                        })(
+                            <InputNumber placeholder='请输入顺序!'/>
+                        )}
+                    </FormItem>
                     <FormItem {...formItemLayout} label="链接" className="bs-form-item">
-                        {getFieldDecorator('url', {})(
+                        {getFieldDecorator('url', {
+                            initialValue: record.url,
+                        })(
                             <Input placeholder='请输入链接!'/>
                         )}
                         <div>
@@ -517,7 +582,9 @@ class BulletinAddDialog extends React.Component {
                         </div>
                     </FormItem>
                     <FormItem {...formItemLayout} label="省份" className="bs-form-item">
-                        {getFieldDecorator('province', {})(
+                        {getFieldDecorator('province', {
+                            initialValue: record.province,
+                        })(
                             <Select className="w-full" disabled={this.props.loading}>
                                 {this.state.areas ? this.getAreasOption() : null}
                             </Select>
@@ -528,6 +595,7 @@ class BulletinAddDialog extends React.Component {
                             <div className="w-full center">
                                 <FormItem {...formItemLayout} className="bs-form-item form-match-poster">
                                     {getFieldDecorator('content', {
+                                        initialValue: record.content,
                                         getValueFromEvent(e) {
                                             return form.getFieldValue('content')
                                         },
@@ -569,6 +637,7 @@ class BulletinAddDialog extends React.Component {
                         </div> : <FormItem {...formItemLayout} label="内容" className="bs-form-item">
                             {getFieldDecorator('content', {
                                 rules: [{required: true, message: '请输入内容!'}],
+                                initialValue: record.content,
                                 getValueFromEvent(e) {
                                     return e.target.value
                                 },
@@ -578,6 +647,13 @@ class BulletinAddDialog extends React.Component {
                                 <Input.TextArea placeholder='请输入内容!'/>
                             )}
                         </FormItem>}
+                    <FormItem style={{margin: 0}}>
+                        {getFieldDecorator('id', {
+                            initialValue: record.id,
+                        })(
+                            <Input hidden={true}/>
+                        )}
+                    </FormItem>
                 </Form>
                 :
                 null
@@ -593,4 +669,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(BulletinAddDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(BulletinModifyDialog);

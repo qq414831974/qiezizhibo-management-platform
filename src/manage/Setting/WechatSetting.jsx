@@ -1,7 +1,6 @@
 import React from 'react';
 import {Row, Col, Divider, message, Input, Button, Select} from 'antd';
 import BreadcrumbCustom from '../Components/BreadcrumbCustom';
-import BannerUpload from './BannerUpload';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../action";
 import {connect} from "react-redux";

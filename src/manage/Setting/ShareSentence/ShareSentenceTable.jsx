@@ -45,7 +45,7 @@ class ShareSentenceTable extends React.Component {
     }
     deleteShareSentence = () => {
         delShareSentenceById({id: this.state.record.id}).then((data) => {
-            this.setState({deleteVisible: false});
+            this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();

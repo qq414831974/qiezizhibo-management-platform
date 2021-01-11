@@ -58,13 +58,19 @@ export const updateAdminUserById = (params) => put({url: `${config.user_service}
     }).catch(function (error) {
         console.log(error)
     });
-export const updateAdminUserPassword = (params) => post({url: `${config.user_service}/admin/user/password/update`, data: params})
+export const updateAdminUserPassword = (params) => post({
+    url: `${config.user_service}/admin/user/password/update`,
+    data: params
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const resetAdminUserPassword = (params) => post({url: `${config.user_service}/admin/user/password/reset`, data: params})
+export const resetAdminUserPassword = (params) => post({
+    url: `${config.user_service}/admin/user/password/reset`,
+    data: params
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -227,6 +233,153 @@ export const getAllSysLog = (params) => get({url: `${config.system_service}/sys/
     }).catch(function (error) {
         console.log(error);
     });
+export const getAreasList = () => get({url: `${config.system_service}/sys/area`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const createArea = (params) => post({url: `${config.system_service}/sys/area`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const delAreaById = (params) => del({url: `${config.system_service}/sys/area?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getBanner = (params) => get({url: `${config.system_service}/sys/banner`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addBanner = (params) => post({url: `${config.system_service}/sys/banner`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateBanner = (params) => put({url: `${config.system_service}/sys/banner`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const delBannerById = (params) => del({url: `${config.system_service}/sys/banner?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getBulletin = () => get({url: `${config.system_service}/sys/bulletin`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const setBulletin = (params) => post({url: `${config.system_service}/sys/bulletin`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateBulletin = (params) => put({url: `${config.system_service}/sys/bulletin`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const delBulletinById = (params) => del({url: `${config.system_service}/sys/bulletin?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getScoreboard = () => get({url: `${config.system_service}/sys/scoreboard`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const setScoreboard = (params) => post({url: `${config.system_service}/sys/scoreboard`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateScoreboard = (params) => put({url: `${config.system_service}/sys/scoreboard`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const delScoreboardById = (params) => del({url: `${config.system_service}/sys/scoreboard?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getShareSentenceList = () => get({url: `${config.system_service}/sys/share/sentence`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const createShareSentence = (params) => post({
+    url: `${config.system_service}/sys/share/sentence`,
+    data: params
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateShareSentence = (params) => put({
+    url: `${config.system_service}/sys/share/sentence`,
+    data: params
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const delShareSentenceById = (params) => del({url: `${config.system_service}/sys/share/sentence?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getExp = () => get({url: `${config.system_service}/sys/exp`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addExp = (param) => post({url: `${config.system_service}/sys/exp`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateExp = (param) => put({url: `${config.system_service}/sys/exp`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteExp = (param) => del({url: `${config.system_service}/sys/exp?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+
+
+
 export const createActivity = (params) => post({url: `${config.live_service}/activity`, data: params})
     .then(function (response) {
         return response.data;
@@ -853,76 +1006,7 @@ export const getMatchMedia = (params) => get({url: `${config.media_service}/medi
     }).catch(function (error) {
         console.log(error)
     });
-export const getBanner = (params) => get({url: `${config.system_service}/system/config/banner`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const setBanner = (params) => post({url: `${config.system_service}/system/config/banner`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateBanner = (params) => put({url: `${config.system_service}/system/config/banner`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
 export const delConfig = (params) => del({url: `${config.system_service}/system/config?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getScoreboard = () => get({url: `${config.system_service}/system/config/scoreboard`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const setScoreboard = (params) => post({url: `${config.system_service}/system/config/scoreboard`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateScoreboard = (params) => put({
-    url: `${config.system_service}/system/config/scoreboard`,
-    data: params
-})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteScoreboard = (params) => del({url: `${config.system_service}/system/config?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getBulletin = () => get({url: `${config.system_service}/system/config/bulletin`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const setBulletin = (params) => post({url: `${config.system_service}/system/config/bulletin`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateBulletin = (params) => put({url: `${config.system_service}/system/config/bulletin`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteBulletin = (params) => del({url: `${config.system_service}/system/config?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -977,24 +1061,6 @@ export const removeLeagueIntoSeries = (params) => del({url: `${config.football_s
         console.log(error)
     });
 export const getNoSeriesLeague = (params) => get({url: `${config.football_service}/league?${unpack({leagueType: 2, ...params})}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getAreasList = () => get({url: `${config.system_service}/system/config/area`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const createArea = (params) => post({url: `${config.system_service}/system/config/area`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const delAreaById = (params) => del({url: `${config.system_service}/system/config/area?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1151,60 +1217,6 @@ export const getLiveQuality = (id) => get({url: `${config.live_service}/activity
         console.log(error)
     });
 export const getMatchMonopolys = (param) => get({url: `${config.football_service}/match/monopoly?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getShareSentenceList = () => get({url: `${config.system_service}/system/share/sentence`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const createShareSentence = (params) => post({
-    url: `${config.system_service}/system/share/sentence`,
-    data: params
-})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateShareSentence = (params) => put({
-    url: `${config.system_service}/system/share/sentence`,
-    data: params
-})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const delShareSentenceById = (params) => del({url: `${config.system_service}/system/share/sentence?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getExp = () => get({url: `${config.system_service}/sys/exp`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const addExp = (param) => post({url: `${config.system_service}/sys/exp`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateExp = (param) => put({url: `${config.system_service}/sys/exp`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteExp = (param) => del({url: `${config.system_service}/sys/exp?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1480,13 +1492,19 @@ export const getLeagueClipRule = (param) => get({url: `${config.football_service
     }).catch(function (error) {
         console.log(error)
     });
-export const addLeagueClipRule = (param) => post({url: `${config.football_service}/league/${param.leagueId}/clip`, data: param})
+export const addLeagueClipRule = (param) => post({
+    url: `${config.football_service}/league/${param.leagueId}/clip`,
+    data: param
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const updateLeagueClipRule = (param) => put({url: `${config.football_service}/league/${param.leagueId}/clip`, data: param})
+export const updateLeagueClipRule = (param) => put({
+    url: `${config.football_service}/league/${param.leagueId}/clip`,
+    data: param
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1504,13 +1522,19 @@ export const getMatchClipRule = (param) => get({url: `${config.football_service}
     }).catch(function (error) {
         console.log(error)
     });
-export const addMatchClipRule = (param) => post({url: `${config.football_service}/match/${param.matchId}/clip`, data: param})
+export const addMatchClipRule = (param) => post({
+    url: `${config.football_service}/match/${param.matchId}/clip`,
+    data: param
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
-export const updateMatchClipRule = (param) => put({url: `${config.football_service}/match/${param.matchId}/clip`, data: param})
+export const updateMatchClipRule = (param) => put({
+    url: `${config.football_service}/match/${param.matchId}/clip`,
+    data: param
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1546,7 +1570,10 @@ export const getClipCollectionsByMatchId = (param) => get({url: `${config.media_
     }).catch(function (error) {
         console.log(error)
     });
-export const updateClipCollectionsByMatchId = (param) => put({url: `${config.media_service}/media/clipCollection`, data: param})
+export const updateClipCollectionsByMatchId = (param) => put({
+    url: `${config.media_service}/media/clipCollection`,
+    data: param
+})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

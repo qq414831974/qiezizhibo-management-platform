@@ -1,11 +1,10 @@
 import React from 'react';
 import {Row, Col, Divider, message, Input, Button, Select, Tooltip} from 'antd';
-import BreadcrumbCustom from '../Components/BreadcrumbCustom';
-import BannerUpload from './BannerUpload';
+import BreadcrumbCustom from '../../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
-import {receiveData} from "../../action";
+import {receiveData} from "../../../action";
 import {connect} from "react-redux";
-import {getScoreboard, setScoreboard, updateScoreboard, upload, getAreasList} from "../../axios";
+import {getScoreboard, setScoreboard, updateScoreboard} from "../../../axios";
 import ScoreBoard from './ScoreBoard';
 
 class ScoreBoardSetting extends React.Component {
@@ -18,13 +17,18 @@ class ScoreBoardSetting extends React.Component {
     fetch = () => {
         getScoreboard().then((data) => {
             if (data && data.code == 200) {
-                this.setState({scoreboardList: data.data});
+                this.setState({
+                    scoreboardList: data.data ? data.data.flatMap(value => {
+                        return {id: value.id, ...value.detail}
+                    }) : []
+                });
             }
         });
     }
 
     getScoreBoardOption = () => {
         let dom = [];
+        console.log(this.state.scoreboardList)
         this.state.scoreboardList && this.state.scoreboardList.forEach((item) => {
             dom.push(<Select.Option key={`item-${item.id}`} value={item.id} data={item}>
                 <img src={item.scoreboardpic}
@@ -73,7 +77,7 @@ class ScoreBoardSetting extends React.Component {
             return;
         }
         let setFunc = setScoreboard;
-        if(position && position.id){
+        if (position && position.id) {
             setFunc = updateScoreboard;
         }
         setFunc(position).then((data) => {
