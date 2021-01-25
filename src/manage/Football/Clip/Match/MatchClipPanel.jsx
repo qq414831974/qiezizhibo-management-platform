@@ -393,7 +393,7 @@ class MatchClipPanel extends React.Component {
             <Card title={<div>自动剪辑视频{this.state.selectIds != null && this.state.selectIds.length > 0 ?
                 <Button type="primary" className="ml-l" onClick={this.mergeClipsConfirm}>合并</Button> : null}</div>}
                   className="mt-m" style={{minHeight: 250}}>
-                <Checkbox.Group style={{width: '100%'}} onChange={this.onCheckBoxChange}>
+                <Checkbox.Group style={{width: '100%'}} value={this.state.selectIds} onChange={this.onCheckBoxChange}>
                     <List
                         rowKey={record => record.id}
                         grid={{gutter: 16, lg: 3, md: 2, xs: 1}}
