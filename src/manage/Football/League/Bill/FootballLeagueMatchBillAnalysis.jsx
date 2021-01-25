@@ -1,16 +1,16 @@
 import React from 'react';
 import {Row, Col, Card, Button, Tabs, message, Form, Avatar} from 'antd';
-import BreadcrumbCustom from '../../Components/BreadcrumbCustom';
+import BreadcrumbCustom from '../../../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {connect} from "react-redux";
-import {getQueryString} from "../../../utils";
+import {getQueryString} from "../../../../utils";
 import {
     getLeagueMatchById,
     getLeagueBillAnalysisGift,
     getLeagueBillAnalysisCharge,
-} from "../../../axios";
-import defultAvatar from "../../../static/avatar.jpg";
+} from "../../../../axios";
+import defultAvatar from "../../../../static/avatar.jpg";
 
 const TabPane = Tabs.TabPane;
 
@@ -24,19 +24,15 @@ class FootballLeagueMatchBillAnalysis extends React.Component {
     }
 
     refresh = () => {
-        const currentLeague = getQueryString(this.props.location.search, "leagueId");
+        let currentLeague;
+        if(this.props.location){
+            currentLeague = getQueryString(this.props.location.search, "leagueId");
+        }else{
+            currentLeague = this.props.leagueId;
+        }
         this.fetch({leagueId: currentLeague})
     }
     fetch = (params = {}) => {
-        getLeagueMatchById(params.leagueId).then(data => {
-            if (data && data.code == 200) {
-                this.setState({
-                    data: data.data ? data.data : {},
-                });
-            } else {
-                message.error('获取联赛信息失败：' + (data ? data.result + "-" + data.message : data), 3);
-            }
-        })
         getLeagueBillAnalysisGift(params).then(data => {
             if (data && data.code == 200) {
                 this.setState({
@@ -60,11 +56,7 @@ class FootballLeagueMatchBillAnalysis extends React.Component {
     render() {
         return (
             <div className="gutter-example">
-                <BreadcrumbCustom first="联赛" second="联赛收益"/>
-                <Card title={<div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
-                    <Avatar src={this.state.data.headImg ? this.state.data.headImg : defultAvatar}/>
-                    <span className="ml-s">{this.state.data.name}</span>
-                </div>}>
+                <Card>
                     {this.state.giftBill ? <div>
                         <h3>礼物收益：</h3>
                         <div>{`线上支付：${this.state.giftBill ? this.state.giftBill.online / 100 : 0}`}</div>

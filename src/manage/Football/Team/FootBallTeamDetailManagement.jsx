@@ -40,30 +40,30 @@ class FootBallTeamDetailManagement extends React.Component {
         });
     }
 
-    saveTeamModifyDialogRef = (form) => {
-        this.formModify = form;
-    };
-    handleTeamModifyCreate = () => {
-        const form = this.formModify;
-        form.validateFields((err, values) => {
-            if (err) {
-                return;
-            }
-            updateTeamById(values).then((data) => {
-                if (data && data.code == 200) {
-                    if (data.data) {
-                        this.fetch(this.props.match.params.id);
-                        message.success('修改成功', 1);
-                    }else{
-                        message.warn(data.message, 1);
-                    }
-                } else {
-                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
-                }
-            });
-            form.resetFields();
-        });
-    };
+    // saveTeamModifyDialogRef = (form) => {
+    //     this.formModify = form;
+    // };
+    // handleTeamModifyCreate = () => {
+    //     const form = this.formModify;
+    //     form.validateFields((err, values) => {
+    //         if (err) {
+    //             return;
+    //         }
+    //         updateTeamById(values).then((data) => {
+    //             if (data && data.code == 200) {
+    //                 if (data.data) {
+    //                     this.fetch(this.props.match.params.id);
+    //                     message.success('修改成功', 1);
+    //                 }else{
+    //                     message.warn(data.message, 1);
+    //                 }
+    //             } else {
+    //                 message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
+    //             }
+    //         });
+    //         form.resetFields();
+    //     });
+    // };
 
     render() {
         if (!(this.props.match.params && this.props.match.params.id)) {
@@ -86,12 +86,13 @@ class FootBallTeamDetailManagement extends React.Component {
                                 <Tabs defaultActiveKey="1" onChange={(value) => {
                                     this.setState({currentTab: value});
                                 }}>
-                                    <TabPane tab="基础设置" key="1">
-                                        <TeamSimple visible={this.state.currentTab == "1" ? true : false}
-                                                    record={this.state.data}
-                                                    detail={true} handleSave={this.handleTeamModifyCreate}
-                                                    ref={this.saveTeamModifyDialogRef}/></TabPane>
-                                    <TabPane tab="球队人员设置" key="2">
+                                    {/*<TabPane tab="基础设置" key="1">*/}
+                                    {/*    <TeamSimple visible={this.state.currentTab == "1" ? true : false}*/}
+                                    {/*                record={this.state.data}*/}
+                                    {/*                detail={true} handleSave={this.handleTeamModifyCreate}*/}
+                                    {/*                ref={this.saveTeamModifyDialogRef}/>*/}
+                                    {/*</TabPane>*/}
+                                    <TabPane tab="球队人员设置" key="1">
                                         <TeamAddPlayersPanel record={this.state.data}/>
                                     </TabPane>
                                 </Tabs>

@@ -87,7 +87,7 @@ class LeagueHeatForm extends React.Component {
                     </FormItem>
                     <FormItem {...formItemLayout} label="开启" className="bs-form-item">
                         {getFieldDecorator('available', {
-                            initialValue: record.available != null ? record.available : true,
+                            initialValue: record.available != null ? record.available : false,
                             valuePropName: 'checked',
                             rules: [{required: true, message: '请选择是否开始!'}],
                         })(
@@ -118,8 +118,8 @@ class LeagueHeatForm extends React.Component {
                         <Row gutter={10}>
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
-                                    {getFieldDecorator('heatBaseMin', {
-                                        initialValue: record.heatBaseMin != null ? record.heatBaseMin : null,
+                                    {getFieldDecorator('expand.baseMin', {
+                                        initialValue: record.expand != null ? record.expand.baseMin : null,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" hidden placeholder='请输入数值!'/>
@@ -128,8 +128,8 @@ class LeagueHeatForm extends React.Component {
                             </Col>
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
-                                    {getFieldDecorator('heatBaseMax', {
-                                        initialValue: record.heatBaseMax != null ? record.heatBaseMax : null,
+                                    {getFieldDecorator('expand.baseMax', {
+                                        initialValue: record.expand != null ? record.expand.baseMax : null,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -142,8 +142,8 @@ class LeagueHeatForm extends React.Component {
                         <Row gutter={10}>
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
-                                    {getFieldDecorator('heatExpandMin', {
-                                        initialValue: record.heatExpandMin != null ? record.heatExpandMin : null,
+                                    {getFieldDecorator('expand.expandMin', {
+                                        initialValue: record.expand != null ? record.expand.expandMin : null,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" hidden placeholder='请输入数值!'/>
@@ -152,8 +152,8 @@ class LeagueHeatForm extends React.Component {
                             </Col>
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
-                                    {getFieldDecorator('heatExpandMax', {
-                                        initialValue: record.heatExpandMax != null ? record.heatExpandMax : null,
+                                    {getFieldDecorator('expand.expandMax', {
+                                        initialValue: record.expand != null ? record.expand.expandMax : null,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" placeholder='请输入数值!'/>

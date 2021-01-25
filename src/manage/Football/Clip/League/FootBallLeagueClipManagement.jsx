@@ -1,5 +1,5 @@
 import React from 'react';
-import {Row, Col, Card, Button, Tabs, message, Form} from 'antd';
+import {Row, Col, Card, Button, Tabs, message, Form, Avatar} from 'antd';
 import BreadcrumbCustom from '../../../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../../../action";
@@ -9,15 +9,17 @@ import {
     getLeagueClipRule,
     addLeagueClipRule,
     updateLeagueClipRule,
-    leagueClipAllMatch,
+    leagueClipAllMatch, getLeagueMatchById,
 } from "../../../../axios";
 import LeagueClipForm from "./LeagueClipForm";
+import defultAvatar from "../../../../static/avatar.jpg";
 
 const TabPane = Tabs.TabPane;
 
 class FootBallLeagueClipManagement extends React.Component {
     state = {
         data: {},
+        leagueData: {},
     }
 
     componentDidMount() {
@@ -38,6 +40,15 @@ class FootBallLeagueClipManagement extends React.Component {
                 message.error('获取联赛自动剪辑规则失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
+        getLeagueMatchById(params.leagueId).then(data => {
+            if (data && data.code == 200) {
+                this.setState({
+                    leagueData: data.data ? data.data : {},
+                });
+            } else {
+                message.error('获取联赛信息失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        })
     }
     saveClipSettingRef = (form) => {
         this.form = form;
@@ -111,7 +122,10 @@ class FootBallLeagueClipManagement extends React.Component {
                 <Row gutter={16}>
                     <Col className="gutter-row">
                         <div className="gutter-box">
-                            <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false}>
+                            <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false} title={<div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
+                                <Avatar src={this.state.leagueData.headImg ? this.state.leagueData.headImg : defultAvatar}/>
+                                <span className="ml-s">{this.state.leagueData.name}</span>
+                            </div>}>
                                 <Tabs>
                                     <TabPane tab="自动剪辑设置" key="1">
                                         <div className="w-full center" style={{

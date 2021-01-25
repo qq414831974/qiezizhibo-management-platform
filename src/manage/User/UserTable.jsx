@@ -361,14 +361,14 @@ class UserTable extends React.Component {
             render: function (text, record, index) {
                 let type = "未知"
                 switch (record.wechatType) {
-                    case 1 :
+                    case 0 :
                         type = "茄子tv";
+                        break;
+                    case 1 :
+                        type = "青少年";
                         break;
                     case 2 :
                         type = "茄子FC";
-                        break;
-                    case 3 :
-                        type = "青少年";
                         break;
                 }
                 return type;

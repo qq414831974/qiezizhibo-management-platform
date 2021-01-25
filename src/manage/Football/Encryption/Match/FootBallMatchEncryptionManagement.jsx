@@ -6,17 +6,16 @@ import {receiveData} from "../../../../action";
 import {connect} from "react-redux";
 import {getQueryString} from "../../../../utils";
 import {
-    getMatchClipRule,
-    addMatchClipRule,
-    updateMatchClipRule, getMatchById,
+    getMatchEncryptionRule,
+    addMatchEncryptionRule,
+    updateMatchEncryptionRule, getMatchById,
 } from "../../../../axios";
-import MatchClipForm from "./MatchClipForm";
-import MatchClipPanel from "./MatchClipPanel";
+import MatchEncryptionForm from "./MatchEncryptionForm";
 import FootBallMatchPlayersMediaPanel from "../../Match/Media/FootBallMatchPlayersMediaPanel";
 
 const TabPane = Tabs.TabPane;
 
-class FootBallMatchClipManagement extends React.Component {
+class FootBallMatchEncryptionManagement extends React.Component {
     state = {
         data: {},
     }
@@ -37,13 +36,13 @@ class FootBallMatchClipManagement extends React.Component {
         }
     }
     fetch = (params = {}) => {
-        getMatchClipRule(params).then((data) => {
+        getMatchEncryptionRule(params).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     data: data.data ? data.data : {},
                 });
             } else {
-                message.error('获取比赛自动剪辑规则失败：' + (data ? data.result + "-" + data.message : data), 3);
+                message.error('获取比赛加密规则失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
         this.setState({matchLoading: true})
@@ -57,10 +56,10 @@ class FootBallMatchClipManagement extends React.Component {
         });
     }
 
-    saveClipSettingRef = (form) => {
+    saveEncryptionSettingRef = (form) => {
         this.form = form;
     }
-    handleClipSettingSubmit = (e) => {
+    handleEncryptionSettingSubmit = (e) => {
         const currentMatch = getQueryString(this.props.location.search, "matchId");
         e.preventDefault();
         const form = this.form;
@@ -71,7 +70,7 @@ class FootBallMatchClipManagement extends React.Component {
             values.matchId = currentMatch;
             this.setState({modifyLoading: true})
             if (this.state.data && this.state.data.id) {
-                updateMatchClipRule(values).then(data => {
+                updateMatchEncryptionRule(values).then(data => {
                     this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
@@ -85,7 +84,7 @@ class FootBallMatchClipManagement extends React.Component {
                     }
                 })
             } else {
-                addMatchClipRule(values).then(data => {
+                addMatchEncryptionRule(values).then(data => {
                     this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
@@ -104,40 +103,29 @@ class FootBallMatchClipManagement extends React.Component {
 
     render() {
         const currentMatch = getQueryString(this.props.location.search, "matchId");
-        const ClipSetting = Form.create()(MatchClipForm);
+        const EncryptionSetting = Form.create()(MatchEncryptionForm);
 
         return (
             <div className="gutter-example">
-                <BreadcrumbCustom first="自动剪辑" second="比赛"/>
+                <BreadcrumbCustom first="加密" second="比赛"/>
                 <Row gutter={16}>
                     <Col className="gutter-row">
                         <div className="gutter-box">
                             <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false}>
                                 <Tabs activeKey={this.state.currentTab} onChange={(value) => {
                                     this.setState({currentTab: value});
-                                    this.props.history.replace(`/football/match/clip?matchId=${currentMatch}&tab=${value}`)
+                                    this.props.history.replace(`/football/match/encryption?matchId=${currentMatch}&tab=${value}`)
                                 }}>
-                                    <TabPane tab="自动剪辑设置" key="1">
+                                    <TabPane tab="加密设置" key="1">
                                         <div className="w-full center" style={{
                                             fontSize: 16,
                                             fontWeight: 'bold'
-                                        }}>{this.state.data && this.state.data.id ? "已开启自动剪辑" : "未开启自动剪辑"}</div>
-                                        <ClipSetting
+                                        }}>{this.state.data && this.state.data.id ? "已开启加密" : "未开启加密"}</div>
+                                        <EncryptionSetting
                                             visible={this.state.currentTab == 1 ? true : false}
                                             record={this.state.data}
-                                            handleSubmit={this.handleClipSettingSubmit}
-                                            ref={this.saveClipSettingRef}/>
-                                    </TabPane>
-                                    <TabPane tab="剪辑列表" key="2">
-                                        {this.state.matchLoading ? null : <MatchClipPanel
-                                            visible={this.state.currentTab == 2 ? true : false}
-                                            matchId={currentMatch}
-                                            match={this.state.match}/>}
-                                    </TabPane>
-                                    <TabPane tab="视频列表" key="3">
-                                        {this.state.matchLoading ? null : <FootBallMatchPlayersMediaPanel
-                                            visible={this.state.currentTab == 3 ? true : false}
-                                            matchId={currentMatch}/>}
+                                            handleSubmit={this.handleEncryptionSettingSubmit}
+                                            ref={this.saveEncryptionSettingRef}/>
                                     </TabPane>
                                 </Tabs>
                             </Card>
@@ -159,4 +147,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FootBallMatchClipManagement);
+export default connect(mapStateToProps, mapDispatchToProps)(FootBallMatchEncryptionManagement);

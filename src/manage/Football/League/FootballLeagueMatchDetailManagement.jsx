@@ -10,6 +10,7 @@ import {
     Modal,
     Radio,
     Switch,
+    Skeleton,
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
@@ -26,11 +27,12 @@ import {
     addLeaguePlayer,
     updatePlayerInLeague,
     delPlayerInLeague,
-    updateLeagueMatchById,
     genLeagueTeamRank,
     genLeaguePlayerRank,
     genLeagueReport,
     getLeagueReport,
+    getLeagueRankSetting,
+    updateLeagueRankSetting,
 } from "../../../axios/index";
 import avatar from '../../../static/avatar.jpg';
 import logo from '../../../static/logo.png';
@@ -69,12 +71,10 @@ class FootballLeagueMatchDetailManagement extends React.Component {
 
     fetch = () => {
         getLeagueMatchById(this.props.match.params.id).then(data => {
-            if(data && data.code == 200  && data.data){
+            if (data && data.code == 200 && data.data) {
                 this.setState({
                     data: data.data,
                     teamListloading: true,
-                    teamSwitch: data.data.showleagueteam,
-                    playerSwitch: data.data.showleagueplayer
                 });
                 if (data.data && data.data.id) {
                     getLeagueTeam({leagueId: data.data.id}).then(res => {
@@ -85,6 +85,17 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                 }
             }
         });
+        getLeagueRankSetting({leagueId: this.props.match.params.id}).then(data => {
+            let autoRank = false;
+            let showLeagueTeam = false;
+            let showLeaguePlayer = false;
+            if (data && data.data && data.data.id) {
+                autoRank = data.data.autoRank;
+                showLeagueTeam = data.data.showLeagueTeam;
+                showLeaguePlayer = data.data.showLeaguePlayer;
+            }
+            this.setState({teamSwitch: showLeagueTeam, playerSwitch: showLeaguePlayer, sortradiovalue: autoRank})
+        });
         this.setState({playerListLoading: true});
         getLeaguePlayer({leagueId: this.props.match.params.id}).then(data => {
             if (data && data.code == 200) {
@@ -93,9 +104,9 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                 this.setState({playerListLoading: false});
             }
         });
-        getLeagueReport(this.props.match.params.id).then(data => {
-            if(data && data.code == 200){
-                if(data.data){
+        getLeagueReport({leagueId: this.props.match.params.id}).then(data => {
+            if (data && data.code == 200) {
+                if (data.data) {
                     this.setState({reportUrl: data.data.url});
                 }
             }
@@ -105,8 +116,8 @@ class FootballLeagueMatchDetailManagement extends React.Component {
         this.fetch();
     }
     refreshReport = () => {
-        getLeagueReport(this.props.match.params.id).then(data => {
-            if(data && data.code == 200){
+        getLeagueReport({leagueId: this.props.match.params.id}).then(data => {
+            if (data && data.code == 200) {
                 this.setState({reportUrl: data.data.url});
             }
         })
@@ -244,7 +255,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
     handleDeletePlayerOK = () => {
         this.state.currentPlayer &&
         delPlayerInLeague({
-            leagueId: this.state.currentPlayer.leaguematchId,
+            leagueId: this.state.currentPlayer.leagueId,
             teamId: this.state.currentPlayer.teamId,
             playerId: this.state.currentPlayer.playerId
         }).then(data => {
@@ -264,7 +275,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
     handleDeleteTeamOK = () => {
         this.state.currentTeam &&
         deleteTeamInLeague({
-            leagueId: this.state.currentTeam.leaguematchId,
+            leagueId: this.state.currentTeam.leagueId,
             teamId: this.state.currentTeam.teamId
         }).then(data => {
             this.setState({deleteVisible: false, modifyTeamVisible: false});
@@ -284,7 +295,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
         this.setState({deleteVisible: false});
     }
     onSortRadioChange = (e) => {
-        updateLeagueMatchById({id: this.props.match.params.id, autorankorder: e.target.value}).then((data) => {
+        updateLeagueRankSetting({leagueId: this.props.match.params.id, autoRank: e.target.value}).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
@@ -301,7 +312,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
         });
     }
     onLeagueTeamSwitchChange = (e) => {
-        updateLeagueMatchById({id: this.props.match.params.id, showleagueteam: e}).then((data) => {
+        updateLeagueRankSetting({leagueId: this.props.match.params.id, showLeagueTeam: e}).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
@@ -316,7 +327,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
         });
     }
     onLeaguePlayerSwitchChange = (e) => {
-        updateLeagueMatchById({id: this.props.match.params.id, showleagueplayer: e}).then((data) => {
+        updateLeagueRankSetting({leagueId: this.props.match.params.id, showLeaguePlayer: e}).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
                     this.refresh();
@@ -332,6 +343,9 @@ class FootballLeagueMatchDetailManagement extends React.Component {
     }
     getGroupLegueTeam = () => {
         let dom = [];
+        if (this.state.teamListloading) {
+            return <Skeleton active/>;
+        }
         if (this.state.teamList) {
             const indexes = Object.keys(this.state.teamList).sort();
             indexes.forEach(key => {
@@ -395,7 +409,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
     }
     genLeagueReport = () => {
         message.info("正在生成，请稍后", 10)
-        genLeagueReport(this.state.data.id).then(data => {
+        genLeagueReport({leagueId: this.state.data.id}).then(data => {
             if (data && data.code == 200) {
                 if (data.data && data.data.id) {
                     this.refreshReport();
@@ -461,7 +475,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                                     <Button type="primary" shape="circle" icon="plus" onClick={this.onAddTeamClick}/>
                                     <span className="ml-s mr-s">队伍</span>
                                     <Radio.Group onChange={this.onSortRadioChange}
-                                                 value={this.state.sortradiovalue ? this.state.sortradiovalue : (this.state.data ? this.state.data.autorankorder : true)}>
+                                                 value={this.state.sortradiovalue}>
                                         <Radio value={true}>自动</Radio>
                                         <Radio value={false}>手动</Radio>
                                     </Radio.Group>

@@ -175,9 +175,9 @@ class LiveTable extends React.Component {
             if (err) {
                 return;
             }
-            values["startedAt"] = values["startedAt"] ? values["startedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["endedAt"] = values["endedAt"] ? values["endedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createdAt"] = values["createdAt"] ? values["createdAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["startTime"] = values["startTime"] ? values["startTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["endTime"] = values["endTime"] ? values["endTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
 
             createActivity(values).then((data) => {
                 if (data && data.code == 200) {
@@ -201,9 +201,9 @@ class LiveTable extends React.Component {
             if (err) {
                 return;
             }
-            values["startedAt"] = values["startedAt"] ? values["startedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["endedAt"] = values["endedAt"] ? values["endedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createdAt"] = values["createdAt"] ? values["createdAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["startTime"] = values["startTime"] ? values["startTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["endTime"] = values["endTime"] ? values["endTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
 
             modifyActivityInfo(values).then((data) => {
                 if (data && data.code == 200) {
@@ -331,7 +331,7 @@ class LiveTable extends React.Component {
             // ],
             // filterMultiple: false,
             render: function (text, record, index) {
-                return <p>{parseTimeString(record.startedAt)}~{parseTimeString(record.endedAt)}</p>;
+                return <p>{parseTimeString(record.startTime)}~{parseTimeString(record.endTime)}</p>;
             },
             width: '20%',
         }, {

@@ -122,9 +122,9 @@ class LiveStatusManagement extends React.Component {
             if (err) {
                 return;
             }
-            values["startedAt"] = values["startedAt"] ? values["startedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["endedAt"] = values["endedAt"] ? values["endedAt"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createdAt"] = values["createdAt"] ? values["createdAt"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["startTime"] = values["startTime"] ? values["startTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["endTime"] = values["endTime"] ? values["endTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
 
             modifyActivityInfo(values).then((data) => {
                 if (data && data.code == 200) {
@@ -169,7 +169,7 @@ class LiveStatusManagement extends React.Component {
                     </div>
                     <div className="w-full center">
                         <span
-                            style={{fontSize: 14}}>{this.state.data ? `${this.state.data.startedAt} ~ ${this.state.data.endedAt}` : ""}</span>
+                            style={{fontSize: 14}}>{this.state.data ? `${this.state.data.startTime} ~ ${this.state.data.endTime}` : ""}</span>
                     </div>
                     <div className="w-full center mt-s">
                         <Button onClick={this.showVideoPlayDialog}

@@ -17,7 +17,7 @@ import {
 import {Form, message, notification} from "antd/lib/index";
 import FootBallMatchAddDialog from "../Match/FootBallMatchAddDialog"
 import FootBallMatchModifyDialog from "../Match/FootBallMatchModifyDialog"
-import FootBallMatchScoreDialog from "../Match/FootBallMatchScoreDialog"
+import FootBallMatchScoreDialog from "./Score/FootBallMatchScoreDialog"
 import {parseTimeString} from "../../../utils";
 import defultAvatar from '../../../static/avatar.jpg';
 import {Link} from 'react-router-dom';
@@ -76,7 +76,6 @@ class FootBallMatchTable extends React.Component {
     fetch = (params = {}) => {
         params["sortField"] = "startTime";
         params["sortOrder"] = "desc";
-        params["chargeIgnoreMedia"] = true;
         this.setState({loading: true});
         getAllMatchs(params).then((data) => {
             if (data && data.code == 200) {
@@ -202,10 +201,6 @@ class FootBallMatchTable extends React.Component {
                 return;
             }
             values["startTime"] = values["startTime"] ? values["startTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["endTime"] = values["endTime"] ? values["endTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             createMatch(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -229,10 +224,7 @@ class FootBallMatchTable extends React.Component {
                 return;
             }
             values["startTime"] = values["startTime"] ? values["startTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["endTime"] = values["endTime"] ? values["endTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["available"] = values["available"] != null ? !values["available"] : false;
             updateMatchById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -276,7 +268,7 @@ class FootBallMatchTable extends React.Component {
             record: record,
             statusDialogRadio: record.status,
             statusDialogScore: record.score,
-            statusDialogPenaltyScore: record.penaltyscore
+            statusDialogPenaltyScore: record.penaltyScore
         });
         const matchType = record ? (record.type ? eval(record.type) : []) : [];
         if (matchType.indexOf(TIME_LINE) >= 0) {
@@ -302,7 +294,7 @@ class FootBallMatchTable extends React.Component {
             id: this.state.record.id,
             status: this.state.statusDialogRadio,
             score: this.state.statusDialogScore,
-            penaltyscore: this.state.statusDialogPenaltyScore,
+            penaltyScore: this.state.statusDialogPenaltyScore,
         }).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
@@ -608,17 +600,17 @@ class FootBallMatchTable extends React.Component {
             },
             width: '35%',
             render: function (text, record, index) {
-                const hostteam = record.hostteam;
-                const guestteam = record.guestteam;
-                if (hostteam == null || guestteam == null) {
+                const hostTeam = record.hostTeam;
+                const guestTeam = record.guestTeam;
+                if (hostTeam == null || guestTeam == null) {
                     return <span className="cursor-hand" onClick={onNameClick.bind(this, record)}>{record.name}</span>
                 }
                 return <div className="center cursor-hand" onClick={onNameClick.bind(this, record)}>
-                    <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
-                    <p className="ml-s">{hostteam.name}</p>
+                    <Avatar src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}/>
+                    <p className="ml-s">{hostTeam.name}</p>
                     <p className="ml-s mr-s">VS</p>
-                    <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
-                    <p className="ml-s">{guestteam.name}</p>
+                    <Avatar src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}/>
+                    <p className="ml-s">{guestTeam.name}</p>
                 </div>;
             },
         }, {
@@ -652,7 +644,7 @@ class FootBallMatchTable extends React.Component {
             width: '8%',
             render: function (text, record, index) {
                 return <p className="cursor-hand"
-                          onClick={onScoreClick.bind(this, record)}>{record.score ? (record.score + (record.penaltyscore ? `(${record.penaltyscore})` : "")) : "-"}</p>;
+                          onClick={onScoreClick.bind(this, record)}>{record.score ? (record.score + (record.penaltyScore ? `(${record.penaltyScore})` : "")) : "-"}</p>;
             },
         }, {
             title: <Dropdown overlay={onlineDropdown}
@@ -668,7 +660,7 @@ class FootBallMatchTable extends React.Component {
                         number = record.online;
                         break;
                     case "2":
-                        number = record.onlineforreal;
+                        number = record.onlineReal;
                         break;
                     case "3":
                         number = record.onlineCount;
@@ -712,17 +704,17 @@ class FootBallMatchTable extends React.Component {
             },
             width: '70%',
             render: function (text, record, index) {
-                const hostteam = record.hostteam;
-                const guestteam = record.guestteam;
-                if (hostteam == null || guestteam == null) {
+                const hostTeam = record.hostTeam;
+                const guestTeam = record.guestTeam;
+                if (hostTeam == null || guestTeam == null) {
                     return <span className="cursor-hand" onClick={onNameClick.bind(this, record)}>{record.name}</span>
                 }
                 return <div className="center cursor-hand" onClick={onNameClick.bind(this, record)}>
-                    <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
-                    <p className="ml-s">{hostteam.name}</p>
+                    <Avatar src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}/>
+                    <p className="ml-s">{hostTeam.name}</p>
                     <p className="ml-s mr-s">VS</p>
-                    <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
-                    <p className="ml-s">{guestteam.name}</p>
+                    <Avatar src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}/>
+                    <p className="ml-s">{guestTeam.name}</p>
                 </div>;
             },
         }, {
@@ -896,7 +888,7 @@ class FootBallMatchTable extends React.Component {
             </Modal>
             <Modal
                 className={isMobile ? "top-n" : ""}
-                width={600}
+                width={800}
                 visible={this.state.dialogModifyVisible}
                 title="编辑比赛"
                 okText="确定"
@@ -914,6 +906,10 @@ class FootBallMatchTable extends React.Component {
                             `/football/comment/${this.state.record.id}`
                         }>评论</Link>
                     </Button>,
+                    <Button key="charge" type="primary" className="pull-left"><Link to={
+                        `/football/match/charge?matchId=${this.state.record.id}`
+                    }>收费</Link>
+                    </Button>,
                     <Button key="comment" type="primary" className="pull-left">
                         <Link to={
                             `/football/match/heat?matchId=${this.state.record.id}`
@@ -926,6 +922,10 @@ class FootBallMatchTable extends React.Component {
                     <Button key="bet" type="primary" className="pull-left"><Link to={
                         `/football/match/clip?matchId=${this.state.record.id}`
                     }>剪辑</Link>
+                    </Button>,
+                    <Button key="bet" type="primary" className="pull-left"><Link to={
+                        `/football/match/encryption?matchId=${this.state.record.id}`
+                    }>加密</Link>
                     </Button>,
                     <Button key="delete" type="danger" className="pull-left"
                             onClick={this.handleDelete}>删除</Button>,

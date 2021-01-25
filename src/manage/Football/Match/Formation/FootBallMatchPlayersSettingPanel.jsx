@@ -1,7 +1,7 @@
 import React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {Row, Col, Card, Tooltip, Tag, List, Button, Modal, Avatar, Select, Spin, Popconfirm} from 'antd';
 import {
     updateFormation,
@@ -9,11 +9,12 @@ import {
     addPlayerToMatchTeam,
     getMatchById,
     modifyPlayerInMatchTeam,
-    getFormationByMatchTeam
-} from "../../../axios";
-import defultAvatar from '../../../static/avatar.jpg';
-import shirt from '../../../static/shirt.png';
-import shirt2 from '../../../static/shirt2.png';
+    getFormationByMatchTeam,
+    deletePlayerInMatchTeam
+} from "../../../../axios";
+import defultAvatar from '../../../../static/avatar.jpg';
+import shirt from '../../../../static/shirt.png';
+import shirt2 from '../../../../static/shirt2.png';
 import {Form, message} from "antd/lib/index";
 import FootBallMatchAddPlayersDialog from "./FootBallMatchAddPlayersDialog";
 import FootBallMatchModifyPlayersDialog from "./FootBallMatchModifyPlayersDialog";
@@ -70,29 +71,24 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                 });
                 getFormationByMatchTeam({
                     matchId: this.props.matchId,
-                    teamId: data.data.hostteam.id
+                    teamId: data.data.hostTeamId
                 }).then((formation) => {
                     if (formation && formation.code == 200) {
-                        let matchData = this.state.data;
-                        matchData.hostteam && (matchData.hostteam.formation = formation.data);
                         this.setState({
-                            data: matchData,
-                            hostFormation: formation.data ? formation.data.type : 1
+                            hostFormation: formation.data ? formation.data : null
+                        }, () => {
+                            getFormationByMatchTeam({
+                                matchId: this.props.matchId,
+                                teamId: data.data.guestTeamId
+                            }).then((formation) => {
+                                if (formation && formation.code == 200) {
+                                    this.setState({
+                                        pageLoaded: true,
+                                        guestFormation: formation.data ? formation.data : null
+                                    })
+                                }
+                            });
                         })
-                        getFormationByMatchTeam({
-                            matchId: this.props.matchId,
-                            teamId: data.data.guestteam.id
-                        }).then((formation) => {
-                            if (formation && formation.code == 200) {
-                                let matchData = this.state.data;
-                                matchData.guestteam && (matchData.guestteam.formation = formation.data);
-                                this.setState({
-                                    pageLoaded: true,
-                                    data: matchData,
-                                    guestFormation: formation.data ? formation.data.type : 1
-                                })
-                            }
-                        });
                     }
                 });
                 this.fetchHostTeam({
@@ -115,7 +111,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         this.setState({
             hostloading: true,
         });
-        getMatchPlayersByTeamId(this.props.matchId, this.state.data.hostteam.id).then((data) => {
+        getMatchPlayersByTeamId(this.props.matchId, this.state.data.hostTeamId).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     hostdata: data.data ? data.data.records : "",
@@ -131,7 +127,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         this.setState({
             guestloading: true,
         });
-        getMatchPlayersByTeamId(this.props.matchId, this.state.data.guestteam.id).then((data) => {
+        getMatchPlayersByTeamId(this.props.matchId, this.state.data.guestTeamId).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     guestdata: data.data ? data.data.records : "",
@@ -202,18 +198,30 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
             if (err) {
                 return;
             }
-            addPlayerToMatchTeam(values).then((data) => {
+            const formation = values.formation;
+            updateFormation(formation).then(data => {
                 if (data && data.code == 200) {
                     if (data.data) {
-                        this.refresh();
-                        message.success('添加成功', 1);
+                        delete values.formation;
+                        addPlayerToMatchTeam(values).then((data) => {
+                            if (data && data.code == 200) {
+                                if (data.data) {
+                                    this.refresh();
+                                    message.success('添加成功', 1);
+                                } else {
+                                    message.warn(data.message, 1);
+                                }
+                            } else {
+                                message.error('添加失败：' + (data ? data.result + "-" + data.message : data), 3);
+                            }
+                        });
                     } else {
                         message.warn(data.message, 1);
                     }
                 } else {
                     message.error('添加失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
-            });
+            })
             form.resetFields();
             this.setState({dialogAddVisible: false});
         });
@@ -224,18 +232,30 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
             if (err) {
                 return;
             }
-            modifyPlayerInMatchTeam(values).then((data) => {
+            const formation = values.formation;
+            updateFormation(formation).then(data => {
                 if (data && data.code == 200) {
                     if (data.data) {
-                        this.refresh();
-                        message.success('修改成功', 1);
+                        delete values.formation;
+                        modifyPlayerInMatchTeam(values).then((data) => {
+                            if (data && data.code == 200) {
+                                if (data.data) {
+                                    this.refresh();
+                                    message.success('修改成功', 1);
+                                } else {
+                                    message.warn(data.message, 1);
+                                }
+                            } else {
+                                message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
+                            }
+                        });
                     } else {
                         message.warn(data.message, 1);
                     }
                 } else {
-                    message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
+                    message.error('添加失败：' + (data ? data.result + "-" + data.message : data), 3);
                 }
-            });
+            })
             form.resetFields();
             this.setState({dialogModifyVisible: false});
         });
@@ -256,26 +276,26 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         let formation;
         let formationStr;
         if (type == KECHANG) {
-            if (this.state.data.guestteam && this.state.data.guestteam.formation) {
-                formation = this.state.data.guestteam.formation;
+            if (this.state.guestFormation) {
+                formation = this.state.guestFormation;
             }
         } else {
-            if (this.state.data.hostteam && this.state.data.hostteam.formation) {
-                formation = this.state.data.hostteam.formation;
+            if (this.state.hostFormation) {
+                formation = this.state.hostFormation;
             }
         }
         if (formation == null) {
             return null;
         }
-        formationStr = formation.type;
+        formationStr = this.getFormation(formation.type);
         let times = 12;
         const getColPlayer = (item, colWidth, type, formation) => {
             let dom_col = [];
             for (var i = 0; i < item; i++) {
                 times = times - 1;
                 let playerInfo;
-                if (formation.formation) {
-                    playerInfo = formation.formation[times];
+                if (formation.detail) {
+                    playerInfo = formation.detail[times];
                 }
                 dom_col.push(<Col span={colWidth} key={"player" + "-" + type + "-" + item + "-" + i}>
                     <div className="center flex-important" style={{WebkitTransform: 'perspective(1000)'}}>
@@ -286,7 +306,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
             }
             return dom_col;
         }
-        const formationList = this.getFormation(formationStr).split("-")
+        const formationList = formationStr.split("-")
         const divHeight = 250 * 3 / 4 / formationList.length;
         let dom = []
         for (var i = formationList.length - 1; i >= 0; i--) {
@@ -298,49 +318,57 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         }
         let playerInfo;
         if (formation) {
-            if (formation.formation) {
-                playerInfo = formation.formation[(times - 1)];
+            if (formation.detail) {
+                playerInfo = formation.detail[(times - 1)];
             }
         }
-        dom.push(<div className="center flex-important" style={{WebkitTransform: 'perspective(1000)'}} key={"player-gk" + "-" + type}>
+        dom.push(<div className="center flex-important" style={{WebkitTransform: 'perspective(1000)'}}
+                      key={"player-gk" + "-" + type}>
             <Avatar size="large" className={type == KECHANG ? "reverse" : ""}
                     src={playerInfo ? playerInfo.headImg : defultAvatar}/>
         </div>);
         return dom;
     }
     onHostFormationSelect = (e, op) => {
-        this.setState({
-            hostFormation: e,
-        });
-        if (this.state.data.hostteam.formation) {
-            this.updateFormation(this.state.data.hostteam.formation.id, e, ZHUCHANG)
-        }
+        // this.state.hostFormation.type = e
+        // this.setState({
+        //     hostFormation: this.state.hostFormation,
+        // });
+        this.updateFormation({
+            matchId: this.state.data.id,
+            teamId: this.state.data.hostTeamId,
+            value: e,
+            type: ZHUCHANG
+        })
     }
     onGuestFormationSelect = (e, op) => {
-        this.setState({
-            guestFormation: e,
-        });
-        if (this.state.data.guestteam.formation) {
-            this.updateFormation(this.state.data.guestteam.formation.id, e, KECHANG)
-        }
+        // this.state.guestFormation.type = e
+        // this.setState({
+        //     guestFormation: this.state.guestFormation,
+        // });
+        this.updateFormation({
+            matchId: this.state.data.id,
+            teamId: this.state.data.guestTeamId,
+            value: e,
+            type: KECHANG
+        })
     }
-    updateFormation = (id, value, type) => {
-        updateFormation({id: id, type: value}).then((data) => {
+    updateFormation = ({matchId, teamId, value, type}) => {
+        updateFormation({matchId: matchId, teamId: teamId, type: value}).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
-                    if (type == KECHANG) {
-                        this.state.data.guestteam.formation.type = value;
-                        this.setState({
-                            guestFormation: value,
-                            data: this.state.data
-                        });
-                    } else {
-                        this.state.data.hostteam.formation.type = value;
-                        this.setState({
-                            hostFormation: value,
-                            data: this.state.data
-                        });
-                    }
+                    // if (type == KECHANG) {
+                    //     this.state.guestFormation.type = value;
+                    //     this.setState({
+                    //         guestFormation: this.state.guestFormation,
+                    //     });
+                    // } else {
+                    //     this.state.hostFormation.type = value;
+                    //     this.setState({
+                    //         hostFormation: this.state.hostFormation,
+                    //     });
+                    // }
+                    this.refresh();
                     message.success('修改成功', 1);
                 }
             } else {
@@ -349,19 +377,16 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
         });
     }
     handleMatchPlayerDelete = () => {
-        const team = this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam : this.state.data.guestteam;
-        let tFormation = team.formation
-        for (var i = 1; i <= 11; i++) {
-            if (tFormation.detail[i] && tFormation.detail[i] == this.state.currentPlayer.id) {
-                delete tFormation.detail[i];
-            }
+        let teamId;
+        if (this.state.currentTeam == KECHANG) {
+            teamId = this.state.guestFormation.teamId
+        } else {
+            teamId = this.state.hostFormation.teamId
         }
-        modifyPlayerInMatchTeam({
+        deletePlayerInMatchTeam({
             matchId: this.props.matchId,
+            teamId: teamId,
             playerId: this.state.currentPlayer.id,
-            teamId: team.id,
-            isDelete: true,
-            formation: tFormation
         }).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
@@ -397,11 +422,11 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     <Card>
                         <div className="center">
                             <img className="round-img"
-                                 src={this.state.data ? this.state.data.hostteam.headImg : defultAvatar}/>
+                                 src={this.state.data ? this.state.data.hostTeam.headImg : defultAvatar}/>
                         </div>
                         <div className="center w-full">
                             <p style={{fontSize: 22}}
-                               className="mt-s mb-n">{this.state.data ? this.state.data.hostteam.name : ""}</p>
+                               className="mt-s mb-n">{this.state.data ? this.state.data.hostTeam.name : ""}</p>
                         </div>
                         <div className="center w-full">
                             <p className="mt-n">主队</p>
@@ -415,7 +440,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                             style={{minHeight: 400}}
                             size="small"
                             className="list-header-border-none"
-                            dataSource={this.state.hostdata ? this.state.hostdata : {}}
+                            dataSource={this.state.hostdata ? this.state.hostdata : []}
                             loading={this.state.hostloading}
                             renderItem={item => (
                                 <List.Item className="cursor-hand"
@@ -451,9 +476,9 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     <div className="playground">
                         <div className="w-full mb-m">
                             <p className="pull-left mt-n mb-n"
-                               style={{color: "#FFFFFF"}}>{this.state.data.guestteam.name}</p>
+                               style={{color: "#FFFFFF"}}>{this.state.data.guestTeam.name}</p>
                             <Select size="small"
-                                    value={this.state.guestFormation}
+                                    value={this.state.guestFormation ? this.state.guestFormation.type : 1}
                                     className="pull-right mt-ms-r mb-n"
                                     onSelect={onGuestFormationSelect}
                                     style={{minWidth: 100}}>
@@ -488,9 +513,9 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                         </div>
                         <div className="w-full mb-m">
                             <p className="pull-left mt-n mb-n"
-                               style={{color: "#FFFFFF"}}>{this.state.data.hostteam.name}</p>
+                               style={{color: "#FFFFFF"}}>{this.state.data.hostTeam.name}</p>
                             <Select size="small"
-                                    value={this.state.hostFormation}
+                                    value={this.state.hostFormation ? this.state.hostFormation.type : 1}
                                     className="pull-right mt-xxs mb-n"
                                     onSelect={onHostFormationSelect}
                                     style={{minWidth: 100}}>
@@ -509,11 +534,11 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                     <Card>
                         <div className="center">
                             <img className="round-img"
-                                 src={this.state.data ? this.state.data.guestteam.headImg : defultAvatar}/>
+                                 src={this.state.data ? this.state.data.guestTeam.headImg : defultAvatar}/>
                         </div>
                         <div className="center w-full">
                             <p style={{fontSize: 22}}
-                               className="mt-s mb-n">{this.state.data ? this.state.data.guestteam.name : ""}</p>
+                               className="mt-s mb-n">{this.state.data ? this.state.data.guestTeam.name : ""}</p>
                         </div>
                         <div className="center w-full">
                             <p className="mt-n">客队</p>
@@ -527,7 +552,7 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
                             style={{minHeight: 400}}
                             size="small"
                             className="list-header-border-none"
-                            dataSource={this.state.guestdata ? this.state.guestdata : {}}
+                            dataSource={this.state.guestdata ? this.state.guestdata : []}
                             loading={this.state.guestloading}
                             renderItem={item => (
                                 <List.Item className="cursor-hand"
@@ -571,8 +596,8 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
             >
                 <AddDialog
                     visible={this.state.dialogAddVisible}
-                    record={this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam : this.state.data.guestteam}
-                    formationId={this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam.formation.id : this.state.data.guestteam.formation.id}
+                    record={this.state.currentTeam == ZHUCHANG ? this.state.hostFormation : this.state.guestFormation}
+                    teamId={this.state.currentTeam == ZHUCHANG ? this.state.data.hostTeamId : this.state.data.guestTeamId}
                     matchId={this.props.matchId}
                     ref={this.saveMatchPlayerDialogRef}/>
             </Modal>
@@ -598,9 +623,9 @@ class FootBallMatchPlayersSettingPanel extends React.Component {
             >
                 <ModifyDialog
                     visible={this.state.dialogModifyVisible}
-                    record={this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam : this.state.data.guestteam}
-                    formationId={this.state.currentTeam == ZHUCHANG ? this.state.data.hostteam.formation.id : this.state.data.guestteam.formation.id}
+                    record={this.state.currentTeam == ZHUCHANG ? this.state.hostFormation : this.state.guestFormation}
                     matchId={this.props.matchId}
+                    teamId={this.state.currentTeam == ZHUCHANG ? this.state.data.hostTeamId : this.state.data.guestTeamId}
                     player={this.state.currentPlayer}
                     ref={this.saveMatchPlayerModifyDialogRef}/>
             </Modal>

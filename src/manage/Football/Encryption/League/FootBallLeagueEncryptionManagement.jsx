@@ -6,19 +6,17 @@ import {receiveData} from "../../../../action";
 import {connect} from "react-redux";
 import {getQueryString} from "../../../../utils";
 import {
-    getLeagueBetRule,
-    addLeagueBetRule,
-    updateLeagueBetRule,
-    deleteLeagueBetRule,
-    leagueBetAllMatch, getLeagueMatchById,
+    getLeagueEncryptionRule,
+    addLeagueEncryptionRule,
+    updateLeagueEncryptionRule,
+    leagueEncryptionAllMatch, getLeagueMatchById,
 } from "../../../../axios";
-import LeagueBetForm from "../League/LeagueBetForm";
+import LeagueEncryptionForm from "./LeagueEncryptionForm";
 import defultAvatar from "../../../../static/avatar.jpg";
-import NP from 'number-precision'
 
 const TabPane = Tabs.TabPane;
 
-class FootBallLeagueBetManagement extends React.Component {
+class FootBallLeagueEncryptionManagement extends React.Component {
     state = {
         data: {},
         leagueData: {},
@@ -33,13 +31,13 @@ class FootBallLeagueBetManagement extends React.Component {
         this.fetch({leagueId: currentLeague})
     }
     fetch = (params = {}) => {
-        getLeagueBetRule(params).then((data) => {
+        getLeagueEncryptionRule(params).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     data: data.data ? data.data : {},
                 });
             } else {
-                message.error('获取联赛竞猜规则失败：' + (data ? data.result + "-" + data.message : data), 3);
+                message.error('获取联赛加密规则失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
         getLeagueMatchById(params.leagueId).then(data => {
@@ -52,13 +50,13 @@ class FootBallLeagueBetManagement extends React.Component {
             }
         })
     }
-    saveBetSettingRef = (form) => {
+    saveEncryptionSettingRef = (form) => {
         this.form = form;
     }
-    betAll = () => {
+    encryptionAll = () => {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
-        this.setState({betAllLoading: true})
-        leagueBetAllMatch({leagueId: currentLeague}).then(data => {
+        this.setState({encryptionAllLoading: true})
+        leagueEncryptionAllMatch({leagueId: currentLeague}).then(data => {
             if (data && data.code == 200) {
                 if (data.data) {
                     message.success('修改成功', 1);
@@ -66,13 +64,13 @@ class FootBallLeagueBetManagement extends React.Component {
                 } else {
                     message.warn(data.message, 1);
                 }
-                this.setState({betAllLoading: false})
+                this.setState({encryptionAllLoading: false})
             } else {
                 message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         })
     }
-    handleBetSettingSubmit = (e) => {
+    handleEncryptionSettingSubmit = (e) => {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
         e.preventDefault();
         const form = this.form;
@@ -81,22 +79,9 @@ class FootBallLeagueBetManagement extends React.Component {
                 return;
             }
             values.leagueId = currentLeague;
-            if (values.settleExpireInterval) {
-                values.settleExpireInterval = values.settleExpireInterval * 24 * 60;
-            }
-            if (values.gradeInfo) {
-                for (let key in values.gradeInfo) {
-                    if (values.gradeInfo[key] && values.gradeInfo[key].awardDeposit) {
-                        values.gradeInfo[key].awardDeposit = NP.times(values.gradeInfo[key].awardDeposit, 100);
-                    }
-                    if (values.gradeInfo[key] && values.gradeInfo[key].price) {
-                        values.gradeInfo[key].price = NP.times(values.gradeInfo[key].price, 100);
-                    }
-                }
-            }
             this.setState({modifyLoading: true})
             if (this.state.data && this.state.data.id) {
-                updateLeagueBetRule(values).then(data => {
+                updateLeagueEncryptionRule(values).then(data => {
                     this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
@@ -110,7 +95,7 @@ class FootBallLeagueBetManagement extends React.Component {
                     }
                 })
             } else {
-                addLeagueBetRule(values).then(data => {
+                addLeagueEncryptionRule(values).then(data => {
                     this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
@@ -129,34 +114,32 @@ class FootBallLeagueBetManagement extends React.Component {
 
     render() {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
-        const BetSetting = Form.create()(LeagueBetForm);
+        const EncryptionSetting = Form.create()(LeagueEncryptionForm);
 
         return (
             <div className="gutter-example">
-                <BreadcrumbCustom first="竞猜" second="联赛"/>
+                <BreadcrumbCustom first="加密" second="联赛"/>
                 <Row gutter={16}>
                     <Col className="gutter-row">
                         <div className="gutter-box">
-                            <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false}
-                                  title={<div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
-                                      <Avatar
-                                          src={this.state.leagueData.headImg ? this.state.leagueData.headImg : defultAvatar}/>
-                                      <span className="ml-s">{this.state.leagueData.name}</span>
-                                  </div>}>
+                            <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false} title={<div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
+                                <Avatar src={this.state.leagueData.headImg ? this.state.leagueData.headImg : defultAvatar}/>
+                                <span className="ml-s">{this.state.leagueData.name}</span>
+                            </div>}>
                                 <Tabs>
-                                    <TabPane tab="竞猜设置" key="1">
+                                    <TabPane tab="加密设置" key="1">
                                         <div className="w-full center" style={{
                                             fontSize: 16,
                                             fontWeight: 'bold'
-                                        }}>{this.state.data && this.state.data.id ? "已开启竞猜" : "未开启竞猜"}</div>
-                                        <BetSetting
+                                        }}>{this.state.data && this.state.data.id ? "已开启加密" : "未开启加密"}</div>
+                                        <EncryptionSetting
                                             visible={true}
                                             record={this.state.data}
-                                            handleSubmit={this.handleBetSettingSubmit}
-                                            betAll={this.betAll}
-                                            betAllLoading={this.state.betAllLoading}
+                                            handleSubmit={this.handleEncryptionSettingSubmit}
+                                            encryptionAll={this.encryptionAll}
+                                            encryptionAllLoading={this.state.encryptionAllLoading}
                                             modifyLoading={this.state.modifyLoading}
-                                            ref={this.saveBetSettingRef}/>
+                                            ref={this.saveEncryptionSettingRef}/>
                                     </TabPane>
                                 </Tabs>
                             </Card>
@@ -178,4 +161,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FootBallLeagueBetManagement);
+export default connect(mapStateToProps, mapDispatchToProps)(FootBallLeagueEncryptionManagement);

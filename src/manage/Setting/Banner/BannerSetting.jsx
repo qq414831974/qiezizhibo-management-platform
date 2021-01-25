@@ -175,6 +175,7 @@ class BannerSetting extends React.Component {
                         header="茄子TV"
                         renderItem={(item) => (<List.Item className="pa-s">
                             <Card
+                                hoverable
                                 cover={<div className="h-full w-full center flex-important pt-m">
                                     <img
                                         alt="img"

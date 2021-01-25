@@ -9,20 +9,19 @@ import {
     Select,
     Progress,
     Checkbox,
-    Tooltip,
-    InputNumber,
+    Avatar, Tooltip, InputNumber, message,
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {uploadimg, getAreasList} from "../../../axios/index";
-import avatar from '../../../static/avatar.jpg';
-import {randomNum, toChinesNum} from '../../../utils/index';
-import {upload} from "../../../axios";
-import imgcover from '../../../static/imgcover.jpg';
-import {message} from "antd/lib/index";
+import {getAreasList, uploadimg} from "../../../../axios";
+import avatar from '../../../../static/avatar.jpg';
+import {randomNum, toChinesNum} from '../../../../utils';
+import {upload} from "../../../../axios";
+import imgcover from '../../../../static/imgcover.jpg';
+import defultAvatar from '../../../../static/avatar.jpg';
 
 moment.locale('zh-cn');
 
@@ -42,7 +41,7 @@ const formItemLayout = {
     },
 };
 
-class FootBallLeagueMatchAddDialog extends React.Component {
+class FootBallLeagueSeriesAddDialog extends React.Component {
     state = {}
 
     componentDidMount() {
@@ -164,23 +163,33 @@ class FootBallLeagueMatchAddDialog extends React.Component {
     getAreasOption = () => {
         let dom = [];
         this.state.areas.forEach((item) => {
-            dom.push(<Option value={item.province} data={item.province}
-                             key={`area-${item.id}`}>{item.province}</Option>);
+            dom.push(<Option value={item.province} data={item.province} key={`area-${item.id}`}>{item.province}</Option>);
         })
         return dom;
     }
 
     render() {
-        const {visible, form} = this.props;
+        const {visible, form, leagueData} = this.props;
 
         const isMobile = this.props.responsive.data.isMobile;
         const handlePosterChange = this.handlePosterChange;
+        const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (leagueData && leagueData.isLiveCharge);
+        const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (leagueData && leagueData.isRecordCharge);
+        const isMonopolyCharge = this.state.isMonopolyCharge != null ? this.state.isMonopolyCharge : (leagueData && leagueData.isMonopolyCharge);
+        const giftWatchRecordEnable = this.state.giftWatchRecordEnable != null ? this.state.giftWatchRecordEnable : (leagueData && leagueData.giftWatchRecordEnable);
 
         const {getFieldDecorator} = form;
         return (
             visible ?
                 <div>
                     <Form>
+                        <div className="w-full center">
+                            <div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
+                                <span>系列赛：</span>
+                                <Avatar src={leagueData.headImg ? leagueData.headImg : defultAvatar}/>
+                                <span className="ml-s">{leagueData.name}{leagueData.shortName ? "(" + leagueData.shortName + ")" : ""}</span>
+                            </div>
+                        </div>
                         <FormItem {...formItemLayout} className="bs-form-item round-div ml-l mb-s">
                             {getFieldDecorator('headImg', {
                                 // initialValue: logo,
@@ -214,16 +223,6 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 </Upload>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="系列赛" className="bs-form-item">
-                            {getFieldDecorator('isParent', {
-                                valuePropName: 'checked',
-                                onChange: (e) => {
-                                    this.setState({isSeries: e.target.checked})
-                                }
-                            })(
-                                <Checkbox/>
-                            )}
-                        </FormItem>
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
                                 rules: [{required: true, message: '请选择类型'}],
@@ -232,17 +231,6 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 <RadioGroup>
                                     <Radio value={1}>杯赛</Radio>
                                     <Radio value={2}>联赛</Radio>
-                                </RadioGroup>
-                            )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="地区类型" className="bs-form-item">
-                            {getFieldDecorator('areaType', {
-                                rules: [{required: true, message: '请选择类型'}],
-                                initialValue: 0
-                            })(
-                                <RadioGroup>
-                                    <Radio value={0}>默认</Radio>
-                                    <Radio value={1}>全国</Radio>
                                 </RadioGroup>
                             )}
                         </FormItem>
@@ -260,7 +248,6 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                         </FormItem>
                         <FormItem {...formItemLayout} label="英文名" className="bs-form-item">
                             {getFieldDecorator('englishName', {
-                                // initialValue: record.englishName,
                             })(
                                 <Input placeholder='请输入英文名'/>
                             )}
@@ -307,7 +294,7 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                     if (e == null) {
                                         return null
                                     }
-                                    if (typeof (e) === 'string') {
+                                    if (typeof(e) === 'string') {
                                         return e.replace(/[^\d]/g, '')
                                     }
                                     return e
@@ -443,6 +430,20 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 )}
                             </FormItem>
                         </div>
+                        <FormItem style={{margin: 0}}>
+                            {getFieldDecorator('parentId', {
+                                initialValue: leagueData.id,
+                            })(
+                                <Input hidden={true}/>
+                            )}
+                        </FormItem>
+                        <FormItem {...formItemLayout} className="bs-form-item">
+                            {getFieldDecorator('areaType', {
+                                initialValue: leagueData.areaType,
+                            })(
+                                <Input hidden={true}/>
+                            )}
+                        </FormItem>
                         <div className="center mt-m">
                             <Input style={{minWidth: 300, textAlign: "center"}} placeholder='封面地址'
                                    onChange={this.onPosterChange.bind(this, form)}
@@ -467,4 +468,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FootBallLeagueMatchAddDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(FootBallLeagueSeriesAddDialog);

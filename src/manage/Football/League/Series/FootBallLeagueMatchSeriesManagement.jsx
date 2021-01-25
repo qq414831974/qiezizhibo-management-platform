@@ -1,6 +1,6 @@
 import React from 'react';
-import {Row, Col, Card, Button, Table, Avatar, Modal} from 'antd';
-import BreadcrumbCustom from '../../Components/BreadcrumbCustom';
+import {Row, Col, Card, Button, Table, Avatar, Modal, Tooltip} from 'antd';
+import BreadcrumbCustom from '../../../Components/BreadcrumbCustom';
 import {
     getLeagueInfoBySeriesId,
     addLeagueIntoSeries,
@@ -8,14 +8,14 @@ import {
     getNoSeriesLeague,
     createLeagueMatch, updateLeagueMatchById,
     getLeagueMatchById, delLeagueMatchByIds, getwxacodeunlimit, chargeAllMatchByLeagueId,
-} from "../../../axios";
-import {parseTimeStringYMD} from "../../../utils";
+} from "../../../../axios";
+import {parseTimeStringYMD} from "../../../../utils";
 import copy from "copy-to-clipboard/index";
 import {Form, message} from "antd/lib/index";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {receiveData} from "../../../action";
-import defultAvatar from '../../../static/avatar.jpg';
+import {receiveData} from "../../../../action";
+import defultAvatar from '../../../../static/avatar.jpg';
 import FootBallLeagueMatchModifyDialog from "./FootBallLeagueSeriesModifyDialog";
 import FootBallLeagueMatchAddDialog from "./FootBallLeagueSeriesAddDialog";
 import {Link} from 'react-router-dom';
@@ -86,9 +86,6 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             }
             values["dateBegin"] = values["dateBegin"] ? values["dateBegin"].format('YYYY/MM/DD HH:mm:ss') : null;
             values["dateEnd"] = values["dateEnd"] ? values["dateEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             createLeagueMatch(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -113,9 +110,6 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             }
             values["dateBegin"] = values["dateBegin"] ? values["dateBegin"].format('YYYY/MM/DD HH:mm:ss') : null;
             values["dateEnd"] = values["dateEnd"] ? values["dateEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             updateLeagueMatchById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -170,7 +164,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
         });
     }
     removeRecord = () => {
-        removeLeagueIntoSeries({leagueId: this.state.record.id, parentId: this.state.record.parentid}).then(data => {
+        removeLeagueIntoSeries({leagueId: this.state.record.id, parentId: this.state.record.parentId}).then(data => {
             this.setState({deleteVisible: false, dialogModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -206,29 +200,9 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             this.removeRecord();
         }
     }
-    handleChargeAllCancel = () => {
-        this.setState({chargeAllVisible: false})
-    }
-    showChargeAllConfirm = () => {
-        this.setState({chargeAllVisible: true})
-    }
-    chargeAll = () => {
-        chargeAllMatchByLeagueId(this.state.record.id).then(data => {
-            if (data && data.code == 200) {
-                if (data.data) {
-                    this.setState({chargeAllVisible: false})
-                    message.success('修改成功', 1);
-                } else {
-                    message.warn(data.message, 1);
-                }
-            } else {
-                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
-            }
-        })
-    }
     genWxaCode = (record) => {
         let page;
-        if (record.isparent) {
+        if (record.isParent) {
             page = `pages/series/series`
         } else {
             page = `pages/leagueManager/leagueManager`
@@ -266,13 +240,31 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             dataIndex: 'name',
             width: '30%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
-                    <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
+                return <div className="cursor-hand" onClick={onNameClick.bind(this, record)}>
+                    <div className="center border-bottom-gray"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
+                        <p className="ml-s">{record.name}</p>
+                    </div>
+                    {record.shortName ? <div className="center">简称：{record.shortName}</div> : null}
                 </div>;
             },
         }, {
-            title: '地点',
+            title: '类型',
+            align: 'center',
+            dataIndex: 'isParent',
+            width: '5%',
+            render: function (text, record, index) {
+                let type = "联赛";
+                if (record.isParent) {
+                    type = "系列赛";
+                } else if (record.type == 1) {
+                    type = "杯赛";
+                } else if (record.type == 2) {
+                    type = "联赛";
+                }
+                return <span>{type}</span>
+            }
+        },{
+            title: '城市',
             align: 'center',
             dataIndex: 'country',
             width: '10%',
@@ -283,62 +275,88 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             title: '时间',
             align: 'center',
             dataIndex: 'dateBegin',
-            width: '20%',
+            width: '15%',
             render: function (text, record, index) {
-                return <p>{(record.dateBegin ? parseTimeStringYMD(record.dateBegin) : "-") + "~" + (record.dateEnd ? parseTimeStringYMD(record.dateEnd) : "-")}</p>
+                return <span>{(record.dateBegin ? parseTimeStringYMD(record.dateBegin) : "-") + "~" + (record.dateEnd ? parseTimeStringYMD(record.dateEnd) : "-")}</span>
+            }
+        },  {
+            title: '地区类型',
+            dataIndex: 'areaType',
+            key: 'areaType',
+            width: '5%',
+            align: 'center',
+            render: function (text, record, index) {
+                let area = "默认";
+                if (record.areaType) {
+                    switch (record.areaType) {
+                        case 0:
+                            area = "默认";
+                            break;
+                        case 1:
+                            area = "全国";
+                            break;
+                    }
+                }
+                return <span>{area}</span>
+            }
+        }, , {
+            title: '微信类型',
+            dataIndex: 'wechatType',
+            key: 'wechatType',
+            width: '5%',
+            align: 'center',
+            render: function (text, record, index) {
+                let type = "茄子tv";
+                if (record.wechatType) {
+                    switch (record.wechatType) {
+                        case 0:
+                            type = "茄子tv";
+                            break;
+                        case 1:
+                            type = "青少年";
+                            break;
+                    }
+                }
+                return <span>{type}</span>
             }
         }, {
-            title: '类型',
+            title: <Tooltip title="数字越大排名越前面"><span>排序</span></Tooltip>,
             align: 'center',
-            dataIndex: 'isparent',
+            dataIndex: 'sortIndex',
             width: '10%',
+        }, {
+            title: <span>轮播id</span>,
+            align: 'center',
+            width: '5%',
             render: function (text, record, index) {
-                return <p>{(record.isparent ? "系列赛" : "联赛")}</p>
+                return <p className="cursor-hand" onClick={() => {
+                    copy(`../leagueManager/leagueManager?id=${record.id}`);
+                    message.success('轮播链接已复制到剪贴板');
+                }}>{record.id ? `${record.id}` : "-"}</p>
             }
         }, {
-            title: '联系电话',
+            title: "小程序码",
             align: 'center',
-            dataIndex: 'phoneNumber',
-            width: '9%',
+            width: '5%',
             render: function (text, record, index) {
-                return <p>{record.phoneNumber ? record.phoneNumber : "-"}</p>
+                return <span onClick={genWxaCode.bind(this, record)}>生成</span>
+            }
+        }, {
+            title: "收益",
+            align: 'center',
+            width: '5%',
+            render: function (text, record, index) {
+                if (record.isParent) {
+                    return <span onClick={() => {
+                        message.warn("请前往系列赛中查看", 1);
+                    }
+                    } className="cursor-hand">查看</span>
+                }
+                return <Link to={
+                    `/analysis/bill?leagueId=${record.id}`
+                }><span className="cursor-hand">查看</span></Link>
             }
         },
-            {
-                title: "备注",
-                align: 'center',
-                dataIndex: 'remark',
-                width: '8%',
-            },
-            {
-                title: <span>轮播id</span>,
-                align: 'center',
-                width: '5%',
-                render: function (text, record, index) {
-                    return <p className="cursor-hand" onClick={() => {
-                        copy(`../leagueManager/leagueManager?id=${record.id}`);
-                        message.success('轮播链接已复制到剪贴板');
-                    }}>{record.id ? `${record.id}` : "-"}</p>
-                }
-            },
-            {
-                title: "小程序码",
-                align: 'center',
-                width: '4%',
-                render: function (text, record, index) {
-                    return <span onClick={genWxaCode.bind(this, record)}>生成</span>
-                }
-            },
-            {
-                title: "收益",
-                align: 'center',
-                width: '4%',
-                render: function (text, record, index) {
-                    return <Link to={
-                        `/analysis/bill?leagueId=${record.id}`
-                    }><span className="cursor-hand">查看</span></Link>
-                }
-            },
         ];
         const columns_mobile = [{
             title: '名字',
@@ -348,7 +366,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             render: function (text, record, index) {
                 return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.shortName ? "(" + record.shortName + ")" : ""}</p>
                 </div>;
             },
         }
@@ -412,7 +430,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                 <Modal
                     key="dialog-modify"
                     className={isMobile ? "top-n" : ""}
-                    width={700}
+                    width={800}
                     visible={this.state.dialogModifyVisible}
                     title="编辑球队"
                     okText="确定"
@@ -430,8 +448,10 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                                 `/football/footballMatch?leagueId=${this.state.record.id}`
                             }>浏览比赛</Link>
                         </Button>,
-                        <Button key="chargeall" type="primary" className="pull-left"
-                                onClick={this.showChargeAllConfirm}>全部收费</Button>,
+                        <Button key="charge" type="primary" className="pull-left"><Link to={
+                            `/football/league/charge?leagueId=${this.state.record.id}`
+                        }>收费</Link>
+                        </Button>,
                         <Button key="heat" type="primary" className="pull-left"><Link to={
                             `/football/league/heat?leagueId=${this.state.record.id}`
                         }>热度</Link></Button>,
@@ -442,6 +462,10 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                         <Button key="bet" type="primary" className="pull-left"><Link to={
                             `/football/league/clip?leagueId=${this.state.record.id}`
                         }>剪辑</Link>
+                        </Button>,
+                        <Button key="bet" type="primary" className="pull-left"><Link to={
+                            `/football/league/encryption?leagueId=${this.state.record.id}`
+                        }>加密</Link>
                         </Button>,
                         <Button key="delete" type="danger" className="pull-left"
                                 onClick={this.handleLeagueDelete}>删除</Button>,
@@ -486,17 +510,6 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                         visible={this.state.dialogAddSeriesVisible}
                         record={this.state.leagueData}
                         ref={this.saveAddLeagueDialogRef}/>
-                </Modal>
-                <Modal
-                    key="dialog-chargeall"
-                    className={isMobile ? "top-n" : ""}
-                    title="确认修改"
-                    visible={this.state.chargeAllVisible}
-                    onOk={this.chargeAll}
-                    onCancel={this.handleChargeAllCancel}
-                    zIndex={1001}
-                >
-                    <p style={{fontSize: 14}}>是否确认将联赛中的比赛全部设置为与联赛相同的收费方式？</p>
                 </Modal>
             </div>
         );

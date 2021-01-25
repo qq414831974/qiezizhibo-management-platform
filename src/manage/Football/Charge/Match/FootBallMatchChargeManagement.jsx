@@ -1,21 +1,21 @@
 import React from 'react';
-import {Row, Col, Card, Button, Tabs, message, Form} from 'antd';
+import {Row, Col, Card, Button, Tabs, message, Form, Tooltip} from 'antd';
 import BreadcrumbCustom from '../../../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../../../action";
 import {connect} from "react-redux";
 import {getQueryString} from "../../../../utils";
 import {
-    getMatchBetRule,
-    addMatchBetRule,
-    updateMatchBetRule,
+    getMatchChargeRule,
+    addMatchChargeRule,
+    updateMatchChargeRule,
 } from "../../../../axios";
-import MatchBetForm from "../Match/MatchBetForm";
+import MatchChargeForm from "./MatchChargeForm";
 import NP from 'number-precision'
 
 const TabPane = Tabs.TabPane;
 
-class FootBallMatchBetManagement extends React.Component {
+class FootBallMatchChargeManagement extends React.Component {
     state = {
         data: {},
     }
@@ -29,20 +29,22 @@ class FootBallMatchBetManagement extends React.Component {
         this.fetch({matchId: currentMatch})
     }
     fetch = (params = {}) => {
-        getMatchBetRule(params).then((data) => {
+        this.setState({loading: true})
+        getMatchChargeRule(params).then((data) => {
+            this.setState({loading: false})
             if (data && data.code == 200) {
                 this.setState({
                     data: data.data ? data.data : {},
                 });
             } else {
-                message.error('获取比赛竞猜规则失败：' + (data ? data.result + "-" + data.message : data), 3);
+                message.error('获取比赛充值规则失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
-    saveBetSettingRef = (form) => {
+    saveChargeSettingRef = (form) => {
         this.form = form;
     }
-    handleBetSettingSubmit = (e) => {
+    handleChargeSettingSubmit = (e) => {
         const currentMatch = getQueryString(this.props.location.search, "matchId");
         e.preventDefault();
         const form = this.form;
@@ -51,27 +53,27 @@ class FootBallMatchBetManagement extends React.Component {
                 return;
             }
             values.matchId = currentMatch;
-            if (values.settleExpireInterval) {
-                values.settleExpireInterval = values.settleExpireInterval * 24 * 60;
+            if (values.record) {
+                values.record.price = NP.times(values.record.price, 100)
+                values.record.priceMonthly = NP.times(values.record.priceMonthly, 100)
+                values.record.giftWatchPrice = NP.times(values.record.giftWatchPrice, 100)
+                values.record.giftWatchPriceMonthly = NP.times(values.record.giftWatchPriceMonthly, 100)
             }
-            if (values.gradeInfo) {
-                for (let key in values.gradeInfo) {
-                    if (values.gradeInfo[key] && values.gradeInfo[key].awardDeposit) {
-                        values.gradeInfo[key].awardDeposit = NP.times(values.gradeInfo[key].awardDeposit, 100);
-                    }
-                    if (values.gradeInfo[key] && values.gradeInfo[key].price) {
-                        values.gradeInfo[key].price = NP.times(values.gradeInfo[key].price, 100);
-                    }
-                }
+            if (values.live) {
+                values.live.price = NP.times(values.live.price, 100)
+                values.live.priceMonthly = NP.times(values.live.priceMonthly, 100)
+            }
+            if (values.monopoly) {
+                values.monopoly.price = NP.times(values.monopoly.price, 100)
             }
             this.setState({modifyLoading: true})
             if (this.state.data && this.state.data.id) {
-                updateMatchBetRule(values).then(data => {
+                updateMatchChargeRule(values).then(data => {
                     this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
-                            this.refresh();
                             message.success('修改成功', 1);
+                            this.refresh();
                         } else {
                             message.warn(data.message, 1);
                         }
@@ -80,12 +82,12 @@ class FootBallMatchBetManagement extends React.Component {
                     }
                 })
             } else {
-                addMatchBetRule(values).then(data => {
+                addMatchChargeRule(values).then(data => {
                     this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
+                            message.success('修改成功', 1);
                             this.refresh();
-                            message.success('添加成功', 1);
                         } else {
                             message.warn(data.message, 1);
                         }
@@ -99,26 +101,32 @@ class FootBallMatchBetManagement extends React.Component {
 
     render() {
         const currentMatch = getQueryString(this.props.location.search, "matchId");
-        const BetSetting = Form.create()(MatchBetForm);
+        const ChargeSetting = Form.create()(MatchChargeForm);
 
         return (
             <div className="gutter-example">
-                <BreadcrumbCustom first="竞猜" second="比赛"/>
+                <BreadcrumbCustom first="充值" second="比赛"/>
                 <Row gutter={16}>
                     <Col className="gutter-row">
                         <div className="gutter-box">
-                            <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false}>
+                            <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""}
+                                  bordered={false}>
                                 <Tabs>
-                                    <TabPane tab="竞猜设置" key="1">
-                                        <div className="w-full center" style={{
-                                            fontSize: 16,
-                                            fontWeight: 'bold'
-                                        }}>{this.state.data && this.state.data.id ? "已开启竞猜" : "未开启竞猜"}</div>
-                                        <BetSetting
+                                    <TabPane tab="充值设置" key="1">
+                                        <div style={{minHeight: 32,marginBottom: 10}}>
+                                            <Tooltip title="刷新">
+                                                <Button type="primary" shape="circle" icon="reload"
+                                                        className="pull-right"
+                                                        loading={this.state.loading}
+                                                        onClick={this.refresh}/>
+                                            </Tooltip>
+                                        </div>
+                                        <ChargeSetting
                                             visible={true}
                                             record={this.state.data}
-                                            handleSubmit={this.handleBetSettingSubmit}
-                                            ref={this.saveBetSettingRef}/>
+                                            handleSubmit={this.handleChargeSettingSubmit}
+                                            modifyLoading={this.state.modifyLoading}
+                                            ref={this.saveChargeSettingRef}/>
                                     </TabPane>
                                 </Tabs>
                             </Card>
@@ -140,4 +148,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FootBallMatchBetManagement);
+export default connect(mapStateToProps, mapDispatchToProps)(FootBallMatchChargeManagement);

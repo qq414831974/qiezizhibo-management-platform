@@ -2,6 +2,7 @@ import React from 'react';
 import {
     Form,
     Input,
+    Avatar,
     Select,
     Col,
     TreeSelect,
@@ -10,16 +11,18 @@ import {
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import defultAvatar from '../../../static/avatar.jpg';
-import {getPlayersByTeamId, getFormationById} from "../../../axios";
+import defultAvatar from '../../../../static/avatar.jpg';
+import {getPlayersByTeamId, getFormationByMatchTeam} from "../../../../axios";
 import {message} from "antd/lib/index";
 
+const Option = Select.Option;
 moment.locale('zh-cn');
 
 const FormItem = Form.Item;
+
 const formationData = {
     1: "4-3-3",
     2: "4-4-2",
@@ -74,7 +77,7 @@ const positions =
         {title: "左前锋", value: "lf"}, {title: "右边锋", value: "rw"}, {title: "右中锋", value: "rs"},
         {title: "中锋", value: "st"}, {title: "左中锋", value: "ls"}, {title: "左边锋", value: "lw"},];
 
-class FootBallMatchModifyPlayersDialog extends React.Component {
+class FootBallMatchAddPlayersDialog extends React.Component {
     state = {
         formationPosition: {},
         playerInfo: {}
@@ -94,7 +97,7 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
         this.setState({
             loading: true,
         });
-        getPlayersByTeamId(this.props.record.id, params).then((data) => {
+        getPlayersByTeamId(this.props.teamId, params).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     data: data.data ? data.data.records : "",
@@ -105,7 +108,7 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
                 message.error('获取队员列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
-        getFormationById(this.props.formationId).then((data) => {
+        getFormationByMatchTeam({matchId: this.props.matchId, teamId: this.props.teamId}).then((data) => {
             if (data && data.code == 200) {
                 if (data.data && data.data.detail == null) {
                     data.data.detail = {}
@@ -113,30 +116,10 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
                 this.setState({
                     formation: data.data ? data.data : "",
                 });
-                this.getPlayerFormationPosition(data.data ? data.data : "");
             } else {
                 message.error('获取阵型失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
-    }
-    getPlayerFormationPosition = (data) => {
-        if (data == null || data == "") {
-            return;
-        }
-        for (var i = 1; i <= 11; i++) {
-            if (data["detail"] && data["detail"][i] && data["detail"][i] == this.props.player.id) {
-                this.setState({
-                    playerPosition: i,
-                });
-                let tFormation = {}
-                tFormation["id"] = this.props.formationId;
-                tFormation["detail"] = {};
-                tFormation["detail"][i] = this.props.player.id;
-                this.props.form.setFieldsValue({
-                    formation: tFormation,
-                });
-            }
-        }
     }
     getPlayerInfo = (data) => {
         if (data == null || data == "") {
@@ -167,17 +150,35 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
         let i = 0;
         let position = [];
         let dom = [];
-        if (record.position.indexOf("[") != -1) {
-            position = eval(record.position);
-            position.forEach((item, index) => {
-                dom.push(<Tag key={i} color="#001529">{positionName(item)}</Tag>)
-                i = i + 1;
-            });
-        } else {
-            dom.push(<Tag key={i} color="#001529">{positionName(record.position)}</Tag>)
-        }
+        position = record.position;
+        position.forEach((item, index) => {
+            dom.push(<Tag key={i} color="#001529">{positionName(item)}</Tag>)
+            i = i + 1;
+        });
         return <div className="center">{dom}</div>;
     };
+    onPlayerSelect = (e, op) => {
+        this.setState({
+            player: op.props.data,
+            formationPosition: {},
+        });
+        this.props.form.setFieldsValue({
+            formation: null,
+        });
+    }
+    getPlayersOption = () => {
+        let dom = [];
+        this.state.data.forEach((item, index) => {
+            if (!this.isPlayerInFormation(item.id)) {
+                dom.push(<Option value={item.id} data={item} key={"selectOption-player-" + item.id}>{<div
+                    className="inline-p inline-div"><Avatar
+                    src={item.headImg}/><p
+                    className="ml-s mt-n mb-n">{`${item.name}(${item.shirtNum}号)`}</p>{this.getPosition(item)}
+                </div>}</Option>)
+            }
+        });
+        return dom;
+    }
     getHalfPlayer = () => {
         const formation = this.state.formation ? formationData[this.state.formation.type] : null
         if (formation == null) {
@@ -190,17 +191,15 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
                 times = times - 1;
                 let playerId = -1;
                 if (this.state.formation) {
-                    if (this.state.formation["detail"][times] && (this.state.status ? (this.state.status == 1) : (this.props.player.status == 1))) {
-                        if (this.state.formationPosition.id != this.state.formation["detail"][times]) {
-                            playerId = this.state.formation["detail"][times];
-                        }
+                    if (this.state.formation["detail"][times]) {
+                        playerId = this.state.formation["detail"][times];
                     }
                 }
                 if (times == this.state.formationPosition.position) {
                     playerId = this.state.formationPosition.id;
                 }
                 dom_col.push(<Col span={colWidth} key={"player" + "-" + item + "-" + i}>
-                    <div className="center flex-important">
+                    <div className="center">
                         <img
                             style={{width: "35px", height: "35px", borderRadius: "50%"}}
                             src={this.state.playerInfo[playerId] ? this.state.playerInfo[playerId].headImg : defultAvatar}/>
@@ -219,19 +218,19 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
         const formationList = formation.split("-")
         const divHeight = 250 * 3 / 4 / formationList.length;
         let dom = []
-        for (let i = formationList.length - 1; i >= 0; i--) {
+        for (var i = formationList.length - 1; i >= 0; i--) {
             dom.push(<div style={{height: divHeight}} key={"row-div" + "-" + i}>
-                <Row gutter={1} className="center flex-important" key={"row" + "-" + i}>
+                <Row gutter={1} className="center" key={"row" + "-" + i}>
                     {getColPlayer(formationList[i], Math.floor(24 / formationList[i]))}
                 </Row></div>);
         }
         let playerId = -1;
         if (this.state.formation) {
-            if (this.state.formation["detail"][1] && this.state.formation["detail"][1] != this.state.formationPosition.id) {
-                playerId = this.state.formation["detail"][1];
+            if (this.state.formation["detail"][(times - 1)]) {
+                playerId = this.state.formation["detail"][(times - 1)];
             }
         }
-        if (this.state.formationPosition.position == 1) {
+        if ((times - 1) == this.state.formationPosition.position) {
             playerId = this.state.formationPosition.id;
         }
         dom.push(<div className="center flex-important" key={"player-gk"}>
@@ -266,50 +265,17 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
     }
     onFormationPositionSelect = (e) => {
         this.setState({
-            formationPosition: {position: e, id: this.props.player.id,},
+            formationPosition: {position: e, id: this.state.player.id,},
         });
-        let tFormation = this.state.formation
+        let tFormation = this.props.record
         if (tFormation == null) {
             tFormation = {}
         }
-        tFormation["id"] = this.props.formationId;
         if (tFormation["detail"] == null) {
             tFormation["detail"] = {}
         }
-        for (let item in tFormation["detail"]) {
-            if (tFormation["detail"][item] != null && tFormation["detail"][item] == this.props.player.id) {
-                tFormation["detail"][item] = null;
-            }
-        }
-        tFormation["detail"][e] = this.props.player.id;
-        this.props.form.setFieldsValue({
-            formation: tFormation,
-        });
-    }
-    onStatusSelect = (e) => {
-        if (e == 1) {
-            this.setState({
-                status: e,
-            });
-            return;
-        }
-        this.setState({
-            formationPosition: {},
-            status: e,
-        });
-        let tFormation = this.state.formation
-        if (tFormation == null) {
-            tFormation = {}
-        }
-        tFormation["id"] = this.props.formationId;
-        if (tFormation["detail"] == null) {
-            tFormation["detail"] = {}
-        }
-        for (let item in tFormation["detail"]) {
-            if (tFormation["detail"][item] != null && tFormation["detail"][item] == this.props.player.id) {
-                tFormation["detail"][item] = null;
-            }
-        }
+        tFormation["detail"][e] = this.state.player.id;
+        tFormation["type"] = this.props.record && this.props.record.type ? this.props.record.type : 1
         this.props.form.setFieldsValue({
             formation: tFormation,
         });
@@ -320,53 +286,70 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
         if (tFormation == null) {
             tFormation = {}
         }
-        tFormation["id"] = this.props.formationId;
         if (tFormation["detail"] == null) {
             tFormation["detail"] = {}
         }
+        tFormation["type"] = this.props.record && this.props.record.type ? this.props.record.type : 1
         for (let i = 1; i < 12; i++) {
-            if(tFormation["detail"][i] == null){
+            if (tFormation["detail"][i] == null) {
                 dom.push(<Select.Option value={i}>{this.getPositionOption(i)}</Select.Option>);
             }
         }
         return dom;
     }
+    isPlayerInFormation = (playerId) => {
+        let tFormation = this.state.formation
+        if (tFormation == null) {
+            tFormation = {}
+        }
+        if (tFormation["detail"] == null) {
+            tFormation["detail"] = {}
+        }
+        tFormation["type"] = this.props.record && this.props.record.type ? this.props.record.type : 1
+        for (let item in tFormation["detail"]) {
+            if (tFormation["detail"][item] != null && tFormation["detail"][item] == playerId) {
+                return true
+            }
+        }
+        return false;
+    }
 
     render() {
-        const {visible, form, record, matchId, player} = this.props;
+        const {visible, form, record, matchId} = this.props;
         const {getFieldDecorator} = form;
+        const getPlayersOption = this.getPlayersOption;
+        const onPlayerSelect = this.onPlayerSelect;
         const getHalfPlayer = this.getHalfPlayer;
         const getPositionOption = this.getPositionOption;
         const onFormationPositionSelect = this.onFormationPositionSelect;
-        const onStatusSelect = this.onStatusSelect;
         return (
             visible ?
                 <div>
                     <Form>
                         <Row gutter={8}>
                             <Col span={12}>
-                                <div hidden={true}>
+                                <div className="center w-full mb-m">
                                     <FormItem className="bs-form-item">
-                                        {getFieldDecorator('playerId', {
-                                            initialValue: player.id
-                                        })(
-                                            <Input/>
+                                        {getFieldDecorator('playerId', {})(
+                                            <Select size="large" style={{minWidth: 180}} onSelect={onPlayerSelect}>
+                                                {this.state.data ? getPlayersOption() : null}
+                                            </Select>
                                         )}
                                     </FormItem>
                                 </div>
                                 <div className="center">
                                     <img className="round-img"
-                                         src={this.props.player ? this.props.player.headImg : defultAvatar}/>
+                                         src={this.state.player ? this.state.player.headImg : defultAvatar}/>
                                 </div>
                                 <div className="center w-full">
                                     <p style={{fontSize: 22}}
-                                       className="mt-s mb-n">{this.props.player ? this.props.player.name : ""}</p>
+                                       className="mt-s mb-n">{this.state.player ? this.state.player.name : ""}</p>
                                 </div>
-                                <div className="center w-full mb-m" hidden={this.props.player ? false : true}>
+                                <div className="center w-full mb-m" hidden={this.state.player ? false : true}>
                                     <FormItem className="bs-form-item">
                                         {getFieldDecorator('position', {
                                             rules: [{required: true, message: '请选择位置!'}],
-                                            initialValue: this.props.player ? this.props.player.position : "",
+                                            initialValue: this.state.player ? this.state.player.position : "",
                                         })(
                                             <TreeSelect className="select-center"
                                                         style={{minWidth: 180}}
@@ -381,18 +364,19 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
                                         )}
                                     </FormItem>
                                 </div>
-                                <div className="center w-full mb-m" hidden={this.props.player ? false : true}>
+                                <div className="center w-full mb-m" hidden={this.state.player ? false : true}>
                                     <FormItem className="bs-form-item">
                                         {getFieldDecorator('status', {
-                                            initialValue: this.props.player ? this.props.player.status : ""
+                                            initialValue: this.state.player ? this.state.player.status : ""
                                         })(
                                             <Select placeholder="是否首发"
                                                     className="select-center"
-                                                    style={{minWidth: 180}}
-                                                    onChange={onStatusSelect}>
+                                                    style={{minWidth: 180}}>
                                                 <Select.Option value={1}><p className="center mb-n mt-n">首发</p>
                                                 </Select.Option>
                                                 <Select.Option value={2}><p className="center mb-n mt-n">替补</p>
+                                                </Select.Option>
+                                                <Select.Option value={3}><p className="center mb-n mt-n">队员</p>
                                                 </Select.Option>
                                             </Select>
                                         )}
@@ -403,7 +387,7 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
                                     <Select
                                         placeholder="选择位置"
                                         size="large"
-                                        value={this.state.formationPosition.position ? this.state.formationPosition.position : this.state.playerPosition}
+                                        value={this.state.formationPosition.position}
                                         className="select-center"
                                         style={{maxWidth: 180}}
                                         onChange={onFormationPositionSelect}>
@@ -413,7 +397,7 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
                                 <div hidden={true}>
                                     <FormItem className="bs-form-item">
                                         {getFieldDecorator('formation', {
-                                            initialValue: record.formation ? record.formation : null
+                                            // initialValue: record.formation ? record.formation : null
                                         })(
                                             <Input/>
                                         )}
@@ -422,7 +406,7 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
                                 <div hidden={true}>
                                     <FormItem className="bs-form-item">
                                         {getFieldDecorator('playerId', {
-                                            initialValue: this.props.player ? this.props.player.id : ""
+                                            initialValue: this.state.player ? this.state.player.id : ""
                                         })(
                                             <Input/>
                                         )}
@@ -449,7 +433,7 @@ class FootBallMatchModifyPlayersDialog extends React.Component {
                                 <div hidden={true}>
                                     <FormItem className="bs-form-item">
                                         {getFieldDecorator('shirtNum', {
-                                            initialValue: this.props.player ? this.props.player.shirtNum : ""
+                                            initialValue: this.state.player ? this.state.player.shirtNum : ""
                                         })(
                                             <Input/>
                                         )}
@@ -495,4 +479,4 @@ const mapDispatchToProps = dispatch => ({
     receiveData: bindActionCreators(receiveData, dispatch)
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FootBallMatchModifyPlayersDialog);
+export default connect(mapStateToProps, mapDispatchToProps)(FootBallMatchAddPlayersDialog);

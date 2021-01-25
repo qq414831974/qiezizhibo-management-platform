@@ -5,7 +5,7 @@ import {
     Icon,
     DatePicker,
     Col,
-    Upload,
+    Upload, Select,
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
@@ -18,6 +18,7 @@ import avatar from '../../../static/avatar.jpg';
 moment.locale('zh-cn');
 
 const FormItem = Form.Item;
+const Option = Select.Option;
 
 const formItemLayout = {
     labelCol: {
@@ -104,6 +105,13 @@ class FootBallTeamAddDialog extends React.Component {
                                 <Input placeholder='请输入名字'/>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} label="简称" className="bs-form-item">
+                            {getFieldDecorator('shortName', {
+                                // initialValue: record.englishName,
+                            })(
+                                <Input placeholder='请输入简称'/>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="英文名" className="bs-form-item">
                             {getFieldDecorator('englishName', {
                                 // initialValue: record.englishName,
@@ -111,13 +119,20 @@ class FootBallTeamAddDialog extends React.Component {
                                 <Input placeholder='请输入英文名'/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="国籍" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="国家" className="bs-form-item">
+                            {getFieldDecorator('country', {
+                                initialValue: "中国",
+                            })(
+                                <Input placeholder='请输入国家'/>
+                            )}
+                        </FormItem>
+                        <FormItem {...formItemLayout} label="地区" className="bs-form-item">
                             <Col span={11}>
                                 <FormItem>
-                                    {getFieldDecorator('country', {
-                                        // initialValue: record.country,
+                                    {getFieldDecorator('province', {
+                                        // initialValue: record.province,
                                     })(
-                                        <Input placeholder='请输入国家'/>
+                                        <Input placeholder='请输入省份'/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -135,25 +150,15 @@ class FootBallTeamAddDialog extends React.Component {
                                 </FormItem>
                             </Col>
                         </FormItem>
-                        <FormItem {...formItemLayout} label="所属人/单位" className="bs-form-item">
-                            {getFieldDecorator('owner', {
-                                // initialValue: record.owner,
+                        <FormItem {...formItemLayout} label="微信类型" className="bs-form-item">
+                            {getFieldDecorator('wechatType', {
+                                initialValue: 0,
                             })(
-                                <Input placeholder='请输入所属人/单位'/>
-                            )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="口号" className="bs-form-item">
-                            {getFieldDecorator('slogan', {
-                                // initialValue: record.slogan,
-                            })(
-                                <Input placeholder='请输入口号'/>
-                            )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="创建日" className="bs-form-item">
-                            {getFieldDecorator('birthdate', {
-                                // initialValue: moment(record.birthdate),
-                            })(
-                                <DatePicker placeholder='请输入创建日' format={'YYYY-MM-DD'}/>
+                                <Select placeholder='请选择微信类型!'>
+                                    <Option value={0} key={"wechatType-0"}>茄子TV</Option>
+                                    <Option value={1} key={"wechatType-1"}>青少年</Option>
+                                    <Option value={2} key={"wechatType-2"}>茄子FC</Option>
+                                </Select>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="备注" className="bs-form-item">

@@ -19,6 +19,7 @@ import avatar from '../../../static/avatar.jpg';
 
 moment.locale('zh-cn');
 
+const Option = Select.Option;
 const FormItem = Form.Item;
 
 const formItemLayout = {
@@ -175,13 +176,20 @@ class FootBallPlayerAddDialog extends React.Component {
                                             }}/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="国籍" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="国家" className="bs-form-item">
+                            {getFieldDecorator('country', {
+                                initialValue: "中国",
+                            })(
+                                <Input placeholder='请输入国家'/>
+                            )}
+                        </FormItem>
+                        <FormItem {...formItemLayout} label="地区" className="bs-form-item">
                             <Col span={11}>
                                 <FormItem>
-                                    {getFieldDecorator('country', {
-                                        // initialValue: record.country,
+                                    {getFieldDecorator('province', {
+                                        // initialValue: record.province,
                                     })(
-                                        <Input placeholder='请输入国家'/>
+                                        <Input placeholder='请输入省份'/>
                                     )}
                                 </FormItem>
                             </Col>
@@ -199,16 +207,9 @@ class FootBallPlayerAddDialog extends React.Component {
                                 </FormItem>
                             </Col>
                         </FormItem>
-                        <FormItem {...formItemLayout} label="生日" className="bs-form-item">
-                            {getFieldDecorator('birthdate', {
-                                // initialValue: moment(record.birthdate),
-                            })(
-                                <DatePicker placeholder='请输入生日' format={'YYYY-MM-DD'}/>
-                            )}
-                        </FormItem>
                         <FormItem {...formItemLayout} label="性别" className="bs-form-item">
                             {getFieldDecorator('sex', {
-                                initialValue: "1",
+                                initialValue: 1,
                             })(
                                 <Select style={{maxWidth: 150}}>
                                     <Select.Option value={1}>男</Select.Option>
@@ -230,6 +231,17 @@ class FootBallPlayerAddDialog extends React.Component {
                             })(
                                 <Input style={{maxWidth: 150}} placeholder='请输入体重'
                                        addonAfter={<p style={{width: 20, marginBottom: 0}}>kg</p>}/>
+                            )}
+                        </FormItem>
+                        <FormItem {...formItemLayout} label="微信类型" className="bs-form-item">
+                            {getFieldDecorator('wechatType', {
+                                initialValue: 0,
+                            })(
+                                <Select placeholder='请选择微信类型!'>
+                                    <Option value={0} key={"wechatType-0"}>茄子TV</Option>
+                                    <Option value={1} key={"wechatType-1"}>青少年</Option>
+                                    <Option value={2} key={"wechatType-2"}>茄子FC</Option>
+                                </Select>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="备注" className="bs-form-item">

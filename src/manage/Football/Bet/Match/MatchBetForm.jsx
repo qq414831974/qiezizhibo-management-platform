@@ -19,7 +19,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {upload} from "../../../../axios";
 import imgcover from "../../../../static/imgcover.jpg";
-
+import NP from 'number-precision'
 
 const Option = Select.Option;
 const {Panel} = Collapse;
@@ -47,11 +47,11 @@ class MatchBetForm extends React.Component {
 
     componentDidMount() {
         const {form, record} = this.props;
-        if (record.gradeInfos) {
+        if (record.gradeInfo) {
             const grades = this.state.grades;
             const gradeAwardRadio = this.state.gradeAwardRadio;
             let index = 0;
-            record.gradeInfos.forEach(item => {
+            record.gradeInfo.forEach(item => {
                 grades.push({
                     index: index,
                     price: item.price,
@@ -120,7 +120,7 @@ class MatchBetForm extends React.Component {
                 <Row gutter={10}>
                     <Col span={0}>
                         <FormItem hidden className="bs-form-item">
-                            {getFieldDecorator(`gradeInfos[${i}].grade`, {
+                            {getFieldDecorator(`gradeInfo[${i}].grade`, {
                                 rules: [{required: true, message: '请输入档位!'}],
                                 initialValue: i,
                             })(
@@ -135,19 +135,18 @@ class MatchBetForm extends React.Component {
                     </Col>
                     <Col span={9}>
                         <FormItem {...formItemLayout} label="价格：" className="bs-form-item">
-                            {getFieldDecorator(`gradeInfos[${i}].price`, {
+                            {getFieldDecorator(`gradeInfo[${i}].price`, {
                                 rules: [{required: true, message: '请输入价格!'}],
-                                initialValue: grades[i].price,
+                                initialValue: grades[i].price ? NP.divide(grades[i].price, 100) : null,
                             })(
-                                <InputNumber
-                                    formatter={value => `${value}分`}
-                                    parser={value => value.replace('分', '')}
+                                <Input
+                                    addonAfter="元/茄币"
                                     className="w-full"
                                     placeholder='请输入价格!'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="消耗免费次数：" className="bs-form-item">
-                            {getFieldDecorator(`gradeInfos[${i}].freeTime`, {
+                            {getFieldDecorator(`gradeInfo[${i}].freeTime`, {
                                 rules: [{required: true, message: '请输入消耗免费次数!'}],
                                 initialValue: grades[i].freeTime,
                             })(
@@ -169,16 +168,17 @@ class MatchBetForm extends React.Component {
                         </div>
                         {this.state.gradeAwardRadio[i] == "money" ?
                             <FormItem {...formItemLayout} label="茄币：" className="bs-form-item">
-                                {getFieldDecorator(`gradeInfos[${i}].awardDeposit`, {
+                                {getFieldDecorator(`gradeInfo[${i}].awardDeposit`, {
                                     rules: [{required: true, message: '请输入茄币!'}],
-                                    initialValue: grades[i].awardDeposit,
+                                    initialValue: grades[i].awardDeposit ? NP.divide(grades[i].awardDeposit, 100) : null,
                                 })(
-                                    <InputNumber
+                                    <Input
+                                        addonAfter="元/茄币"
                                         className="w-full"
                                         placeholder='请输入茄币!'/>
                                 )}
                             </FormItem> : <FormItem {...formItemLayout} label="奖品：" className="bs-form-item">
-                                {getFieldDecorator(`gradeInfos[${i}].award`, {
+                                {getFieldDecorator(`gradeInfo[${i}].award`, {
                                     rules: [{required: true, message: '请输入奖品!'}],
                                     initialValue: grades[i].award,
                                 })(
@@ -205,6 +205,7 @@ class MatchBetForm extends React.Component {
             gradeAwardRadio: this.state.gradeAwardRadio,
         });
     }
+
     render() {
         const {visible, form, record} = this.props;
         const {getFieldDecorator} = form;
@@ -215,7 +216,7 @@ class MatchBetForm extends React.Component {
                 <Form onSubmit={this.props.handleSubmit}>
                     <FormItem {...formItemLayout} label="开启" className="bs-form-item">
                         {getFieldDecorator('available', {
-                            initialValue: record.available != null ? record.available : true,
+                            initialValue: record.available != null ? record.available : false,
                             valuePropName: 'checked',
                             rules: [{required: true, message: '请选择是否开始!'}],
                         })(

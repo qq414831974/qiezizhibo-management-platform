@@ -109,13 +109,6 @@ class FootBallTeamAddPlayersDialog extends React.Component {
                                 <Input hidden={true}/>
                             )}
                         </FormItem>
-                        <FormItem {...formItemLayout} label="入队日期" className="bs-form-item">
-                            {getFieldDecorator('joinTime', {
-                                // initialValue: moment(),
-                            })(
-                                <DatePicker placeholder='请输入入队日期' format={'YYYY/MM/DD'}/>
-                            )}
-                        </FormItem>
                         <FormItem style={{margin:0}}>
                             {getFieldDecorator('playerId', {
                                 initialValue: record.id,

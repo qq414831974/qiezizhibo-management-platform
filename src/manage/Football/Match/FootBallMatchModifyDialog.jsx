@@ -88,8 +88,8 @@ class FootBallMatchModifyDialog extends React.Component {
         }
         this.fetch();
         this.setState({
-            hostTeam: this.props.record.hostteam,
-            guestTeam: this.props.record.guestteam
+            hostTeam: this.props.record.hostTeam,
+            guestTeam: this.props.record.guestTeam
         });
         this.setState({currentLeague: this.props.record.league})
     };
@@ -105,7 +105,7 @@ class FootBallMatchModifyDialog extends React.Component {
             getTeamInLeague(league.id).then(res => {
                 if (res && res.code == 200) {
                     this.setState({
-                        data: res.data,
+                        data: res.data.records,
                         teamloading: false
                     });
                 }
@@ -119,7 +119,7 @@ class FootBallMatchModifyDialog extends React.Component {
             }).then((data) => {
                 if (data && data.code == 200) {
                     this.setState({
-                        data: data.data ? data.data.records : "",
+                        data: data.data ? data.data.records : [],
                         teamloading: false,
                     });
                 } else {
@@ -146,7 +146,7 @@ class FootBallMatchModifyDialog extends React.Component {
         this.setState({
             listloading: true,
         });
-        getActivityInfoList({sortField: "createdAt", sortOrder: "desc", ...params}).then((data) => {
+        getActivityInfoList({sortField: "createTime", sortOrder: "desc", ...params}).then((data) => {
             if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
@@ -202,12 +202,12 @@ class FootBallMatchModifyDialog extends React.Component {
         const startTime = moment(this.props.form.getFieldValue('startTime')).subtract(30, "m");
         const endTime = moment(this.props.form.getFieldValue('startTime')).add(210, "m");
         let data = {}
-        data.startedAt = this.state.liveStartTime ? this.state.liveStartTime : startTime;
-        data.endedAt = this.state.liveEndTime ? this.state.liveEndTime : endTime;
+        data.startTime = this.state.liveStartTime ? this.state.liveStartTime : startTime;
+        data.endTime = this.state.liveEndTime ? this.state.liveEndTime : endTime;
         data.name = this.state.createLivename ? this.state.createLivename : this.props.form.getFieldValue('name');
         data.areatype = 0;
-        data.startedAt = data.startedAt ? moment(data.startedAt).format('YYYY/MM/DD HH:mm:ss') : null;
-        data.endedAt = data.endedAt ? moment(data.endedAt).format('YYYY/MM/DD HH:mm:ss') : null;
+        data.startTime = data.startTime ? moment(data.startTime).format('YYYY/MM/DD HH:mm:ss') : null;
+        data.endTime = data.endTime ? moment(data.endTime).format('YYYY/MM/DD HH:mm:ss') : null;
         this.setState({
             liveloading: true,
         });
@@ -419,15 +419,15 @@ class FootBallMatchModifyDialog extends React.Component {
     onTeamClick = () => {
         this.fetch();
     }
-    onActivityCheckedChange = (e) => {
-        const {form} = this.props;
-        this.setState({activityChecked: e.target.checked})
-        if (e.target.checked) {
-            form.setFieldsValue({activityId: null, activityOld: form.getFieldValue("activityId")})
-        } else {
-            form.setFieldsValue({activityId: form.getFieldValue("activityOld"), activityOld: null})
-        }
-    }
+    // onActivityCheckedChange = (e) => {
+    //     const {form} = this.props;
+    //     this.setState({activityChecked: e.target.checked})
+    //     if (e.target.checked) {
+    //         form.setFieldsValue({activityId: null, activityOld: form.getFieldValue("activityId")})
+    //     } else {
+    //         form.setFieldsValue({activityId: form.getFieldValue("activityOld"), activityOld: null})
+    //     }
+    // }
     getPlaceSelecter = () => {
         const league = this.state.league || (this.props.record ? this.props.record.league : null)
         let dom = []
@@ -531,7 +531,7 @@ class FootBallMatchModifyDialog extends React.Component {
                             <div className="cursor-hand" onClick={onLivelistClick.bind(this, form, item)}>
                                 <p style={{fontSize: 14}}>{item.name}</p>
                                 <p className="mb-n"
-                                   style={{fontSize: 10}}>{parseTimeStringWithOutYear(item.startedAt)}~{parseTimeStringWithOutYear(item.endedAt)}</p>
+                                   style={{fontSize: 10}}>{parseTimeStringWithOutYear(item.startTime)}~{parseTimeStringWithOutYear(item.endTime)}</p>
                             </div>
                         </List.Item>
                     )}
@@ -547,7 +547,7 @@ class FootBallMatchModifyDialog extends React.Component {
                     <Form>
                         <div className="center w-full mb-m">
                             <FormItem {...formItemLayout} className="bs-form-item">
-                                {getFieldDecorator('leaguematchId', {
+                                {getFieldDecorator('leagueId', {
                                     // rules: [{required: true, message: '请选择联赛!'}],
                                     initialValue: record.league ? record.league.id : null,
                                 })(
@@ -566,7 +566,7 @@ class FootBallMatchModifyDialog extends React.Component {
                                     <FormItem {...formItemLayout} className="bs-form-item">
                                         {getFieldDecorator('hostTeamId', {
                                             // rules: [{required: true, message: '请选择主队!'}],
-                                            initialValue: record.hostteam ? record.hostteam.id : null,
+                                            initialValue: record.hostTeam ? record.hostTeam.id : null,
                                         })(
                                             <Select size="large" style={{minWidth: 150}}
                                                     onSelect={onHostSelect}
@@ -610,7 +610,7 @@ class FootBallMatchModifyDialog extends React.Component {
                                     <FormItem {...formItemLayout} className="bs-form-item">
                                         {getFieldDecorator('guestTeamId', {
                                             // rules: [{required: true, message: '请选择客队!'}],
-                                            initialValue: record.guestteam ? record.guestteam.id : null,
+                                            initialValue: record.guestTeam ? record.guestTeam.id : null,
                                         })(
                                             <Select size="large" style={{minWidth: 150}}
                                                     onSelect={onGuestSelect}
@@ -658,8 +658,8 @@ class FootBallMatchModifyDialog extends React.Component {
                                 </div>
                                 <div className="center w-full mt-m">
                                     <FormItem {...formItemLayout} className="bs-form-item center">
-                                        {getFieldDecorator('hostnooice', {
-                                            initialValue: record.hostnooice,
+                                        {getFieldDecorator('hostNooice', {
+                                            initialValue: record.hostNooice,
                                         })(
                                             <Input placeholder="点赞数"
                                                    disabled={this.state.hostTeam == null || this.state.guestTeam == null}
@@ -743,8 +743,8 @@ class FootBallMatchModifyDialog extends React.Component {
                                 </div>
                                 <div className="center w-full mt-m">
                                     <FormItem {...formItemLayout} className="bs-form-item center">
-                                        {getFieldDecorator('guestnooice', {
-                                            initialValue: record.guestnooice,
+                                        {getFieldDecorator('guestNooice', {
+                                            initialValue: record.guestNooice,
                                         })(
                                             <Input placeholder="点赞数"
                                                    disabled={this.state.hostTeam == null || this.state.guestTeam == null}
@@ -781,47 +781,19 @@ class FootBallMatchModifyDialog extends React.Component {
                             </FormItem>
                         </div>
                         <div className="center w-full">
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('playPath', {
-                                    initialValue: record.playPath,
-                                })(
-                                    <Input hidden={true}/>
-                                )}
-                            </FormItem>
-                        </div>
-                        <div className="center w-full">
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('activityId', {
-                                    initialValue: record.activityId,
-                                })(
-                                    <Input hidden={true}/>
-                                )}
-                            </FormItem>
-                        </div>
-                        <div className="center w-full">
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('activityOld', {
-                                    initialValue: record.activityOld,
-                                })(
-                                    <Input hidden={true}/>
-                                )}
-                            </FormItem>
-                        </div>
-                        <div className="center w-full">
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('id', {
-                                    initialValue: record.id,
-                                })(
-                                    <Input hidden={true}/>
-                                )}
-                            </FormItem>
-                        </div>
-                        <div className="center w-full">
                             <p className="mt-m" style={{fontSize: 22}}>直播间</p>
                             <span>是否关闭：</span>
-                            <Checkbox
-                                checked={this.state.activityChecked ? this.state.activityChecked : (form.getFieldValue("activityOld") != null)}
-                                onChange={this.onActivityCheckedChange}/>
+                            <FormItem className="bs-form-item">
+                                {getFieldDecorator('available', {
+                                    initialValue: record.available != null ? !record.available : false,
+                                    valuePropName: "checked"
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                            {/*<Checkbox*/}
+                            {/*    checked={this.state.activityChecked ? this.state.activityChecked : (form.getFieldValue("activityOld") != null)}*/}
+                            {/*    onChange={this.onActivityCheckedChange}/>*/}
                         </div>
                         <div className="center w-full">
                             {this.state.currentLiveData ?
@@ -864,176 +836,6 @@ class FootBallMatchModifyDialog extends React.Component {
                         {/*</FormItem>*/}
                         {/*</div>*/}
                         <div className="center w-full">
-                            <span className="mb-n mt-m" style={{fontSize: 20}}>收费设置</span>
-                        </div>
-                        <div className="center w-full">
-                            <span>直播收费：</span>
-                            <FormItem {...formItemLayout} className="bs-form-item">
-                                {getFieldDecorator('isLiveCharge', {
-                                    initialValue: record ? record.isLiveCharge : false,
-                                    valuePropName: 'checked',
-                                    onChange: (e) => {
-                                        this.setState({isLiveCharge: e.target.checked})
-                                    }
-                                })(
-                                    <Checkbox/>
-                                )}
-                            </FormItem>
-                            {isLiveCharge ? <FormItem {...formItemLayout}
-                                                      className="bs-form-item">
-                                {getFieldDecorator('livePrice', {
-                                    initialValue: record ? record.livePrice : null,
-                                    rules: [{required: true, message: '请输入价格'}],
-                                })(
-                                    <Input addonBefore="永久" addonAfter="分" placeholder='请输入价格'/>
-                                )}
-                            </FormItem> : null}
-                            {isLiveCharge ? <FormItem {...formItemLayout}
-                                                      className="bs-form-item">
-                                {getFieldDecorator('liveMonthPrice', {
-                                    initialValue: record ? record.liveMonthPrice : null,
-                                    rules: [{required: true, message: '请输入价格'}],
-                                })(
-                                    <Input addonBefore="一月" addonAfter="分" placeholder='请输入价格'/>
-                                )}
-                            </FormItem> : null}
-                        </div>
-                        <div className="center w-full">
-                            <span>录播收费：</span>
-                            <FormItem {...formItemLayout} className="bs-form-item">
-                                {getFieldDecorator('isRecordCharge', {
-                                    initialValue: record ? record.isRecordCharge : false,
-                                    valuePropName: 'checked',
-                                    onChange: (e) => {
-                                        this.setState({isRecordCharge: e.target.checked})
-                                    }
-                                })(
-                                    <Checkbox/>
-                                )}
-                            </FormItem>
-                            {isRecordCharge ? <FormItem {...formItemLayout}
-                                                        className="bs-form-item">
-                                {getFieldDecorator('recordPrice', {
-                                    initialValue: record ? record.recordPrice : null,
-                                    rules: [{required: true, message: '请输入价格'}],
-                                })(
-                                    <Input addonBefore="永久" addonAfter="分" placeholder='请输入价格'/>
-                                )}
-                            </FormItem> : null}
-                            {isRecordCharge ? <FormItem {...formItemLayout}
-                                                        className="bs-form-item">
-                                {getFieldDecorator('recordMonthPrice', {
-                                    initialValue: record ? record.recordMonthPrice : null,
-                                    rules: [{required: true, message: '请输入价格'}],
-                                })(
-                                    <Input addonBefore="一月" addonAfter="分" placeholder='请输入价格'/>
-                                )}
-                            </FormItem> : null}
-                        </div>
-                        {isLiveCharge || isRecordCharge ?
-                            <div className="center w-full" style={{fontWeight: 'bold'}}>付费人数放大</div> : null}
-                        {isLiveCharge || isRecordCharge ? <div className="center w-full">
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('expand.base', {
-                                    initialValue: record && record.expand ? record.expand.base : randomNum(1, 10),
-                                    rules: [{required: true, message: '请输入'}],
-                                })(
-                                    <Input addonBefore="初始值" style={{minWidth: 60, textAlign: "center"}}
-                                           placeholder="初始值"/>
-                                )}
-                            </FormItem>
-                            <span className="ml-s mr-s"> </span>
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('expand.expandMin', {
-                                    initialValue: record && record.expand ? record.expand.expandMin : 2,
-                                    rules: [{required: true, message: '请输入'}],
-                                })(
-                                    <Input addonBefore="放大最小" style={{minWidth: 60, textAlign: "center"}}
-                                           placeholder="最小值"/>
-                                )}
-                            </FormItem>
-                            <span className="ml-s mr-s">-</span>
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('expand.expandMax', {
-                                    initialValue: record && record.expand ? record.expand.expandMax : 5,
-                                    rules: [{required: true, message: '请输入'}],
-                                })(
-                                    <Input addonBefore="放大最大" style={{minWidth: 60, textAlign: "center"}}
-                                           placeholder="最大值"/>
-                                )}
-                            </FormItem>
-                        </div> : null}
-                        <div className="center w-full">
-                            <span>刷礼物观看直播：</span>
-                            <FormItem {...formItemLayout} className="bs-form-item">
-                                {getFieldDecorator('giftWatchLiveEnable', {
-                                    initialValue: record ? record.giftWatchLiveEnable : false,
-                                    valuePropName: 'checked',
-                                    onChange: (e) => {
-                                        this.setState({giftWatchLiveEnable: e.target.checked})
-                                    }
-                                })(
-                                    <Checkbox/>
-                                )}
-                            </FormItem>
-                        </div>
-                        {isRecordCharge ? <div className="center w-full">
-                            <span>刷礼物观看录播：</span>
-                            <FormItem {...formItemLayout} className="bs-form-item">
-                                {getFieldDecorator('giftWatchRecordEnable', {
-                                    initialValue: record ? record.giftWatchRecordEnable : false,
-                                    valuePropName: 'checked',
-                                    onChange: (e) => {
-                                        this.setState({giftWatchRecordEnable: e.target.checked})
-                                    }
-                                })(
-                                    <Checkbox/>
-                                )}
-                            </FormItem>
-                        </div> : null}
-                        {isRecordCharge && giftWatchRecordEnable ? <div className="center w-full">
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('giftWatchRecordPrice', {
-                                    initialValue: record ? record.giftWatchRecordPrice : null,
-                                })(
-                                    <Input addonBefore="一个月" addonAfter="分" style={{minWidth: 60, textAlign: "center"}}
-                                           placeholder="一个月"/>
-                                )}
-                            </FormItem>
-                            <span className="ml-s mr-s">-</span>
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('giftWatchRecordEternalPrice', {
-                                    initialValue: record ? record.giftWatchRecordEternalPrice : null,
-                                })(
-                                    <Input addonBefore="永久" addonAfter="分" style={{minWidth: 60, textAlign: "center"}}
-                                           placeholder="永久"/>
-                                )}
-                            </FormItem>
-                        </div> : null}
-                        <div className="center w-full">
-                            <span>开启买断：</span>
-                            <FormItem {...formItemLayout} className="bs-form-item">
-                                {getFieldDecorator('isMonopolyCharge', {
-                                    initialValue: record ? record.isMonopolyCharge : false,
-                                    valuePropName: 'checked',
-                                    onChange: (e) => {
-                                        this.setState({isMonopolyCharge: e.target.checked})
-                                    }
-                                })(
-                                    <Checkbox/>
-                                )}
-                            </FormItem>
-                            {isMonopolyCharge ? <FormItem {...formItemLayout}
-                                                          className="bs-form-item">
-                                {getFieldDecorator('monopolyPrice', {
-                                    initialValue: record ? record.monopolyPrice : null,
-                                    rules: [{required: true, message: '请输入价格'}],
-                                })(
-                                    <Input addonAfter="分" placeholder='请输入价格'/>
-                                )}
-                            </FormItem> : null}
-                        </div>
-                        <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>菜单设置</span>
                         </div>
                         <div className="center w-full">
@@ -1059,29 +861,52 @@ class FootBallMatchModifyDialog extends React.Component {
                         </div>
                         <div className="center w-full">
                             <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('onlinebase', {
-                                    initialValue: record.onlinebase,
+                                {getFieldDecorator('expand.baseMin', {
+                                    initialValue: record.expand ? record.expand.baseMin : 500
                                 })(
-                                    <Input addonBefore="初始值" style={{minWidth: 60, textAlign: "center"}}
-                                           placeholder="初始值"/>
-                                )}
-                            </FormItem>
-                            <span className="ml-s mr-s"></span>
-                            <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('onlineExpendMin', {
-                                    initialValue: record.onlineExpendMin,
-                                })(
-                                    <Input addonBefore="最小" style={{width: 120, textAlign: "center"}}
-                                           placeholder="最小值"/>
+                                    <Input addonBefore="初始值最小" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="初始值最小"/>
                                 )}
                             </FormItem>
                             <span className="ml-s mr-s">-</span>
                             <FormItem style={{margin: 0}}>
-                                {getFieldDecorator('onlineExpendMax', {
-                                    initialValue: record.onlineExpendMax,
+                                {getFieldDecorator('expand.baseMax', {
+                                    initialValue: record.expand ? record.expand.baseMax : 900
                                 })(
-                                    <Input addonBefore="最大" style={{width: 120, textAlign: "center"}}
-                                           placeholder="最大值"/>
+                                    <Input addonBefore="初始值最大" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="初始值最大"/>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.expandMin', {
+                                    initialValue: record.expand ? record.expand.expandMin : 80
+                                })(
+                                    <Input addonBefore="放大值最小" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="放大值最小"/>
+                                )}
+                            </FormItem>
+                            <span className="ml-s mr-s">-</span>
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('expand.expandMax', {
+                                    initialValue: record.expand ? record.expand.expandMax : 100
+                                })(
+                                    <Input addonBefore="放大值最大" style={{minWidth: 60, textAlign: "center"}}
+                                           placeholder="放大值最大"/>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
+                            <span className="mb-n mt-m" style={{fontSize: 20}}>在线人数</span>
+                        </div>
+                        <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('online', {
+                                    initialValue: record.online ? record.online : randomNum(500, 900)
+                                })(
+                                    <Input addonBefore="在线人数" style={{maxWidth: 300, minWidth: 60, textAlign: "center"}}
+                                           placeholder="在线人数"/>
                                 )}
                             </FormItem>
                         </div>
@@ -1123,6 +948,51 @@ class FootBallMatchModifyDialog extends React.Component {
                                         }
 
                                     </Upload>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('playPath', {
+                                    initialValue: record.playPath,
+                                })(
+                                    <Input hidden={true}/>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('activityId', {
+                                    initialValue: record.activityId,
+                                })(
+                                    <Input hidden={true}/>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('id', {
+                                    initialValue: record.id,
+                                })(
+                                    <Input hidden={true}/>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('areaType', {
+                                    initialValue: record.areaType != null ? record.areaType : (this.state.leaguedata ? this.state.leaguedata.areaType : 0),
+                                })(
+                                    <Input hidden={true}/>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
+                            <FormItem style={{margin: 0}}>
+                                {getFieldDecorator('wechatType', {
+                                    initialValue: record.wechatType != null ? record.wechatType : (this.state.leaguedata ? this.state.leaguedata.wechatType : 0),
+                                })(
+                                    <Input hidden={true}/>
                                 )}
                             </FormItem>
                         </div>

@@ -191,10 +191,6 @@ class FootBallPlayerTable extends React.Component {
             if (err) {
                 return;
             }
-            values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["careerTime"] = values["careerTime"] ? values["careerTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["retireTime"] = values["retireTime"] ? values["retireTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             createPlayer(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -215,10 +211,6 @@ class FootBallPlayerTable extends React.Component {
             if (err) {
                 return;
             }
-            values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["careerTime"] = values["careerTime"] ? values["careerTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["retireTime"] = values["retireTime"] ? values["retireTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             updatePlayerById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -340,18 +332,18 @@ class FootBallPlayerTable extends React.Component {
             },
             width: '15%',
         }, {
-            title: '国籍',
+            title: '地区',
             align: 'center',
-            dataIndex: 'country',
+            dataIndex: 'province',
             width: '10%',
             render: function (text, record, index) {
-                return <p>{record.country ? record.country : "-"}/{record.city ? record.city : "-"}</p>
+                return <p>{record.province ? record.province : "-"}/{record.city ? record.city : "-"}</p>
             }
         }, {
             title: '身高',
             align: 'center',
             dataIndex: 'height',
-            width: '7%',
+            width: '10%',
             render: function (text, record, index) {
                 return <p>{record.height ? record.height + "cm" : "-"}</p>
             }
@@ -359,25 +351,30 @@ class FootBallPlayerTable extends React.Component {
             title: '体重',
             align: 'center',
             dataIndex: 'weight',
-            width: '7%',
+            width: '10%',
             render: function (text, record, index) {
                 return <p>{record.weight ? record.weight + "kg" : "-"}</p>
             }
-        }, {
-            title: '年龄',
-            align: 'center',
-            width: '6%',
-            render: function (text, record, index) {
-                return <p>{record.birthdate ? getYearOld(record.birthdate) : "-"}</p>
-            }
-        }, {
-            title: '生日',
-            align: 'center',
-            dataIndex: 'birthdate',
+        },  {
+            title: '小程序',
+            dataIndex: 'wechatType',
             width: '10%',
+            align: 'center',
             render: function (text, record, index) {
-                return <p>{record.birthdate ? parseTimeStringYMD(record.birthdate) : "-"}</p>
-            }
+                let type = "未知"
+                switch (record.wechatType) {
+                    case 0 :
+                        type = "茄子tv";
+                        break;
+                    case 1 :
+                        type = "青少年";
+                        break;
+                    case 2 :
+                        type = "茄子FC";
+                        break;
+                }
+                return type;
+            },
         }, {
             title: '备注',
             align: 'center',

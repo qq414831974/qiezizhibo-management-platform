@@ -208,8 +208,8 @@ class FootBallLeagueMatchModifyTeamDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} className="bs-form-item" label="排名">
-                            {getFieldDecorator('sortindex', {
-                                initialValue: this.props.record.sortindex,
+                            {getFieldDecorator('sortIndex', {
+                                initialValue: this.props.record.sortIndex,
                             })(
                                 <Input placeholder="排名"/>
                             )}
@@ -222,8 +222,8 @@ class FootBallLeagueMatchModifyTeamDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} style={{margin: 0}}>
-                            {getFieldDecorator('leaguematchId', {
-                                initialValue: this.props.record.leaguematchId,
+                            {getFieldDecorator('leagueId', {
+                                initialValue: this.props.record.leagueId,
                             })(
                                 <Input hidden={true}/>
                             )}

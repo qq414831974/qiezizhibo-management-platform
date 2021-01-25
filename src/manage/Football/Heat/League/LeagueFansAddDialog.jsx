@@ -56,7 +56,7 @@ class LeagueFansAddDialog extends React.Component {
         getTeamInLeague(this.props.leagueId).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
-                    teamdata:data.data,
+                    teamdata: data.data.records,
                     loading: false,
                 });
             } else {

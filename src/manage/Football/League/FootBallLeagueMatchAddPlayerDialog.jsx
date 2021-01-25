@@ -45,7 +45,7 @@ class FootBallLeagueMatchAddPlayerDialog extends React.Component {
         this.props.record && getTeamInLeague(this.props.record.id).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
-                    data: data.data,
+                    data: data.data.records,
                     loading: false,
                 });
             } else {
@@ -75,7 +75,7 @@ class FootBallLeagueMatchAddPlayerDialog extends React.Component {
         getLeaguePlayerByLeagueTeam({leagueId: leagueId, teamId: teamId, playerId: playerId}).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
-                    currentPlayerData: data.data,
+                    currentPlayerData: data.data ? data.data[0] : [],
                 });
             }
         });
@@ -245,7 +245,7 @@ class FootBallLeagueMatchAddPlayerDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem style={{margin: 0}}>
-                            {getFieldDecorator('leaguematchId', {
+                            {getFieldDecorator('leagueId', {
                                 initialValue: this.props.record.id,
                             })(
                                 <Input hidden={true}/>

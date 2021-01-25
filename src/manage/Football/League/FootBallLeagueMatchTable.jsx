@@ -3,7 +3,7 @@ import {Table, Input, Button, Icon, Modal, Tooltip} from 'antd';
 import {getAllLeagueMatchSeries, getwxacodeunlimit} from '../../../axios/index';
 import {getQueryString, mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
-import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch, chargeAllMatchByLeagueId} from "../../../axios";
+import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch} from "../../../axios";
 import {Form, message} from "antd/lib/index";
 import FootBallLeagueMatchAddDialog from "../League/FootBallLeagueMatchAddDialog"
 import FootBallLeagueMatchModifyDialog from "../League/FootBallLeagueMatchModifyDialog"
@@ -37,8 +37,8 @@ class FootBallLeagueMatchTable extends React.Component {
     };
 
     fetch = (params = {}) => {
-        params["sortOrder"] = "asc";
-        params["sortField"] = "id";
+        params["sortOrder"] = "desc";
+        params["sortField"] = "sortIndex";
         this.setState({loading: true});
         getAllLeagueMatchSeries(params).then((data) => {
             if (data && data.code == 200) {
@@ -184,9 +184,6 @@ class FootBallLeagueMatchTable extends React.Component {
             }
             values["dateBegin"] = values["dateBegin"] ? values["dateBegin"].format('YYYY/MM/DD HH:mm:ss') : null;
             values["dateEnd"] = values["dateEnd"] ? values["dateEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             createLeagueMatch(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -211,9 +208,6 @@ class FootBallLeagueMatchTable extends React.Component {
             }
             values["dateBegin"] = values["dateBegin"] ? values["dateBegin"].format('YYYY/MM/DD HH:mm:ss') : null;
             values["dateEnd"] = values["dateEnd"] ? values["dateEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             updateLeagueMatchById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -248,7 +242,7 @@ class FootBallLeagueMatchTable extends React.Component {
         this.setState({deleteVisible: false});
     }
     getModifyFooter = (record) => {
-        if (record && record.isparent) {
+        if (record && record.isParent) {
             return [
                 <Button key="view" type="primary" className="pull-left">
                     <Link to={
@@ -274,8 +268,10 @@ class FootBallLeagueMatchTable extends React.Component {
                     `/football/footballMatch?leagueId=${this.state.record.id}`
                 }>浏览比赛</Link>
             </Button>,
-            <Button key="chargeall" type="primary" className="pull-left" loading={this.state.chargeAllLoading}
-                    onClick={this.showChargeAllConfirm}>全部收费</Button>,
+            <Button key="charge" type="primary" className="pull-left"><Link to={
+                `/football/league/charge?leagueId=${this.state.record.id}`
+            }>收费</Link>
+            </Button>,
             <Button key="heat" type="primary" className="pull-left"><Link to={
                 `/football/league/heat?leagueId=${this.state.record.id}`
             }>热度</Link>
@@ -288,6 +284,10 @@ class FootBallLeagueMatchTable extends React.Component {
                 `/football/league/clip?leagueId=${this.state.record.id}`
             }>剪辑</Link>
             </Button>,
+            <Button key="bet" type="primary" className="pull-left"><Link to={
+                `/football/league/encryption?leagueId=${this.state.record.id}`
+            }>加密</Link>
+            </Button>,
             <Button key="delete" type="danger" className="pull-left"
                     onClick={this.handleLeagueDelete}>删除</Button>,
             // <Button key="back" onClick={this.handleLeagueMatchModifyCancel}>取消</Button>,
@@ -296,31 +296,9 @@ class FootBallLeagueMatchTable extends React.Component {
             </Button>
         ]
     }
-    handleChargeAllCancel = () => {
-        this.setState({chargeAllVisible: false})
-    }
-    showChargeAllConfirm = () => {
-        this.setState({chargeAllVisible: true})
-    }
-    chargeAll = () => {
-        this.setState({chargeAllLoading: true})
-        chargeAllMatchByLeagueId(this.state.record.id).then(data => {
-            this.setState({chargeAllLoading: false})
-            if (data && data.code == 200) {
-                if (data.data) {
-                    this.setState({chargeAllVisible: false})
-                    message.success('修改成功', 1);
-                } else {
-                    message.warn(data.message, 1);
-                }
-            } else {
-                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
-            }
-        })
-    }
     genWxaCode = (record) => {
         let page;
-        if (record.isparent) {
+        if (record.isParent) {
             page = `pages/series/series`
         } else {
             page = `pages/leagueManager/leagueManager`
@@ -347,7 +325,6 @@ class FootBallLeagueMatchTable extends React.Component {
     render() {
         const onNameClick = this.onNameClick;
         const genWxaCode = this.genWxaCode;
-        const onBillAnalysisClick = this.onBillAnalysisClick;
         const {selectedRowKeys} = this.state;
         const AddDialog = Form.create()(FootBallLeagueMatchAddDialog);
         const ModifyDialog = Form.create()(FootBallLeagueMatchModifyDialog);
@@ -393,13 +370,31 @@ class FootBallLeagueMatchTable extends React.Component {
             },
             width: '35%',
             render: function (text, record, index) {
-                return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
-                    <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
+                return <div className="cursor-hand" onClick={onNameClick.bind(this, record)}>
+                    <div className="center border-bottom-gray"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
+                        <p className="ml-s">{record.name}</p>
+                    </div>
+                    {record.shortName ? <div className="center">简称：{record.shortName}</div> : null}
                 </div>;
             },
+        },{
+            title: '类型',
+            align: 'center',
+            dataIndex: 'isParent',
+            width: '5%',
+            render: function (text, record, index) {
+                let type = "联赛";
+                if (record.isParent) {
+                    type = "系列赛";
+                } else if (record.type == 1) {
+                    type = "杯赛";
+                } else if (record.type == 2) {
+                    type = "联赛";
+                }
+                return <span>{type}</span>
+            }
         }, {
-            title: '地点',
+            title: '城市',
             align: 'center',
             dataIndex: 'country',
             width: '10%',
@@ -410,75 +405,73 @@ class FootBallLeagueMatchTable extends React.Component {
             title: '时间',
             align: 'center',
             dataIndex: 'dateBegin',
-            width: '20%',
+            width: '15%',
             render: function (text, record, index) {
-                return <p>{(record.dateBegin ? parseTimeStringYMD(record.dateBegin) : "-") + "~" + (record.dateEnd ? parseTimeStringYMD(record.dateEnd) : "-")}</p>
-            }
-        }, {
-            title: '类型',
-            align: 'center',
-            dataIndex: 'isparent',
-            width: '6%',
-            render: function (text, record, index) {
-                return <p>{(record.isparent ? "系列赛" : "联赛")}</p>
+                return <span>{(record.dateBegin ? parseTimeStringYMD(record.dateBegin) : "-") + "~" + (record.dateEnd ? parseTimeStringYMD(record.dateEnd) : "-")}</span>
             }
         }, {
             title: '地区类型',
+            dataIndex: 'areaType',
+            key: 'areaType',
+            width: '7%',
             align: 'center',
-            dataIndex: 'phoneNumber',
-            width: '8%',
             render: function (text, record, index) {
-                let type = "-";
-                if (record.areatype) {
-                    if (record.areatype == 1) {
-                        type = "全国"
-                    } else if (record.areatype == 2) {
-                        type = "全国青少年"
+                let area = "默认";
+                if (record.areaType) {
+                    switch (record.areaType) {
+                        case 0:
+                            area = "默认";
+                            break;
+                        case 1:
+                            area = "全国";
+                            break;
                     }
                 }
-                return <p>{type}</p>
+                return <span>{area}</span>
+            }
+        }, , {
+            title: '微信类型',
+            dataIndex: 'wechatType',
+            key: 'wechatType',
+            width: '7%',
+            align: 'center',
+            render: function (text, record, index) {
+                let type = "茄子tv";
+                if (record.wechatType) {
+                    switch (record.wechatType) {
+                        case 0:
+                            type = "茄子tv";
+                            break;
+                        case 1:
+                            type = "青少年";
+                            break;
+                    }
+                }
+                return <span>{type}</span>
+            }
+        }, {
+            title: <Tooltip title="数字越大排名越前面"><span>排序</span></Tooltip>,
+            align: 'center',
+            dataIndex: 'sortIndex',
+            width: '10%',
+        }, {
+            title: <span>轮播id</span>,
+            align: 'center',
+            width: '5%',
+            render: function (text, record, index) {
+                return <p className="cursor-hand" onClick={() => {
+                    copy(`../leagueManager/leagueManager?id=${record.id}`);
+                    message.success('轮播链接已复制到剪贴板');
+                }}>{record.id ? `${record.id}` : "-"}</p>
+            }
+        }, {
+            title: "小程序码",
+            align: 'center',
+            width: '5%',
+            render: function (text, record, index) {
+                return <span onClick={genWxaCode.bind(this, record)}>生成</span>
             }
         },
-            {
-                title: <Tooltip title="备注从9-0开始代表在首页的排序顺序，9第一位，8第二位以此类推"><span>备注</span></Tooltip>,
-                align: 'center',
-                dataIndex: 'remark',
-                width: '8%',
-            },
-            {
-                title: <span>轮播id</span>,
-                align: 'center',
-                width: '5%',
-                render: function (text, record, index) {
-                    return <p className="cursor-hand" onClick={() => {
-                        copy(`../leagueManager/leagueManager?id=${record.id}`);
-                        message.success('轮播链接已复制到剪贴板');
-                    }}>{record.id ? `${record.id}` : "-"}</p>
-                }
-            },
-            {
-                title: "小程序码",
-                align: 'center',
-                width: '4%',
-                render: function (text, record, index) {
-                    return <span onClick={genWxaCode.bind(this, record)}>生成</span>
-                }
-            }, {
-                title: "收益",
-                align: 'center',
-                width: '4%',
-                render: function (text, record, index) {
-                    if (record.isparent) {
-                        return <span onClick={() => {
-                            message.warn("请前往系列赛中查看", 1);
-                        }
-                        } className="cursor-hand">查看</span>
-                    }
-                    return <Link to={
-                        `/analysis/bill?leagueId=${record.id}`
-                    }><span className="cursor-hand">查看</span></Link>
-                }
-            },
         ];
         const columns_mobile = [{
             title: '名字',
@@ -507,7 +500,7 @@ class FootBallLeagueMatchTable extends React.Component {
             render: function (text, record, index) {
                 return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishname ? "(" + record.englishname + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.shortName ? "(" + record.shortName + ")" : ""}</p>
                 </div>;
             },
         }
@@ -560,7 +553,7 @@ class FootBallLeagueMatchTable extends React.Component {
             <Modal
                 key="dialog-modify"
                 className={isMobile ? "top-n" : ""}
-                width={700}
+                width={800}
                 visible={this.state.dialogModifyVisible}
                 title="编辑球队"
                 okText="确定"
@@ -585,17 +578,6 @@ class FootBallLeagueMatchTable extends React.Component {
             >
                 <p style={{fontSize: 14}}>是否确认删除{this.state.deleteCols}条数据？</p>
                 <p className="mb-n text-danger">注意：删除联赛将删除联赛所有比赛数据！！！</p>
-            </Modal>
-            <Modal
-                key="dialog-chargeall"
-                className={isMobile ? "top-n" : ""}
-                title="确认修改"
-                visible={this.state.chargeAllVisible}
-                onOk={this.chargeAll}
-                onCancel={this.handleChargeAllCancel}
-                zIndex={1001}
-            >
-                <p style={{fontSize: 14}}>是否确认将联赛中的比赛全部设置为与联赛相同的收费方式？</p>
             </Modal>
         </div>
     }

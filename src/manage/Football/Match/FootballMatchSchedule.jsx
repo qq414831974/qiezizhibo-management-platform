@@ -104,17 +104,17 @@ class FootBallMatchSchedule extends React.Component {
             filterMultiple: false,
             render: function (text, item, index) {
                 const record = item.match;
-                const hostteam = record.hostteam;
-                const guestteam = record.guestteam;
-                if (hostteam == null || guestteam == null) {
+                const hostTeam = record.hostTeam;
+                const guestTeam = record.guestTeam;
+                if (hostTeam == null || guestTeam == null) {
                     return <span>{record.name}</span>
                 }
                 return <div className="center cursor-hand" onClick={onNameClick.bind(this, item)}>
-                    <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
-                    <p className="ml-s">{hostteam.name}</p>
+                    <Avatar src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}/>
+                    <p className="ml-s">{hostTeam.name}</p>
                     <p className="ml-s mr-s">VS</p>
-                    <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
-                    <p className="ml-s">{guestteam.name}</p>
+                    <Avatar src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}/>
+                    <p className="ml-s">{guestTeam.name}</p>
                 </div>;
             },
         }, {
@@ -132,7 +132,7 @@ class FootBallMatchSchedule extends React.Component {
             width: '10%',
             render: function (text, item, index) {
                 const record = item.match;
-                return <span>{record.score ? (record.score + (record.penaltyscore ? `(${record.penaltyscore})` : "")) : "-"}</span>;
+                return <span>{record.score ? (record.score + (record.penaltyScore ? `(${record.penaltyScore})` : "")) : "-"}</span>;
             },
         }, {
             title: '状态',

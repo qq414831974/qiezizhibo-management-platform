@@ -16,10 +16,9 @@ import {getAllRoles, uploadimg} from "../../axios";
 import logo from '../../static/logo.png';
 import {message} from "antd/lib/index";
 
-
-const Option = Select.Option;
 moment.locale('zh-cn');
 
+const Option = Select.Option;
 const FormItem = Form.Item;
 
 const formItemLayout = {
@@ -130,12 +129,12 @@ class UserAddDialog extends React.Component {
                     </FormItem>
                     <FormItem {...formItemLayout} label="微信类型" className="bs-form-item">
                         {getFieldDecorator('wechatType', {
-                            initialValue: 1,
+                            initialValue: 0,
                         })(
                             <Select placeholder='请选择微信类型!'>
-                                <Option value={1} key={"wechatType-1"}>茄子TV</Option>
+                                <Option value={0} key={"wechatType-0"}>茄子TV</Option>
+                                <Option value={1} key={"wechatType-1"}>青少年</Option>
                                 <Option value={2} key={"wechatType-2"}>茄子FC</Option>
-                                <Option value={3} key={"wechatType-3"}>青少年</Option>
                             </Select>
                         )}
                     </FormItem>

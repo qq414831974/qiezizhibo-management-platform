@@ -42,7 +42,7 @@ class LeagueFansManagement extends React.Component {
         getTeamInLeague(this.props.leagueId).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
-                    teamdata: data.data,
+                    teamdata: data.data.records,
                 });
             } else {
                 message.error('获取队伍列表失败：' + (data ? data.result + "-" + data.message : data), 3);

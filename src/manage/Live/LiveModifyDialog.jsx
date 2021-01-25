@@ -81,12 +81,12 @@ class LiveModifyDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="开始时间" className="bs-form-item">
-                            {getFieldDecorator('startedAt', {
+                            {getFieldDecorator('startTime', {
                                 rules: [{required: true, message: '请选择时间!'}],
-                                initialValue: record.startedAt ? moment(record.startedAt) : null,
+                                initialValue: record.startTime ? moment(record.startTime) : null,
                                 onChange(e) {
                                     form.setFieldsValue({
-                                        startedAt: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
+                                        startTime: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
                                     })
                                 }
                             })(
@@ -95,12 +95,12 @@ class LiveModifyDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="结束时间" className="bs-form-item">
-                            {getFieldDecorator('endedAt', {
+                            {getFieldDecorator('endTime', {
                                 rules: [{required: true, message: '请选择时间!'}],
-                                initialValue: record.endedAt ? moment(record.endedAt) : null,
+                                initialValue: record.endTime ? moment(record.endTime) : null,
                                 onChange(e) {
                                     form.setFieldsValue({
-                                        endedAt: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
+                                        endTime: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
                                     })
                                 }
                             })(

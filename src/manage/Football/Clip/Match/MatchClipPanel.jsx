@@ -299,7 +299,7 @@ class MatchClipPanel extends React.Component {
             autoPreffix: this.state.autoPreffixChecked,
             clipIds: this.state.selectIds,
         }).then(data => {
-            this.setState({mergeOptionVisible: false});
+            this.setState({mergeOptionVisible: false, selectIds: null});
             if (data && data.code == 200) {
                 if (data.data) {
                     message.success('操作成功', 1);

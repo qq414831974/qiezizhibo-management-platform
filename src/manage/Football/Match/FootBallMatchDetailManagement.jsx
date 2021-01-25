@@ -8,8 +8,8 @@ import {Link, Redirect} from 'react-router-dom';
 import {Form, message, Tabs} from "antd/lib/index";
 import MatchSimpleForm from "../Match/FootBallMatchModifyDialog";
 import {delMatchByIds, getMatchById, updateMatchById} from "../../../axios";
-import FootBallMatchPlayersSettingPanel from "./FootBallMatchPlayersSettingPanel";
-import FootBallMatchPlayersMediaPanel from "./FootBallMatchPlayersMediaPanel";
+import FootBallMatchPlayersSettingPanel from "./Formation/FootBallMatchPlayersSettingPanel";
+import FootBallMatchPlayersMediaPanel from "./Media/FootBallMatchPlayersMediaPanel";
 import {getQueryString} from "../../../utils";
 
 const TabPane = Tabs.TabPane;

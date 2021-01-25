@@ -1,16 +1,16 @@
 import React from "react";
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Avatar, Button, message, Input, DatePicker} from 'antd';
-import {addTimeline} from "../../../axios";
-import start from '../../../static/start.svg';
-import half_time from '../../../static/half_time.svg';
-import injury from '../../../static/injury.svg';
-import extra from '../../../static/extra.svg';
-import pause from '../../../static/pause.svg';
-import penalty from '../../../static/penalty.svg';
-import finish from '../../../static/finish.svg';
+import {addTimeline} from "../../../../axios";
+import start from '../../../../static/start.svg';
+import half_time from '../../../../static/half_time.svg';
+import injury from '../../../../static/injury.svg';
+import extra from '../../../../static/extra.svg';
+import pause from '../../../../static/pause.svg';
+import penalty from '../../../../static/penalty.svg';
+import finish from '../../../../static/finish.svg';
 
 class FootBallMatchScoreTimeEventAddDialog extends React.Component {
     state = {

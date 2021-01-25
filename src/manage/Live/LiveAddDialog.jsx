@@ -47,11 +47,11 @@ class LiveAddDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="开始时间" className="bs-form-item">
-                            {getFieldDecorator('startedAt', {
+                            {getFieldDecorator('startTime', {
                                 rules: [{required: true, message: '请选择时间!'}],
                                 onChange(e) {
                                     form.setFieldsValue({
-                                        startedAt: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
+                                        startTime: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
                                     })
                                 }
                             })(
@@ -60,11 +60,11 @@ class LiveAddDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="结束时间" className="bs-form-item">
-                            {getFieldDecorator('endedAt', {
+                            {getFieldDecorator('endTime', {
                                 rules: [{required: true, message: '请选择时间!'}],
                                 onChange(e) {
                                     form.setFieldsValue({
-                                        endedAt: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
+                                        endTime: e ? e.format('YYYY/MM/DD HH:mm:ss') : null,
                                     })
                                 }
                             })(

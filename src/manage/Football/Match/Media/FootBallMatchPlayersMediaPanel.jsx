@@ -1,22 +1,22 @@
 import React from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {Row, Col, Card, Tooltip, Tag, List, Button, Modal, Avatar, Select, Spin,} from 'antd';
 import {
     getMatchPlayersByTeamId,
     getMatchById,
     getMatchMedia, modifyMedia, deleteMediaToPlayer
-} from "../../../axios";
-import defultAvatar from '../../../static/avatar.jpg';
-import shirt from '../../../static/shirt.png';
-import shirt2 from '../../../static/shirt2.png';
+} from "../../../../axios";
+import defultAvatar from '../../../../static/avatar.jpg';
+import shirt from '../../../../static/shirt.png';
+import shirt2 from '../../../../static/shirt2.png';
 import {Form, message} from "antd/lib/index";
 import {Link} from 'react-router-dom';
 import moment from "moment/moment";
-import VideoPlayer from "../../Live/VideoPlayer";
-import nopic from '../../../static/nopic.png';
-import FootBallPlayerModifyMediaDialog from "../Player/FootBallPlayerModifyMediaDialog";
+import VideoPlayer from "../../../Live/VideoPlayer";
+import nopic from '../../../../static/nopic.png';
+import FootBallPlayerModifyMediaDialog from "../../Player/FootBallPlayerModifyMediaDialog";
 import copy from "copy-to-clipboard/index";
 
 const Option = Select.Option;
@@ -68,7 +68,7 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
         this.setState({
             hostloading: true,
         });
-        getMatchPlayersByTeamId(null, this.state.data.hostteam.id).then((data) => {
+        getMatchPlayersByTeamId(null, this.state.data.hostTeamId).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     hostdata: data.data ? data.data.records : "",
@@ -84,7 +84,7 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
         this.setState({
             guestloading: true,
         });
-        getMatchPlayersByTeamId(null, this.state.data.guestteam.id).then((data) => {
+        getMatchPlayersByTeamId(null, this.state.data.guestTeamId).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     guestdata:data.data ? data.data.records : "",
@@ -219,11 +219,11 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
                 <div>
                     <div className="center">
                         <img className="round-img-xs"
-                             src={this.state.data ? this.state.data.hostteam.headImg : defultAvatar}/>
+                             src={this.state.data ? this.state.data.hostTeam.headImg : defultAvatar}/>
                     </div>
                     <div className="center w-full">
                         <p style={{fontSize: 12}}
-                           className="mt-s mb-n">{this.state.data ? this.state.data.hostteam.name : ""}</p>
+                           className="mt-s mb-n">{this.state.data ? this.state.data.hostTeam.name : ""}</p>
                     </div>
                     {this.getTeamPlayerDom(this.state.hostdata)}
                 </div>
@@ -231,11 +231,11 @@ class FootBallMatchPlayersMediaPanel extends React.Component {
             <Col span={12}>
                 <div className="center">
                     <img className="round-img-xs"
-                         src={this.state.data ? this.state.data.guestteam.headImg : defultAvatar}/>
+                         src={this.state.data ? this.state.data.guestTeam.headImg : defultAvatar}/>
                 </div>
                 <div className="center w-full">
                     <p style={{fontSize: 12}}
-                       className="mt-s mb-n">{this.state.data ? this.state.data.guestteam.name : ""}</p>
+                       className="mt-s mb-n">{this.state.data ? this.state.data.guestTeam.name : ""}</p>
                 </div>
                 {this.getTeamPlayerDom(this.state.guestdata)}
             </Col>

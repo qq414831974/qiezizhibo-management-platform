@@ -22,7 +22,13 @@ import defultAvatar from '../../../static/avatar.jpg';
 import shirt from '../../../static/shirt.png';
 import shirt2 from '../../../static/shirt2.png';
 import plus from '../../../static/plus.png';
-import {addPlayerToTeam, getAllPlayersNotInTeam, getPlayersByTeamId, modifyPlayerInTeam} from "../../../axios";
+import {
+    addPlayerToTeam,
+    getAllPlayersNotInTeam,
+    getPlayersByTeamId,
+    modifyPlayerInTeam,
+    deletePlayerInTeam
+} from "../../../axios";
 import {mergeJSON} from "../../../utils";
 import {Form, message} from "antd/lib/index";
 import ModifyPlayerInTeamDialog from "../Team/FootBallTeamModifyPlayersDialog";
@@ -220,8 +226,8 @@ class FootBallTeamAddPlayersPanel extends React.Component {
         this.setState({dialogTeamPlayerModifyVisible: false});
     }
     handleTeamPlayerDelete = (teamId, playerId) => {
-        const values = {teamId: teamId, playerId: playerId, isDelete: true}
-        modifyPlayerInTeam(values).then((data) => {
+        const values = {teamId: teamId, playerId: playerId}
+        deletePlayerInTeam(values).then((data) => {
             this.setState({dialogTeamPlayerModifyVisible: false});
             if (data && data.code == 200) {
                 if (data.data) {
@@ -315,8 +321,8 @@ class FootBallTeamAddPlayersPanel extends React.Component {
         const showTeamPlayerModifyDialog = this.showTeamPlayerModifyDialog;
         const handleTeamPlayerDelete = this.handleTeamPlayerDelete;
         const getPosition = this.getPosition;
-        const shirtStyle = {position: "absolute", fontSize: 16, color: "#FFFFFF", paddingBottom: "15px"};
-        const shirtStyle2 = {position: "absolute", fontSize: 16, color: "#000000", paddingBottom: "15px"};
+        const shirtStyle = {position: "absolute", fontSize: 16, color: "#FFFFFF",};
+        const shirtStyle2 = {position: "absolute", fontSize: 16, color: "#000000",};
         const teamId = record ? record.id : null;
         const playerId = this.state.playerModifyData ? this.state.playerModifyData.id : null;
         const searchContent = <Row gutter={5}>
@@ -416,7 +422,7 @@ class FootBallTeamAddPlayersPanel extends React.Component {
                                     pagination={this.state.teampagination}
                                     loading={this.state.teamloading}
                                     renderItem={item => (
-                                        <List.Item>
+                                        <List.Item style={{justifyContent: "flex-start"}}>
                                             <div className="center list-item-hover cursor-hand"
                                                  onClick={showTeamPlayerModifyDialog.bind(this, item)}>
                                                 <div className="list-item-hover-plus center">

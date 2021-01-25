@@ -8,11 +8,11 @@ import {
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import avatar from '../../../static/avatar.jpg';
-import {getNoSeriesLeague} from "../../../axios";
+import avatar from '../../../../static/avatar.jpg';
+import {getNoSeriesLeague} from "../../../../axios";
 import {message} from "antd/lib/index";
 
 moment.locale('zh-cn');
@@ -147,7 +147,7 @@ class FootBallLeagueSeriesAddLeagueDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem style={{margin: 0}}>
-                            {getFieldDecorator('parentid', {
+                            {getFieldDecorator('parentId', {
                                 initialValue: this.props.record.id,
                             })(
                                 <Input hidden={true}/>

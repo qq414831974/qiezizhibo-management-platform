@@ -16,7 +16,6 @@ class FootBallMatchManagement extends React.Component {
             this.props.history.replace(`/football/footballMatch?page=${page}`)
         }
     }
-
     render() {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
         const currentPage = getQueryString(this.props.location.search, "page");

@@ -177,7 +177,13 @@ class BulletinSetting extends React.Component {
                 return <span>页面</span>
             }
         }, {
-            title: '地区',
+            title: '省份',
+            dataIndex: 'province',
+            key: 'province',
+            width: '10%',
+            align: 'center',
+        },  {
+            title: '地区类型',
             dataIndex: 'areaType',
             key: 'areaType',
             width: '10%',
@@ -196,13 +202,7 @@ class BulletinSetting extends React.Component {
                 }
                 return <span>{area}</span>
             }
-        }, {
-            title: '省份',
-            dataIndex: 'province',
-            key: 'province',
-            width: '10%',
-            align: 'center',
-        }, {
+        },{
             title: '微信类型',
             dataIndex: 'wechatType',
             key: 'wechatType',

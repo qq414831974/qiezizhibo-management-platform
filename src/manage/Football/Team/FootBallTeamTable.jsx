@@ -178,11 +178,6 @@ class FootBallTeamTable extends React.Component {
             if (err) {
                 return;
             }
-            values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-
             createTeam(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -205,11 +200,6 @@ class FootBallTeamTable extends React.Component {
             if (err) {
                 return;
             }
-            values["birthdate"] = values["birthdate"] ? values["birthdate"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-
             updateTeamById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -317,53 +307,42 @@ class FootBallTeamTable extends React.Component {
             render: function (text, record, index) {
                 return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.shortName ? "(" + record.shortName + ")" : ""}</p>
                 </div>;
             },
         }, {
-            title: '国籍',
+            title: '地区',
             align: 'center',
-            dataIndex: 'country',
-            width: '10%',
+            dataIndex: 'province',
+            width: '20%',
             render: function (text, record, index) {
-                return <p>{record.country ? record.country : "-"}/{record.city ? record.city : "-"}</p>
+                return <p>{record.province ? record.province : "-"}/{record.city ? record.city : "-"}</p>
             }
         }, {
             title: '人数',
             align: 'center',
             dataIndex: 'population',
-            width: '5%',
-        }, {
-            title: '所属人/单位',
-            dataIndex: 'owner',
-            align: 'center',
-            // filters: [
-            //     {text: '教练', value: 'co'},
-            //     {text: '门将', value: 'gk'},
-            //     {text: '后卫', value: 'b'},
-            //     {text: '中场', value: 'm'},
-            //     {text: '前锋', value: 'f'},
-            // ],
             width: '10%',
-            render: function (text, record, index) {
-                return <p>{record.owner ? record.owner : "-"}</p>
-            }
-        }, {
-            title: '创建日',
-            align: 'center',
-            dataIndex: 'birthdate',
+        },  {
+            title: '小程序',
+            dataIndex: 'wechatType',
             width: '10%',
-            render: function (text, record, index) {
-                return <p>{record.birthdate ? parseTimeStringYMD(record.birthdate) : "-"}</p>
-            }
-        }, {
-            title: '口号',
             align: 'center',
-            dataIndex: 'slogan',
-            width: '10%',
             render: function (text, record, index) {
-                return <p>{record.slogan ? record.slogan : "-"}</p>
-            }
+                let type = "未知"
+                switch (record.wechatType) {
+                    case 0 :
+                        type = "茄子tv";
+                        break;
+                    case 1 :
+                        type = "青少年";
+                        break;
+                    case 2 :
+                        type = "茄子FC";
+                        break;
+                }
+                return type;
+            },
         }, {
             title: '备注',
             align: 'center',
@@ -372,7 +351,7 @@ class FootBallTeamTable extends React.Component {
         }, {
             title: <span>id</span>,
             align: 'center',
-            width: '5%',
+            width: '10%',
             render: function (text, record, index) {
                 return <p className="cursor-hand" onClick={() => {
                     copy(`${record.id}`);
@@ -408,7 +387,7 @@ class FootBallTeamTable extends React.Component {
             render: function (text, record, index) {
                 return <div className="center"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
                     <p className="ml-s cursor-hand"
-                       onClick={onNameClick.bind(this, record)}>{record.name}{record.englishName ? "(" + record.englishName + ")" : ""}</p>
+                       onClick={onNameClick.bind(this, record)}>{record.name}{record.shortName ? "(" + record.shortName + ")" : ""}</p>
                 </div>;
             },
         },

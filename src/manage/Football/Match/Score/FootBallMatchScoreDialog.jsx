@@ -15,51 +15,51 @@ import {
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import defultAvatar from '../../../static/avatar.jpg';
-import vs from '../../../static/vs.png';
-import start from '../../../static/start.svg';
-import half_time from '../../../static/half_time.svg';
-import injury from '../../../static/injury.svg';
-import extra from '../../../static/extra.svg';
-import pause from '../../../static/pause.svg';
-import penalty from '../../../static/penalty.svg';
-import finish from '../../../static/finish.svg';
-import yellowcard from '../../../static/yellowcard.svg';
-import redcard from '../../../static/redcard.svg';
-import offside from '../../../static/offside.svg';
-import goal from '../../../static/goal.svg';
-import substitution from '../../../static/substitution.svg';
-import shoot from '../../../static/shoot.svg';
-import tackle from '../../../static/tackle.svg';
-import free_kick from '../../../static/free_kick.svg';
-import foul from '../../../static/foul.svg';
-import save from '../../../static/save.svg';
-import corner from '../../../static/corner.svg';
-import long_pass from '../../../static/long_pass.svg';
-import clearance from '../../../static/clearance.svg';
-import cross from '../../../static/cross.svg';
-import own_goal from '../../../static/own_goal.svg';
-import shoot_out from '../../../static/shoot_out.svg';
-import shoot_door from '../../../static/shoot_door.svg';
-import cross_failed from '../../../static/cross_failed.svg';
-import cross_success from '../../../static/cross_success.svg';
-import substitution_arrow from '../../../static/substitution_arrow.svg';
+import defultAvatar from '../../../../static/avatar.jpg';
+import vs from '../../../../static/vs.png';
+import start from '../../../../static/start.svg';
+import half_time from '../../../../static/half_time.svg';
+import injury from '../../../../static/injury.svg';
+import extra from '../../../../static/extra.svg';
+import pause from '../../../../static/pause.svg';
+import penalty from '../../../../static/penalty.svg';
+import finish from '../../../../static/finish.svg';
+import yellowcard from '../../../../static/yellowcard.svg';
+import redcard from '../../../../static/redcard.svg';
+import offside from '../../../../static/offside.svg';
+import goal from '../../../../static/goal.svg';
+import substitution from '../../../../static/substitution.svg';
+import shoot from '../../../../static/shoot.svg';
+import tackle from '../../../../static/tackle.svg';
+import free_kick from '../../../../static/free_kick.svg';
+import foul from '../../../../static/foul.svg';
+import save from '../../../../static/save.svg';
+import corner from '../../../../static/corner.svg';
+import long_pass from '../../../../static/long_pass.svg';
+import clearance from '../../../../static/clearance.svg';
+import cross from '../../../../static/cross.svg';
+import own_goal from '../../../../static/own_goal.svg';
+import shoot_out from '../../../../static/shoot_out.svg';
+import shoot_door from '../../../../static/shoot_door.svg';
+import cross_failed from '../../../../static/cross_failed.svg';
+import cross_success from '../../../../static/cross_success.svg';
+import substitution_arrow from '../../../../static/substitution_arrow.svg';
 import {
     getTimelineByMatchId,
-    getMatchTime,
+    getMatchStatus,
     getMatchById,
     getPlayersByTeamId,
     updateMatchById,
     updateMatchScoreStatusById,
-} from "../../../axios";
-import FootBallMatchScoreAddDialog from '../Match/FootBallMatchScoreAddDialog';
-import FootBallMatchScoreModifyDialog from '../Match/FootBallMatchScoreModifyDialog';
-import FootBallMatchScoreTimeEventAddDialog from '../Match/FootBallMatchScoreTimeEventAddDialog';
-import FootBallMatchScoreTimeEventModifyDialog from '../Match/FootBallMatchScoreTimeEventModifyDialog';
-import FootBallMatchScorePassDialog from '../Match/FootBallMatchScorePassDialog';
+} from "../../../../axios";
+import FootBallMatchScoreAddDialog from './FootBallMatchScoreAddDialog';
+import FootBallMatchScoreModifyDialog from './FootBallMatchScoreModifyDialog';
+import FootBallMatchScoreTimeEventAddDialog from './FootBallMatchScoreTimeEventAddDialog';
+import FootBallMatchScoreTimeEventModifyDialog from './FootBallMatchScoreTimeEventModifyDialog';
+import FootBallMatchScorePassDialog from './FootBallMatchScorePassDialog';
 import {message} from "antd/lib/index";
 
 const status = {
@@ -154,7 +154,6 @@ class FootBallMatchScoreDialog extends React.Component {
         drawEventHeight: 300,
         hostPoint: 0,
         guestPoint: 0,
-        timelineList: [],
     }
 
     componentDidMount() {
@@ -168,7 +167,6 @@ class FootBallMatchScoreDialog extends React.Component {
         }
         this.timerID = setInterval(
             () => {
-                this.getTime();
                 this.getTimeline();
             },
             30000
@@ -188,40 +186,32 @@ class FootBallMatchScoreDialog extends React.Component {
             if (data && data.code == 200) {
                 this.setState({
                     data: data.data,
-                    // hostFormation: data.hostteam?(data.hostteam.formation ? data.hostteam.formation.type : "4-3-3"):{},
-                    // guestFormation: data.guestteam?(data.guestteam.formation ? data.guestteam.formation.type : "4-3-3"):{}
+                    // hostFormation: data.hostTeam?(data.hostTeam.formation ? data.hostTeam.formation.type : "4-3-3"):{},
+                    // guestFormation: data.guestTeam?(data.guestTeam.formation ? data.guestTeam.formation.type : "4-3-3"):{}
                 });
-                data.data.hostteam && this.getPlayer(data.data.hostteam.id);
-                data.data.guestteam && this.getPlayer(data.data.guestteam.id);
+                data.data.hostTeam && this.getPlayer(data.data.hostTeam.id);
+                data.data.guestTeam && this.getPlayer(data.data.guestTeam.id);
                 this.getTimeline();
-                this.getTime();
             } else {
                 message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
-    getTime = () => {
-        getMatchTime(this.props.matchId).then((data) => {
-            if (data && data.code == 200) {
-                this.setState({status: data.data});
-            } else {
-                message.error('获取比赛时间失败：' + (data ? data.result + "-" + data.message : data), 3);
-            }
-        });
-    }
+
     getTimeline = () => {
-        getTimelineByMatchId({matchId: this.props.matchId}).then((data) => {
-            if (data && data.code == 200) {
-                this.setState({timelineList: data.data});
+        getMatchStatus(this.props.matchId).then((res) => {
+            if (res && res.code == 200) {
+                this.setState({status: res.data});
                 let hostPass = 0;
                 let hostPoss = 50;
                 let guestPass = 0;
                 let guestPoss = 50;
-                data.data && data.data.forEach((item, index) => {
+                let timelines = res.data ? res.data.timeLines : [];
+                timelines && timelines.forEach((item, index) => {
                     if (item.eventType == CHUANKONG) {
                         const passAndPoss = JSON.parse(item.remark)
                         const teamId = item.teamId
-                        if (teamId == this.state.data.hostteam.id) {
+                        if (teamId == this.state.data.hostTeam.id) {
                             hostPass = passAndPoss.pass
                             hostPoss = passAndPoss.possession
                         } else {
@@ -232,9 +222,9 @@ class FootBallMatchScoreDialog extends React.Component {
                 });
                 let hostPoint = 0;
                 let guestPoint = 0;
-                if (this.state.data.hostteam) {
-                    data.data && data.data.forEach((item, index) => {
-                        const isHost = this.state.data.hostteam.id == item.teamId ? true : false;
+                if (this.state.data.hostTeam) {
+                    timelines && timelines.forEach((item, index) => {
+                        const isHost = this.state.data.hostTeam.id == item.teamId ? true : false;
                         if (item.eventType == 1 || item.eventType == 22) {
                             if (isHost) {
                                 if (item.eventType == 22) {
@@ -255,14 +245,14 @@ class FootBallMatchScoreDialog extends React.Component {
                 this.setState({
                     hostPoint: hostPoint,
                     guestPoint: guestPoint,
-                    timelineData: data.data,
+                    timelineData: timelines,
                     hostPass: hostPass,
                     hostPoss: hostPoss,
                     guestPass: guestPass,
                     guestPoss: guestPoss,
                 });
             } else {
-                message.error('获取时间轴失败：' + (data ? data.result + "-" + data.message : data), 3);
+                message.error('获取时间轴失败：' + (res ? res.result + "-" + res.message : res), 3);
             }
         });
     }
@@ -286,67 +276,6 @@ class FootBallMatchScoreDialog extends React.Component {
         this.setState({
             playerInfo: playerInfo,
         });
-    }
-    getFormation = (type) => {
-        return formation[type]
-    }
-    getHalfPlayer = (type, reverse) => {
-        let formation;
-        let formationStr;
-        if (type == KECHANG) {
-            if (this.state.data.guestteam) {
-                formation = this.state.data.guestteam.formation;
-            }
-        } else {
-            if (this.state.data.hostteam) {
-                formation = this.state.data.hostteam.formation;
-            }
-        }
-        if (formation == null) {
-            return null;
-        }
-        formationStr = formation.type;
-        let times = 12;
-        const getColPlayer = (item, colWidth, type, formation) => {
-            let dom_col = [];
-            for (var i = 0; i < item; i++) {
-                times = times - 1;
-                let playerInfo;
-                if (formation.position) {
-                    playerInfo = formation.position[times];
-                }
-                dom_col.push(<Col span={colWidth}>
-                    <div className="center" style={{webkitTransform: 'perspective(1000)'}}>
-                        <Avatar size="small" className={reverse ? "reverse" : ""}
-                                src={playerInfo ? playerInfo.headImg : defultAvatar}/>
-                    </div>
-                </Col>);
-            }
-            return dom_col;
-        }
-        const formationList = this.getFormation(formationStr).split("-")
-        const divHeight = 150 * 3 / 4 / formationList.length;
-        let dom = []
-        for (var i = formationList.length - 1; i >= 0; i--) {
-            dom.push(<div style={{height: divHeight}}>
-                <Row gutter={1} className="center">
-                    {getColPlayer(formationList[i], Math.floor(24 / formationList[i]), type, formation)}
-                </Row></div>);
-        }
-        let playerInfo;
-        if (formation) {
-            if (formation.detail) {
-                playerInfo = formation.detail[(times - 1)];
-            }
-        }
-        dom.push(<div className="center" style={{webkitTransform: 'perspective(1000)'}}>
-            <Avatar size="small" className={reverse ? "reverse" : ""}
-                    src={playerInfo ? playerInfo.headImg : defultAvatar}/>
-        </div>);
-        return dom;
-    }
-    getFormation = (type) => {
-        return formation[type]
     }
     onTimelineAddClick = () => {
         this.showDrawer();
@@ -383,7 +312,7 @@ class FootBallMatchScoreDialog extends React.Component {
                         </div>
                         <span className="w-full center">{des}</span>
                     </div>
-                    const isHost = this.state.data.hostteam ? (this.state.data.hostteam.id == item.teamId ? true : false) : false
+                    const isHost = this.state.data.hostTeam ? (this.state.data.hostTeam.id == item.teamId ? true : false) : false
                     const dis = isHost ? "timeline-left" : "timeline-right"
                     const avatar = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].headImg : defultAvatar;
                     const hideTime = eventType[item.eventType].hideTime;
@@ -570,7 +499,6 @@ class FootBallMatchScoreDialog extends React.Component {
     }
     refreshTimeLine = () => {
         this.getTimeline();
-        this.getTime();
     }
     onStatusDialogRaidoChange = (e) => {
         this.setState({statusDialogRadio: e.target.value});
@@ -587,7 +515,7 @@ class FootBallMatchScoreDialog extends React.Component {
             id: this.state.data.id,
             status: this.state.statusDialogRadio,
             score: this.state.statusDialogScore,
-            penaltyscore: this.state.statusDialogPenaltyScore,
+            penaltyScore: this.state.statusDialogPenaltyScore,
         }).then((data) => {
             if (data && data.code == 200) {
                 if (data.data) {
@@ -608,7 +536,7 @@ class FootBallMatchScoreDialog extends React.Component {
             dialogStatusVisible: true,
             statusDialogRadio: this.state.data.status,
             statusDialogScore: this.state.data.score,
-            statusDialogPenaltyScore: this.state.data.penaltyscore
+            statusDialogPenaltyScore: this.state.data.penaltyScore
         });
     }
     handleMatchStatusCancel = () => {
@@ -617,7 +545,6 @@ class FootBallMatchScoreDialog extends React.Component {
 
     render() {
         const {visible, form, record, responsive} = this.props;
-        const getHalfPlayer = this.getHalfPlayer;
         const onTimelineAddClick = this.onTimelineAddClick;
         const onDrawClose = this.onDrawClose;
         const onModifyDrawClose = this.onModifyDrawClose;
@@ -647,7 +574,7 @@ class FootBallMatchScoreDialog extends React.Component {
         //                 </div>
         //                 <div className="w-full mb-m">
         //                     <p className="pull-left mt-n mb-n"
-        //                        style={{color: "#FFFFFF"}}>{this.state.data.hostteam ? this.state.data.hostteam.name : ""}</p>
+        //                        style={{color: "#FFFFFF"}}>{this.state.data.hostTeam ? this.state.data.hostTeam.name : ""}</p>
         //                     <p className="pull-right mt-xxs mb-n">
         //                         {this.state.hostFormation}
         //                     </p>
@@ -668,7 +595,7 @@ class FootBallMatchScoreDialog extends React.Component {
         //                 </div>
         //                 <div className="w-full mb-m">
         //                     <p className="pull-left mt-n mb-n"
-        //                        style={{color: "#FFFFFF"}}>{this.state.data.guestteam ? this.state.data.guestteam.name : ""}</p>
+        //                        style={{color: "#FFFFFF"}}>{this.state.data.guestTeam ? this.state.data.guestTeam.name : ""}</p>
         //                     <p className="pull-right mt-xxs mb-n">
         //                         {this.state.guestFormation}
         //                     </p>
@@ -681,7 +608,7 @@ class FootBallMatchScoreDialog extends React.Component {
         //         <div className="playground" style={{width: 300}}>
         //             <div className="w-full mb-m">
         //                 <p className="pull-left mt-n mb-n"
-        //                    style={{color: "#FFFFFF"}}>{this.state.data.guestteam ? this.state.data.guestteam.name : ""}</p>
+        //                    style={{color: "#FFFFFF"}}>{this.state.data.guestTeam ? this.state.data.guestTeam.name : ""}</p>
         //                 <p className="pull-right mt-ms-r mb-n">
         //                     {this.state.guestFormation}
         //                 </p>
@@ -708,7 +635,7 @@ class FootBallMatchScoreDialog extends React.Component {
         //             </div>
         //             <div className="w-full mb-m">
         //                 <p className="pull-left mt-n mb-n"
-        //                    style={{color: "#FFFFFF"}}>{this.state.data.hostteam ? this.state.data.hostteam.name : ""}</p>
+        //                    style={{color: "#FFFFFF"}}>{this.state.data.hostTeam ? this.state.data.hostTeam.name : ""}</p>
         //                 <p className="pull-right mt-xxs mb-n">
         //                     {this.state.hostFormation}
         //                 </p>
@@ -721,10 +648,10 @@ class FootBallMatchScoreDialog extends React.Component {
                 <Col span={8}>
                     <div className="center">
                         <img className="round-img"
-                             src={this.state.data.hostteam ? this.state.data.hostteam.headImg : defultAvatar}/>
+                             src={this.state.data.hostTeam ? this.state.data.hostTeam.headImg : defultAvatar}/>
                     </div>
                     <div className="center w-full mt-m">
-                        <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.hostteam ? this.state.data.hostteam.name : ""}</p>
+                        <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.hostTeam ? this.state.data.hostTeam.name : ""}</p>
                     </div>
                     <span className="center w-full">传球准确率</span>
                     <span className="center w-full">{this.state.hostPass}%</span>
@@ -736,7 +663,6 @@ class FootBallMatchScoreDialog extends React.Component {
                     <div className="center w-full">
                         <p style={{fontSize: 22, paddingLeft: 10, paddingRight: 10}}
                            onClick={this.showStatusDialog}
-                            // className="mb-s cursor-hand">{(this.state.timelineList == null || this.state.timelineList.size == 0)? this.state.data.score :(this.state.hostPoint + "-" + this.state.guestPoint)}</p>
                            className="mb-s cursor-hand">{this.state.data ? this.state.data.score : "0-0"}</p>
                     </div>
                     {matchStatus == null || matchStatus.status == -1 ? null :
@@ -753,10 +679,10 @@ class FootBallMatchScoreDialog extends React.Component {
                 <Col span={8}>
                     <div className="center">
                         <img className="round-img"
-                             src={this.state.data.guestteam ? this.state.data.guestteam.headImg : defultAvatar}/>
+                             src={this.state.data.guestTeam ? this.state.data.guestTeam.headImg : defultAvatar}/>
                     </div>
                     <div className="center w-full mt-m">
-                        <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.guestteam ? this.state.data.guestteam.name : ""}</p>
+                        <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.guestTeam ? this.state.data.guestTeam.name : ""}</p>
                     </div>
                     <span className="center w-full">传球准确率</span>
                     <span className="center w-full">{this.state.guestPass}%</span>

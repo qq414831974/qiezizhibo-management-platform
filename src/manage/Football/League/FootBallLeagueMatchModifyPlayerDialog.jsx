@@ -43,10 +43,10 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
         this.setState({
             loading: true,
         });
-        this.props.record && getTeamInLeague(this.props.record.leaguematchId).then((data) => {
+        this.props.record && getTeamInLeague(this.props.record.leagueId).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
-                    data: data.data,
+                    data: data.data.records,
                     loading: false,
                     playerSelectDisable: false,
                 });
@@ -237,8 +237,8 @@ class FootBallLeagueMatchModifyPlayerDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem style={{margin: 0}}>
-                            {getFieldDecorator('leaguematchId', {
-                                initialValue: this.props.record.leaguematchId,
+                            {getFieldDecorator('leagueId', {
+                                initialValue: this.props.record.leagueId,
                             })(
                                 <Input hidden={true}/>
                             )}

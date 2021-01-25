@@ -299,12 +299,6 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
                                    onChange={this.onPosterChange.bind(this, form)}
                                    value={form.getFieldValue('poster') ? form.getFieldValue('poster') : record.poster}/>
                         </div>
-                        <div className="w-full center mt-s">
-                            <span>观看人数：{record.view}</span>
-                        </div>
-                        <div className="w-full center">
-                            <span>实际观看人数：{record.viewreal}</span>
-                        </div>
                         <FormItem {...formItemLayout} label="地址" className="bs-form-item">
                             {getFieldDecorator('path', {
                                 initialValue: record.path,
@@ -318,34 +312,6 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
                                 initialValue: record.title,
                             })(
                                 <Input.TextArea placeholder='标题'/>
-                            )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="基础观看人数" className="bs-form-item">
-                            {getFieldDecorator('viewbase', {
-                                initialValue: record.viewbase,
-                            })(
-                                <Input placeholder='基础观看人数'/>
-                            )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="人数放大最小" className="bs-form-item">
-                            {getFieldDecorator('viewExpendMin', {
-                                initialValue: record.viewExpendMin,
-                            })(
-                                <Input placeholder='人数放大最小'/>
-                            )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="人数放大最大" className="bs-form-item">
-                            {getFieldDecorator('viewExpendMax', {
-                                initialValue: record.viewExpendMax,
-                            })(
-                                <Input placeholder='人数放大最大'/>
-                            )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="点赞数" className="bs-form-item">
-                            {getFieldDecorator('nooice', {
-                                initialValue: record.nooice,
-                            })(
-                                <Input placeholder='点赞数'/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="描述" className="bs-form-item">

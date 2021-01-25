@@ -1,33 +1,33 @@
 import React from "react";
-import {receiveData} from "../../../action";
+import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {Avatar, Button, Row, Col, Icon, Spin, Collapse, message, Input, Select, Popconfirm} from 'antd';
-import {getMatchPlayersByTeamId, updateTimeline, deleteTimelineByIds} from "../../../axios";
-import defultAvatar from '../../../static/avatar.jpg';
-import shirt from '../../../static/shirt.png';
-import shirt2 from '../../../static/shirt2.png';
-import yellowcard from '../../../static/yellowcard.svg';
-import redcard from '../../../static/redcard.svg';
-import offside from '../../../static/offside.svg';
-import goal from '../../../static/goal.svg';
-import substitution from '../../../static/substitution.svg';
-import shoot from '../../../static/shoot.svg';
-import tackle from '../../../static/tackle.svg';
-import free_kick from '../../../static/free_kick.svg';
-import foul from '../../../static/foul.svg';
-import save from '../../../static/save.svg';
-import corner from '../../../static/corner.svg';
-import long_pass from '../../../static/long_pass.svg';
-import clearance from '../../../static/clearance.svg';
-import cross from '../../../static/cross.svg';
-import own_goal from '../../../static/own_goal.svg';
-import shoot_out from '../../../static/shoot_out.svg';
-import shoot_door from '../../../static/shoot_door.svg';
-import cross_failed from '../../../static/cross_failed.svg';
-import cross_success from '../../../static/cross_success.svg';
-import tackle_failed from '../../../static/tackle_failed.svg';
-import penalty from '../../../static/penalty.svg';
+import {getMatchPlayersByTeamId, updateTimeline, deleteTimelineByIds} from "../../../../axios";
+import defultAvatar from '../../../../static/avatar.jpg';
+import shirt from '../../../../static/shirt.png';
+import shirt2 from '../../../../static/shirt2.png';
+import yellowcard from '../../../../static/yellowcard.svg';
+import redcard from '../../../../static/redcard.svg';
+import offside from '../../../../static/offside.svg';
+import goal from '../../../../static/goal.svg';
+import substitution from '../../../../static/substitution.svg';
+import shoot from '../../../../static/shoot.svg';
+import tackle from '../../../../static/tackle.svg';
+import free_kick from '../../../../static/free_kick.svg';
+import foul from '../../../../static/foul.svg';
+import save from '../../../../static/save.svg';
+import corner from '../../../../static/corner.svg';
+import long_pass from '../../../../static/long_pass.svg';
+import clearance from '../../../../static/clearance.svg';
+import cross from '../../../../static/cross.svg';
+import own_goal from '../../../../static/own_goal.svg';
+import shoot_out from '../../../../static/shoot_out.svg';
+import shoot_door from '../../../../static/shoot_door.svg';
+import cross_failed from '../../../../static/cross_failed.svg';
+import cross_success from '../../../../static/cross_success.svg';
+import tackle_failed from '../../../../static/tackle_failed.svg';
+import penalty from '../../../../static/penalty.svg';
 
 const Option = Select.Option;
 const Panel = Collapse.Panel;
@@ -126,8 +126,8 @@ class FootBallMatchScoreModifyDialog extends React.Component {
         if (!this.props.visible) {
             return;
         }
-        this.props.data.hostteam.isHostTeam = true;
-        this.props.data.guestteam.isHostTeam = false;
+        this.props.data.hostTeam.isHostTeam = true;
+        this.props.data.guestTeam.isHostTeam = false;
         const callback1 = () => {
             this.check1 = true;
             if (this.check1 && this.check2) {
@@ -140,24 +140,24 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                 this.initDraw();
             }
         }
-        this.fetchTeamPlayer(this.props.matchId, this.props.data.hostteam.id, HOSTTEAM, callback1);
-        this.fetchTeamPlayer(this.props.matchId, this.props.data.guestteam.id, GUESTTEAM, callback2);
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.hostTeam.id, HOSTTEAM, callback1);
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.guestTeam.id, GUESTTEAM, callback2);
     }
 
     initDraw = () => {
-        let team = this.props.data.guestteam;
+        let team = this.props.data.guestTeam;
         let playerId = this.props.record.playerId;
         let player = null;
         let eventData = null;
-        if (this.props.record.teamId == this.props.data.hostteam.id) {
-            team = this.props.data.hostteam;
+        if (this.props.record.teamId == this.props.data.hostTeam.id) {
+            team = this.props.data.hostTeam;
             this.state.hostTeamPlayer.forEach((item, index) => {
                 if (item.id == playerId) {
                     player = item;
                 }
             });
         } else {
-            team = this.props.data.guestteam;
+            team = this.props.data.guestTeam;
             this.state.guestTeamPlayer.forEach((item, index) => {
                 if (item.id == playerId) {
                     player = item;
@@ -300,7 +300,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
     }
 
     onTeamSelect = (isHostTeam, e) => {
-        this.setState({team: isHostTeam ? this.props.data.hostteam : this.props.data.guestteam, currentChecked: true});
+        this.setState({team: isHostTeam ? this.props.data.hostTeam : this.props.data.guestTeam, currentChecked: true});
         this.next();
     }
     onPlayerSelect = (player, e) => {
@@ -665,18 +665,18 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                 <Row gutter={24}>
                     <Col span={12}>
                         <div
-                            className={this.state.team && (data.hostteam.id == this.state.team.id) ? "step-item-hover step-item-selected" : "step-item-hover"}
+                            className={this.state.team && (data.hostTeam.id == this.state.team.id) ? "step-item-hover step-item-selected" : "step-item-hover"}
                             onClick={onTeamSelect.bind(this, true)}>
-                            <img className="round-img mt-s" src={data.hostteam.headImg}/>
-                            <p style={{fontSize: 16}} className="w-full">{data.hostteam.name}</p>
+                            <img className="round-img mt-s" src={data.hostTeam.headImg}/>
+                            <p style={{fontSize: 16}} className="w-full">{data.hostTeam.name}</p>
                         </div>
                     </Col>
                     <Col span={12}>
                         <div
-                            className={this.state.team && (data.guestteam.id == this.state.team.id) ? "step-item-hover step-item-selected" : "step-item-hover"}
+                            className={this.state.team && (data.guestTeam.id == this.state.team.id) ? "step-item-hover step-item-selected" : "step-item-hover"}
                             onClick={onTeamSelect.bind(this, false)}>
-                            <img className="round-img mt-s" src={data.guestteam.headImg}/>
-                            <p style={{fontSize: 16}} className="w-full">{data.guestteam.name}</p>
+                            <img className="round-img mt-s" src={data.guestTeam.headImg}/>
+                            <p style={{fontSize: 16}} className="w-full">{data.guestTeam.name}</p>
                         </div>
                     </Col>
                 </Row>
