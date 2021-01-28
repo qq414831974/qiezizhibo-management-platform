@@ -1270,6 +1270,12 @@ export const getPing = (id) => get({url: `${config.live_service}/activity/${id}/
     }).catch(function (error) {
         console.log(error)
     });
+export const getLiveQuality = (id) => get({url: `${config.live_service}/activity/${id}/quality/info`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const getPlayerMedia = (params) => get({url: `${config.media_service}/media/player?${unpack(params)}`})
     .then(function (response) {
         return response.data;
@@ -1416,29 +1422,7 @@ export const getMatchStatus = (matchid) => get({url: `${config.football_service}
     }).catch(function (error) {
         console.log(error)
     });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const getCommentByMatchId = (param) => get({url: `${config.chat_service}/comment?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getCommentCountByMatchId = (matchId) => get({url: `${config.chat_service}/comment/count?${unpack({matchId: matchId})}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1519,12 +1503,73 @@ export const deleteCommentByIds = (ids) => del({url: `${config.chat_service}/com
     }).catch(function (error) {
         console.log(error)
     });
-export const getArticleList = (params) => get({url: `${config.system_service}/system/gongzhong/article?${unpack(params)}`})
+export const getLeagueFans = (param) => get({url: `${config.football_service}/football/league/fans?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
         console.log(error)
     });
+export const addLeagueFans = (param) => post({
+    url: `${config.football_service}/football/league/fans`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteLeagueFans = (param) => del({
+    url: `${config.football_service}/football/league/fans/leave?${unpack(param)}`,
+    data: null
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const importLYSYTeamPlayer = (param) => get({url: `${config.system_service}/sys/file/import/LYSY/team?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const importLYSYMatch = (param) => get({url: `${config.system_service}/sys/file/import/LYSY/match?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const importLYSYLeaguePlayer = (param) => get({url: `${config.system_service}/sys/file/import/LYSY/league/player?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getwxacodeunlimit = (param) => post({url: `${config.system_service}/sys/wx/wxa_codeunlimit`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getArticleList = (params) => get({url: `${config.system_service}/sys/wx/gongzhong/article?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const getProducts = (params) => get({url: `${config.pay_service}/product?${unpack(params)}`})
     .then(function (response) {
         return response.data;
@@ -1591,30 +1636,6 @@ export const queryOrder = (id) => post({url: `${config.pay_service}/pay/${id}/qu
     }).catch(function (error) {
         console.log(error)
     });
-export const getwxacodeunlimit = (param) => post({url: `${config.system_service}/system/wxa_codeunlimit`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const importLYSYTeamPlayer = (param) => get({url: `${config.system_service}/file/import/LYSY?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const importLYSYMatch = (param) => get({url: `${config.system_service}/file/import/LYSY/match?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const importLYSYLeaguePlayer = (param) => get({url: `${config.system_service}/file/import/LYSY/league/player?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
 export const getFreeTickets = (param) => get({url: `${config.pay_service}/freeTicket?${unpack(param)}`})
     .then(function (response) {
         return response.data;
@@ -1640,12 +1661,6 @@ export const updateFreeTicket = (param) => put({url: `${config.pay_service}/free
         console.log(error)
     });
 export const deleteFreeTickets = (params) => del({url: `${config.pay_service}/freeTicket?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getLiveQuality = (id) => get({url: `${config.live_service}/activity/${id}/quality/info`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1694,36 +1709,6 @@ export const updateGift = (param) => put({url: `${config.pay_service}/gift`, dat
         console.log(error)
     });
 export const deleteGifts = (param) => del({url: `${config.pay_service}/gift?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getLeagueFans = (param) => get({url: `${config.football_service}/league/fans?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const addLeagueFans = (param) => post({
-    url: `${config.football_service}/league/fans?${unpack(param)}`,
-    data: null
-})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateLeagueFans = (param) => put({url: `${config.football_service}/league/fans`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteLeagueFans = (param) => post({
-    url: `${config.football_service}/league/fans/leave?${unpack(param)}`,
-    data: null
-})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

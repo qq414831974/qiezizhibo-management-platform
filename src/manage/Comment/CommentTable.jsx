@@ -350,7 +350,7 @@ class CommentTable extends React.Component {
                 <div className="custom-filter-dropdown">
                     <Input
                         ref={ele => this.searchInput = ele}
-                        placeholder="Search name"
+                        placeholder="按内容查找"
                         value={this.state.searchText}
                         onChange={this.onInputChange}
                         onPressEnter={this.onSearch}
@@ -398,7 +398,7 @@ class CommentTable extends React.Component {
                     default :
                         status = "未审核";
                 }
-                return record.updatedat ? <Tooltip title={"更新时间：" + parseTimeString(record.updatedat)}>
+                return record.updatedAt ? <Tooltip title={"更新时间：" + parseTimeString(record.updatedAt)}>
                     {status}
                 </Tooltip> : status;
             },
@@ -467,7 +467,7 @@ class CommentTable extends React.Component {
                     default :
                         status = "未审核";
                 }
-                return record.updatedat ? <Tooltip title={"更新时间：" + parseTimeString(record.updatedat)}>
+                return record.updatedAt ? <Tooltip title={"更新时间：" + parseTimeString(record.updatedAt)}>
                     {status}
                 </Tooltip> : status;
             },

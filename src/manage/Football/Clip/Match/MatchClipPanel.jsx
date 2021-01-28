@@ -83,7 +83,7 @@ class MatchClipPanel extends React.Component {
         this.setState({
             hostloading: true,
         });
-        getMatchPlayersByTeamId(null, this.props.match.hostteam.id).then((data) => {
+        getMatchPlayersByTeamId(null, this.props.match.hostTeam.id).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     hostdata: data.data ? data.data.records : "",
@@ -99,7 +99,7 @@ class MatchClipPanel extends React.Component {
         this.setState({
             guestloading: true,
         });
-        getMatchPlayersByTeamId(null, this.props.match.guestteam.id).then((data) => {
+        getMatchPlayersByTeamId(null, this.props.match.guestTeam.id).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
                     guestdata: data.data ? data.data.records : "",
@@ -324,13 +324,13 @@ class MatchClipPanel extends React.Component {
     }
     getTeamOption = () => {
         let dom = [];
-        const hostteam = this.props.match.hostteam;
-        const guestteam = this.props.match.guestteam;
-        if (hostteam) {
-            dom.push(<Option key={hostteam.id} value={hostteam.id}>{hostteam.name}</Option>)
+        const hostTeam = this.props.match.hostTeam;
+        const guestTeam = this.props.match.guestTeam;
+        if (hostTeam) {
+            dom.push(<Option key={hostTeam.id} value={hostTeam.id}>{hostTeam.name}</Option>)
         }
-        if (guestteam) {
-            dom.push(<Option key={guestteam.id} value={guestteam.id}>{guestteam.name}</Option>)
+        if (guestTeam) {
+            dom.push(<Option key={guestTeam.id} value={guestTeam.id}>{guestTeam.name}</Option>)
         }
         return dom;
     }
@@ -369,11 +369,11 @@ class MatchClipPanel extends React.Component {
                     <div>
                         <div className="center">
                             <img className="round-img-xs"
-                                 src={this.props.match ? this.props.match.hostteam.headImg : defultAvatar}/>
+                                 src={this.props.match ? this.props.match.hostTeam.headImg : defultAvatar}/>
                         </div>
                         <div className="center w-full">
                             <p style={{fontSize: 12}}
-                               className="mt-s mb-n">{this.props.match ? this.props.match.hostteam.name : ""}</p>
+                               className="mt-s mb-n">{this.props.match ? this.props.match.hostTeam.name : ""}</p>
                         </div>
                         {this.getTeamPlayerDom(this.state.hostdata)}
                     </div>
@@ -381,11 +381,11 @@ class MatchClipPanel extends React.Component {
                 <Col span={12}>
                     <div className="center">
                         <img className="round-img-xs"
-                             src={this.props.match ? this.props.match.guestteam.headImg : defultAvatar}/>
+                             src={this.props.match ? this.props.match.guestTeam.headImg : defultAvatar}/>
                     </div>
                     <div className="center w-full">
                         <p style={{fontSize: 12}}
-                           className="mt-s mb-n">{this.props.match ? this.props.match.guestteam.name : ""}</p>
+                           className="mt-s mb-n">{this.props.match ? this.props.match.guestTeam.name : ""}</p>
                     </div>
                     {this.getTeamPlayerDom(this.state.guestdata)}
                 </Col>
@@ -393,7 +393,7 @@ class MatchClipPanel extends React.Component {
             <Card title={<div>自动剪辑视频{this.state.selectIds != null && this.state.selectIds.length > 0 ?
                 <Button type="primary" className="ml-l" onClick={this.mergeClipsConfirm}>合并</Button> : null}</div>}
                   className="mt-m" style={{minHeight: 250}}>
-                <Checkbox.Group style={{width: '100%'}} onChange={this.onCheckBoxChange}>
+                <Checkbox.Group style={{width: '100%'}} value={this.state.selectIds} onChange={this.onCheckBoxChange}>
                     <List
                         rowKey={record => record.id}
                         grid={{gutter: 16, lg: 3, md: 2, xs: 1}}
