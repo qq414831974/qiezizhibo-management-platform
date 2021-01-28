@@ -163,6 +163,7 @@ class MatchClipPanel extends React.Component {
             }
             values["timeStart"] = values["timeStart"] ? values["timeStart"].format('YYYY/MM/DD HH:mm:ss') : null;
             values["timeEnd"] = values["timeEnd"] ? values["timeEnd"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["planTime"] = values["planTime"] ? values["planTime"].format('YYYY/MM/DD HH:mm:ss') : null;
             updateClipsByMatchId(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
