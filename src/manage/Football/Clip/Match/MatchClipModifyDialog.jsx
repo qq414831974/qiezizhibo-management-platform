@@ -97,6 +97,16 @@ class MatchClipModifyDialog extends React.Component {
                                 </Select>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} hidden={!record.isError} label="是否错误">
+                            {getFieldDecorator('isError', {
+                                initialValue: record.isError,
+                            })(
+                                <Select disabled hidden={!record.isError}>
+                                    <Option value={true}>生成错误</Option>
+                                    <Option value={false}>没错误</Option>
+                                </Select>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="计划生成" className="bs-form-item">
                             {getFieldDecorator('planTime', {
                                 rules: [{required: true, message: '请选择开始时间!'}],

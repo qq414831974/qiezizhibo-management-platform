@@ -406,6 +406,8 @@ class MatchClipPanel extends React.Component {
                         renderItem={item => (<List.Item key={item.id}>
                             <div className="video-list-item pa-xs" style={{transform: "translate(0px, 0px)"}}>
                                 <Checkbox className="video-list-item-checkbox" value={item.id}/>
+                                {item.url == null || item.url == "" ?
+                                    <div className="video-list-item-hint danger">无地址</div> : null}
                                 <div className="video-list-item-top-left">
                                     <Avatar
                                         src={item.player ? (item.player.headImg ? item.player.headImg : defultAvatar) : defultAvatar}/>
@@ -428,7 +430,7 @@ class MatchClipPanel extends React.Component {
                                     {/*onClick={this.handleMediaDelete.bind(this, item)}/>*/}
                                 </div>
                                 <div className="video-list-item-bottom center">
-                                    <p className="video-list-item-bottom-text">{item.planing ? "生成中" : "已生成"}</p>
+                                    <p className="video-list-item-bottom-text">{item.isError ? "生成错误" : (item.planing ? "生成中" : "已生成")}</p>
                                 </div>
                             </div>
                         </List.Item>)}
