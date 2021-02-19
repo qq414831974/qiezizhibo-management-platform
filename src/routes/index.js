@@ -47,6 +47,7 @@ import FootBallLeagueClipManagement from "../manage/Football/Clip/League/FootBal
 import FootBallMatchClipManagement from "../manage/Football/Clip/Match/FootBallMatchClipManagement";
 import FootBallLeagueEncryptionManagement from "../manage/Football/Encryption/League/FootBallLeagueEncryptionManagement";
 import FootBallMatchEncrypitonManagement from "../manage/Football/Encryption/Match/FootBallMatchEncryptionManagement";
+import FootballLeagueMatchBillAnalysis from "../manage/Football/League/Bill/FootballLeagueMatchBillAnalysis";
 import Unauthorized from '../manage/Pages/Unauthorized';
 import LogManagement from '../manage/Log/LogManagement';
 
@@ -125,6 +126,7 @@ export default class CRouter extends Component {
                 <Route path="/football/footballLeagueSeries/:id" component={this.requireAuth("/football/footballLeagueSeries/:id",FootBallLeagueMatchSeriesManagement)}/>
                 <Route path="/football/footballPlayer/:id" component={this.requireAuth("/football/footballPlayer/:id",FootballPlayerDetailManagement)}/>
                 <Route path="/football/schedule" component={this.requireAuth("/football/schedule",FootballMatchSchedule)}/>
+                <Route path="/analysis/bill" component={this.requireAuth("/analysis/bill",FootballLeagueMatchBillAnalysis)}/>
                 <Route path="/sys/log" component={this.requireAuth("/sys/log",LogManagement)}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>

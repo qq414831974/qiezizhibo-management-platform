@@ -346,12 +346,6 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             align: 'center',
             width: '5%',
             render: function (text, record, index) {
-                if (record.isParent) {
-                    return <span onClick={() => {
-                        message.warn("请前往系列赛中查看", 1);
-                    }
-                    } className="cursor-hand">查看</span>
-                }
                 return <Link to={
                     `/analysis/bill?leagueId=${record.id}`
                 }><span className="cursor-hand">查看</span></Link>

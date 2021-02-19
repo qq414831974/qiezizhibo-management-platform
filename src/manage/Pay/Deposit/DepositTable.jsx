@@ -7,6 +7,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import logo from "../../../static/logo.png";
 import defultAvatar from "../../../static/avatar.jpg";
+import NP from 'number-precision'
 
 const depositType = {
     0: "全部免费",
@@ -164,11 +165,14 @@ class DepositTable extends React.Component {
             },
         },
             {
-                title: '余额',
+                title: '余额/元',
                 key: 'deposit',
                 dataIndex: 'deposit',
                 align: 'center',
                 width: '30%',
+                render: function (text, record, index) {
+                    return <span>{NP.divide(record.deposit, 100)}（元）</span>;
+                },
             }
         ];
         return <div><Table columns={columns}

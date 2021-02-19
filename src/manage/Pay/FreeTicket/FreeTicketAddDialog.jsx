@@ -10,7 +10,7 @@ import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import moment from "moment";
-import {getAllMatchs, getAllLeagueMatchs, getAllAdminUser} from "../../../axios";
+import {getAllMatchs, getAllLeagueMatchs, getAllUser} from "../../../axios";
 import defultAvatar from "../../../static/avatar.jpg";
 import logo from "../../../static/logo.png";
 
@@ -190,7 +190,7 @@ class FreeTicketAddDialog extends React.Component {
         this.setState({
             userloading: true,
         });
-        getAllAdminUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 1}).then((data) => {
+        getAllUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 1}).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
                     userdata: pageNum == 1 ? (data.data ? data.data.records : []) :
@@ -261,14 +261,14 @@ class FreeTicketAddDialog extends React.Component {
         const currentUser = this.state.user;
         const options = this.state.data.map(d => <Option style={{height: 50}} key={d.id} value={d.id}>
             <Tooltip title={d.name + "-" + d.startTime}>
-                {(d.hostteam == null || d.guestteam == null) ?
+                {(d.hostTeam == null || d.guestTeam == null) ?
                     <span>{d.name}</span>
                     : <div className="center">
-                        <Avatar src={d.hostteam ? d.hostteam.headImg : defultAvatar}/>
-                        <p className="ml-s">{d.hostteam ? d.hostteam.name : ""}</p>
+                        <Avatar src={d.hostTeam ? d.hostTeam.headImg : defultAvatar}/>
+                        <p className="ml-s">{d.hostTeam ? d.hostTeam.name : ""}</p>
                         <p className="ml-s mr-s">{d.score}</p>
-                        <Avatar src={d.guestteam ? d.guestteam.headImg : defultAvatar}/>
-                        <p className="ml-s">{d.guestteam ? d.guestteam.name : ""}</p>
+                        <Avatar src={d.guestTeam ? d.guestTeam.headImg : defultAvatar}/>
+                        <p className="ml-s">{d.guestTeam ? d.guestTeam.name : ""}</p>
                     </div>}
             </Tooltip>
         </Option>);
@@ -312,18 +312,18 @@ class FreeTicketAddDialog extends React.Component {
                       hidden={!this.state.loading}/>
             </div>
             <div className="center w-full">
-                {(currentMatch.hostteam == null || currentMatch.guestteam == null) ?
+                {(currentMatch.hostTeam == null || currentMatch.guestTeam == null) ?
                     <Tooltip
                         title={currentMatch.name + "-" + currentMatch.startTime}><span>{currentMatch.name}</span></Tooltip>
                     : <Tooltip title={currentMatch.name + "-" + currentMatch.startTime}>
                         <div className="center">
                             <Avatar
-                                src={currentMatch.hostteam ? currentMatch.hostteam.headImg : defultAvatar}/>
-                            <p className="ml-s">{currentMatch.hostteam ? currentMatch.hostteam.name : ""}</p>
+                                src={currentMatch.hostTeam ? currentMatch.hostTeam.headImg : defultAvatar}/>
+                            <p className="ml-s">{currentMatch.hostTeam ? currentMatch.hostTeam.name : ""}</p>
                             <p className="ml-s mr-s">{currentMatch.score}</p>
                             <Avatar
-                                src={currentMatch.guestteam ? currentMatch.guestteam.headImg : defultAvatar}/>
-                            <p className="ml-s">{currentMatch.guestteam ? currentMatch.guestteam.name : ""}</p>
+                                src={currentMatch.guestTeam ? currentMatch.guestTeam.headImg : defultAvatar}/>
+                            <p className="ml-s">{currentMatch.guestTeam ? currentMatch.guestTeam.name : ""}</p>
                         </div>
                     </Tooltip>}
             </div>

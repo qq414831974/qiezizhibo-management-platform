@@ -471,6 +471,21 @@ class FootBallLeagueMatchTable extends React.Component {
             render: function (text, record, index) {
                 return <span onClick={genWxaCode.bind(this, record)}>生成</span>
             }
+            }, {
+                title: "收益",
+                align: 'center',
+                width: '4%',
+                render: function (text, record, index) {
+                    if (record.isparent) {
+                        return <span onClick={() => {
+                            message.warn("请前往系列赛中查看", 1);
+                        }
+                        } className="cursor-hand">查看</span>
+                    }
+                    return <Link to={
+                        `/analysis/bill?leagueId=${record.id}`
+                    }><span className="cursor-hand">查看</span></Link>
+                }
         },
         ];
         const columns_mobile = [{

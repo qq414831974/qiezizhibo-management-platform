@@ -42,7 +42,7 @@ export const menus_admin = [
         public: 1,
         sub: [
             {key: '/pay/order', title: '订单管理', icon: 'shopping-cart',},
-            {key: '/pay/product', title: '产品管理', icon: 'shopping',},
+            // {key: '/pay/product', title: '产品管理', icon: 'shopping',},
             {key: '/pay/monopoly', title: '比赛买断', icon: 'money-collect',},
             {key: '/pay/freeTicket', title: '免费观看', icon: 'transaction',},
             {key: '/pay/gift', title: '礼物管理', icon: 'gift',},

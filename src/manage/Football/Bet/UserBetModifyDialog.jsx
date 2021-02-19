@@ -96,22 +96,22 @@ class UserBetModifyDialog extends React.Component {
                 <div>奖品:{record.gradeInfo.awardDeposit / 100}茄币</div>}
         </div>;
         const match = record.match;
-        const hostteam = match.hostteam;
-        const guestteam = match.guestteam;
+        const hostTeam = match.hostTeam;
+        const guestTeam = match.guestTeam;
         let matchDom = null;
         let userDom = null;
         if (record.match) {
-            if (hostteam == null || guestteam == null) {
+            if (hostTeam == null || guestTeam == null) {
                 matchDom =
                     <Tooltip title={`比赛时间：${match.startTime}`}><span className="mb-s">{match.name}</span></Tooltip>
             } else {
                 matchDom = <Tooltip title={`比赛时间：${match.startTime}`}>
                     <div className="center mb-s">
-                        <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
-                        <p className="ml-s">{hostteam.name}</p>
+                        <Avatar src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}/>
+                        <p className="ml-s">{hostTeam.name}</p>
                         <p className="ml-s mr-s">{`${match.status == -1 ? "VS" : match.score}`}</p>
-                        <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
-                        <p className="ml-s">{guestteam.name}</p>
+                        <Avatar src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}/>
+                        <p className="ml-s">{guestTeam.name}</p>
                     </div>
                 </Tooltip>
             }

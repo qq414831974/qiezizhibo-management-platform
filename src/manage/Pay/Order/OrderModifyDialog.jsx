@@ -9,6 +9,7 @@ import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import moment from "moment";
+import NP from 'number-precision'
 
 
 const Option = Select.Option;
@@ -45,11 +46,11 @@ class OrderModifyDialog extends React.Component {
                             <Input disabled/>
                         )}
                     </FormItem>
-                    <FormItem {...formItemLayout} label="价格（分）" className="bs-form-item">
+                    <FormItem {...formItemLayout} label="价格（元）" className="bs-form-item">
                         {getFieldDecorator('orderPrice', {
-                            initialValue: record.orderPrice,
+                            initialValue: NP.divide(record.orderPrice, 100),
                         })(
-                            <Input disabled/>
+                            <Input disabled addonAfter="元"/>
                         )}
                     </FormItem>
                     <FormItem {...formItemLayout} label="用户id" className="bs-form-item">

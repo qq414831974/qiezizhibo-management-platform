@@ -7,6 +7,7 @@ import {receiveData} from "../../../action";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import defultAvatar from "../../../static/avatar.jpg";
+import NP from 'number-precision'
 
 const InputGroup = Input.Group;
 
@@ -16,9 +17,12 @@ class OrderTable extends React.Component {
         pagination: {pageSize: 10, filters: {}},
         loading: false,
         filterDropdownVisible: false,
+        filterPriceDropdownVisible: false,
+        filterTypeDropdownVisible: false,
         searchText: '',
         filtered: false,
         filteredPrice: false,
+        filteredType: false,
         dialogModifyVisible: false,
         dialogAddVisible: false,
         record: {},
@@ -68,14 +72,17 @@ class OrderTable extends React.Component {
         this.setState({searchPriceInputEnd: e.target.value});
     }
     onSearch = () => {
-        const {searchText, filterType, searchPriceInputBegin, searchPriceInputEnd} = this.state;
+        const {searchText, filterStatus, filterType, searchPriceInputBegin, searchPriceInputEnd} = this.state;
         const pager = {...this.state.pagination};
         pager.filters = this.getTableFilters(pager);
         pager.current = 1;
         this.setState({
             filterDropdownVisible: false,
-            filtered: !!searchText || filterType != null,
+            filterPriceDropdownVisible: false,
+            filterTypeDropdownVisible: false,
+            filtered: !!searchText || filterStatus != null,
             filteredPrice: !!searchPriceInputBegin && !!searchPriceInputEnd,
+            filteredType: filterType != null,
             pagination: pager,
         });
         this.fetch({
@@ -108,16 +115,19 @@ class OrderTable extends React.Component {
         });
     }
     getTableFilters = (pager, filters) => {
-        const {searchText, filterType, searchPriceInputBegin, searchPriceInputEnd} = this.state;
+        const {searchText, filterStatus, filterType, searchPriceInputBegin, searchPriceInputEnd} = this.state;
         pager.filters = {};
         if (searchText != null && searchText != '') {
             pager.filters["id"] = searchText;
         }
         if (searchPriceInputBegin != null && searchPriceInputBegin != '' && searchPriceInputEnd != null && searchPriceInputEnd != '') {
-            pager.filters["orderPrices"] = [searchPriceInputBegin, searchPriceInputEnd];
+            pager.filters["orderPrices"] = [searchPriceInputBegin * 100, searchPriceInputEnd * 100];
+        }
+        if (filterStatus != null) {
+            pager.filters["orderStatus"] = filterStatus;
         }
         if (filterType != null) {
-            pager.filters["orderStatus"] = filterType;
+            pager.filters["type"] = filterType;
         }
         if (filters) {
             for (let param in filters) {
@@ -158,6 +168,11 @@ class OrderTable extends React.Component {
         });
     };
     onNameDropDownRadioChange = (e) => {
+        this.setState({
+            filterStatus: e.target.value,
+        });
+    }
+    onTypeDropDownRadioChange = (e) => {
         this.setState({
             filterType: e.target.value,
         });
@@ -217,10 +232,15 @@ class OrderTable extends React.Component {
         const history = this.props.history;
         history.push(`/football/footballMatch/${item.id}`);
     }
+    toLeague = (item) => {
+        const history = this.props.history;
+        history.push(`/football/footballLeagueMatch/${item.id}`);
+    }
 
     render() {
         const onNameClick = this.onNameClick;
         const toMatch = this.toMatch;
+        const toLeague = this.toLeague;
 
         const ModifyDialog = Form.create()(OrderModifyDialog);
 
@@ -240,7 +260,7 @@ class OrderTable extends React.Component {
                     />
                     <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
                     <div className="custom-filter-dropdown-radio">
-                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.filterType}>
+                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.filterStatus}>
                             <Radio value={0}>未支付</Radio>
                             <Radio value={1}>已取消</Radio>
                             <Radio value={2}>已付款</Radio>
@@ -265,7 +285,7 @@ class OrderTable extends React.Component {
                 return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.id}</a>;
             },
         }, {
-            title: '价格（分）',
+            title: '价格（元）',
             dataIndex: 'orderPrice',
             key: 'orderPrice',
             align: 'center',
@@ -297,12 +317,15 @@ class OrderTable extends React.Component {
                     filterPriceDropdownVisible: visible,
                 }, () => this.searchPriceInput && this.searchPriceInput.focus());
             },
+            render: function (text, record, index) {
+                return <span>{NP.divide(record.orderPrice, 100)}（元）</span>;
+            },
         }, {
             title: '状态',
             key: 'orderStatus',
             dataIndex: 'orderStatus',
             align: 'center',
-            width: '10%',
+            width: '6%',
             render: function (text, record, index) {
                 let statusString = "未支付"
                 switch (record.orderStatus) {
@@ -336,12 +359,12 @@ class OrderTable extends React.Component {
             dataIndex: 'createTime',
             align: 'center',
             width: '15%',
-        },{
+        }, {
             title: '支付方式',
             key: 'payType',
             dataIndex: 'payType',
             align: 'center',
-            width: '10%',
+            width: '7%',
             render: function (text, record, index) {
                 let statusString = "微信支付"
                 switch (record.payType) {
@@ -355,32 +378,129 @@ class OrderTable extends React.Component {
                 return <span>{statusString}</span>;
             },
         }, {
+            title: '类型',
+            key: 'type',
+            dataIndex: 'type',
+            align: 'center',
+            width: '7%',
+            filterDropdown: (
+                <div className="custom-filter-dropdown">
+                    <div className="custom-filter-dropdown-radio">
+                        <Radio.Group onChange={this.onTypeDropDownRadioChange} value={this.state.filterType}>
+                            <Radio value={1}>购买比赛直播</Radio>
+                            <Radio value={2}>购买比赛录播</Radio>
+                            <Radio value={3}>比赛买断</Radio>
+                            <Radio value={4}>礼物</Radio>
+                            <Radio value={5}>竞猜</Radio>
+                            <Radio value={6}>余额充值</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className="w-full center mt-s">
+                        <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    </div>
+                </div>
+            ),
+            filterIcon: <Icon type="search" style={{color: this.state.filteredType ? '#108ee9' : '#aaa'}}/>,
+            filterDropdownVisible: this.state.filterTypeDropdownVisible,
+            onFilterDropdownVisibleChange: (visible) => {
+                this.setState({
+                    filterTypeDropdownVisible: visible,
+                });
+            },
+            render: function (text, record, index) {
+                let typeString = "未支付"
+                switch (record.type) {
+                    case 1:
+                        typeString = "购买比赛"
+                        break;
+                    case 2:
+                        typeString = "购买比赛"
+                        break;
+                    case 3:
+                        typeString = "比赛买断"
+                        break;
+                    case 4:
+                        typeString = "礼物"
+                        break;
+                    case 5:
+                        typeString = "竞猜"
+                        break;
+                    case 6:
+                        typeString = "余额充值"
+                        break;
+                }
+                return <span>{typeString}</span>;
+            },
+        }, {
             title: '描述',
             key: 'description',
             dataIndex: 'description',
             align: 'center',
             width: '30%',
             render: function (text, record, index) {
+                let dom = [];
+                if (record.league) {
+                    const league = record.league;
+                    dom.push(<div className="center cursor-hand" onClick={toLeague.bind(this, record.league)}>
+                        <Avatar src={league.headImg ? league.headImg : defultAvatar}/>
+                        <p className="ml-s">{league.name}</p>
+                    </div>);
+                }
                 if (record.match) {
                     const match = record.match;
-                    const hostteam = match.hostteam;
-                    const guestteam = match.guestteam;
-                    if (hostteam == null || guestteam == null) {
-                        return <Tooltip title={`比赛时间：${match.startTime}`}><span className="cursor-hand"
-                                                                                onClick={toMatch.bind(this, record.match)}>{match.name}</span></Tooltip>;
+                    const hostTeam = match.hostTeam;
+                    const guestTeam = match.guestTeam;
+                    if (hostTeam == null || guestTeam == null) {
+                        dom.push(<Tooltip title={`比赛时间：${match.startTime}`}>
+                            <div className="cursor-hand"
+                                 onClick={toMatch.bind(this, record.match)}>
+                                {match.name}
+                            </div>
+                            <div className="w-full center">
+                                {record.type == 3 ? <span className="danger">买断</span> : null}
+                            </div>
+                        </Tooltip>);
+                    } else {
+                        dom.push(<Tooltip title={`比赛时间：${match.startTime}`}>
+                            <div className="center cursor-hand" onClick={toMatch.bind(this, record.match)}>
+                                <Avatar src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}/>
+                                <p className="ml-s">{hostTeam.name}</p>
+                                <p className="ml-s mr-s">VS</p>
+                                <Avatar src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}/>
+                                <p className="ml-s">{guestTeam.name}</p>
+                            </div>
+                            <div className="w-full center">
+                                {record.type == 3 ? <span className="danger">买断</span> : null}
+                            </div>
+                        </Tooltip>);
                     }
-                    return <Tooltip title={`比赛时间：${match.startTime}`}>
-                        <div className="center cursor-hand" onClick={toMatch.bind(this, record.match)}>
-                            <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
-                            <p className="ml-s">{hostteam.name}</p>
-                            <p className="ml-s mr-s">VS</p>
-                            <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
-                            <p className="ml-s">{guestteam.name}</p>
-                            {record.type == 3 ? <span className="danger">买断</span>:null}
-                        </div>
-                    </Tooltip>;
                 }
-                return <span>{record.description}</span>;
+                if (record.gift) {
+                    const gift = record.gift;
+                    dom.push(<div className="w-full center">
+                        <Avatar src={gift.pic ? gift.pic : defultAvatar}/>
+                        <p className="ml-s">{gift.name}</p>
+                    </div>);
+                }
+                if (record.team) {
+                    const team = record.team;
+                    dom.push(<div className="w-full center">
+                        <Avatar src={team.headImg ? team.headImg : defultAvatar}/>
+                        <p className="ml-s">{team.name}</p>
+                    </div>);
+                }
+
+                if (record.player) {
+                    const player = record.player;
+                    dom.push(<div className="w-full center">
+                        <Avatar src={player.headImg ? player.headImg : defultAvatar}/>
+                        <p className="ml-s">{player.name}</p>
+                    </div>);
+                }
+                if (dom.length < 1) {
+                    return <span>{record.description}</span>;
+                }
+                return <span>{dom}</span>;
             },
         }
         ];
@@ -398,7 +518,7 @@ class OrderTable extends React.Component {
                     />
                     <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
                     <div className="custom-filter-dropdown-radio">
-                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.filterType}>
+                        <Radio.Group onChange={this.onNameDropDownRadioChange} value={this.state.filterStatus}>
                             <Radio value={0}>未支付</Radio>
                             <Radio value={1}>已取消</Radio>
                             <Radio value={2}>已付款</Radio>
@@ -447,7 +567,7 @@ class OrderTable extends React.Component {
                     <Button key="refund" type="danger" onClick={this.handleOrderRefundClick}>发起退款</Button>,
                     <Button key="cancel" type="danger" onClick={this.handleOrderCancelClick}>取消订单</Button>,
                     <Button key="back" onClick={this.handleOrderModifyCancel}>取消</Button>,
-                    <Button key="submit" type="primary" onClick={this.handleOrderModifyCreate}>确定</Button>,
+                    <Button key="submit" type="primary" onClick={this.handleOrderModifyCancel}>确定</Button>,
                 ]}
                 onCancel={this.handleOrderModifyCancel}>
                 <ModifyDialog visible={this.state.dialogModifyVisible} record={this.state.record}

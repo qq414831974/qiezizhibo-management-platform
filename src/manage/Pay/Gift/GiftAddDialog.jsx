@@ -271,12 +271,12 @@ class GiftAddDialog extends React.Component {
                             })(
                                 <InputNumber hidden/>
                             )}
-                        </FormItem> : <FormItem {...formItemLayout} label="价格/分" className="bs-form-item">
+                        </FormItem> : <FormItem {...formItemLayout} label="价格/元" className="bs-form-item">
                             {getFieldDecorator('price', {
                                 rules: [{required: true, message: '请输入价格!'}],
                             })(
-                                <InputNumber formatter={value => `${value}分`}
-                                             parser={value => value.replace('分', '')}
+                                <InputNumber formatter={value => `${value}元`}
+                                             parser={value => value.replace('元', '')}
                                              placeholder='请输入价格!'/>
                             )}
                         </FormItem>}

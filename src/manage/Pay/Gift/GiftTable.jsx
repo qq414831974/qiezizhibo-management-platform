@@ -8,6 +8,7 @@ import {receiveData} from "../../../action";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import logo from "../../../static/logo.png";
+import NP from 'number-precision'
 
 const giftType = {
     0: "全部免费",
@@ -202,6 +203,9 @@ class GiftTable extends React.Component {
                 });
             }
             values.growth = growth;
+            if (values.price) {
+                values.price = NP.times(values.price, 100)
+            }
             addGift(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -238,6 +242,9 @@ class GiftTable extends React.Component {
                 });
             }
             values.growth = growth;
+            if (values.price) {
+                values.price = NP.times(values.price, 100)
+            }
             updateGift(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
@@ -354,11 +361,14 @@ class GiftTable extends React.Component {
                 return <span>{type}</span>;
             },
         }, {
-            title: '价格/分',
+            title: '价格/元',
             key: 'price',
             dataIndex: 'price',
             align: 'center',
             width: '10%',
+            render: function (text, record, index) {
+                return <span>{NP.divide(record.price, 100)}（元）</span>;
+            },
         }, {
             title: '折扣',
             key: 'discountInfo',
@@ -371,7 +381,9 @@ class GiftTable extends React.Component {
                     let domKey = 0;
                     Object.keys(record.discountInfo).forEach(function (key) {
                         domKey = domKey + 1;
-                        discountToolTip.push(<p key={domKey}>{`${key}个打${record.discountInfo[key] / 10}折`}</p>)
+                        discountToolTip.push(<p key={domKey}>
+                            {`${key}个打${NP.divide(record.discountInfo[key], 10)}折`}
+                        </p>)
                     });
                 }
                 return <Tooltip title={discountToolTip}><span>查看折扣</span></Tooltip>;

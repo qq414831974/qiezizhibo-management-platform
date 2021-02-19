@@ -9,6 +9,7 @@ import {bindActionCreators} from "redux";
 import logo from "../../../static/logo.png";
 import defultAvatar from "../../../static/avatar.jpg";
 import {parseTimeString} from "../../../utils";
+import NP from 'number-precision'
 
 class UserBetTable extends React.Component {
     state = {
@@ -243,18 +244,18 @@ class UserBetTable extends React.Component {
                 render: function (text, record, index) {
                     if (record.match) {
                         const match = record.match;
-                        const hostteam = match.hostteam;
-                        const guestteam = match.guestteam;
-                        if (hostteam == null || guestteam == null) {
+                        const hostTeam = match.hostTeam;
+                        const guestTeam = match.guestTeam;
+                        if (hostTeam == null || guestTeam == null) {
                             return <Tooltip title={`比赛时间：${match.startTime}`}><span>{match.name}</span></Tooltip>
                         }
                         return <Tooltip title={`比赛时间：${match.startTime}`}>
                             <div className="center">
-                                <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
-                                <p className="ml-s">{hostteam.name}</p>
+                                <Avatar src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}/>
+                                <p className="ml-s">{hostTeam.name}</p>
                                 <p className="ml-s mr-s">VS</p>
-                                <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
-                                <p className="ml-s">{guestteam.name}</p>
+                                <Avatar src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}/>
+                                <p className="ml-s">{guestTeam.name}</p>
                             </div>
                         </Tooltip>;
                     }
@@ -269,28 +270,28 @@ class UserBetTable extends React.Component {
                 width: '10%',
                 render: function (text, record, index) {
                     let status = "未知"
-                    if (record.status) {
-                        switch (record.status) {
-                            case -1:
-                                status = "已竞猜，未出赛果"
-                                break;
-                            case 0:
-                                status = "竞猜失败"
-                                break;
-                            case 1:
-                                status = "未发奖"
-                                break;
-                            case 2:
-                                status = "已发奖"
-                                break;
-                            case 3:
-                                status = "放弃领奖"
-                                break;
-                            case 4:
-                                status = "竞猜取消"
-                                break;
-                        }
+                    // if (record.status) {
+                    switch (record.status) {
+                        case -1:
+                            status = "已竞猜，未出赛果"
+                            break;
+                        case 0:
+                            status = "竞猜失败"
+                            break;
+                        case 1:
+                            status = "未发奖"
+                            break;
+                        case 2:
+                            status = "已发奖"
+                            break;
+                        case 3:
+                            status = "放弃领奖"
+                            break;
+                        case 4:
+                            status = "竞猜取消"
+                            break;
                     }
+                    // }
                     return <span>{status}</span>;
                 },
             },
@@ -304,13 +305,13 @@ class UserBetTable extends React.Component {
                     if (record.gradeInfo) {
                         let gradeInfoDom = <div>
                             <div>档位:{record.gradeInfo.grade}</div>
-                            <div>价格:{record.gradeInfo.price / 100}元</div>
+                            <div>价格:{NP.divide(record.gradeInfo.price, 100)}元</div>
                             {record.gradeInfo.award ? <div>奖品:{record.gradeInfo.award}</div> :
-                                <div>奖品:{record.gradeInfo.awardDeposit/100}茄币</div>}
+                                <div>奖品:{NP.divide(record.gradeInfo.awardDeposit, 100)}茄币</div>}
                         </div>;
                         return <Tooltip title={gradeInfoDom}><span>{record.grade}</span></Tooltip>;
                     }
-                    return <span>{record.grade}</span>;
+                    return <span>第{record.grade}档</span>;
                 },
             },
             {
@@ -319,6 +320,24 @@ class UserBetTable extends React.Component {
                 dataIndex: 'score',
                 align: 'center',
                 width: '6%',
+                render: function (text, record, index) {
+                    let score = record.score;
+                    switch (record.score) {
+                        case "win":
+                            score = "主胜其他";
+                            break;
+                        case "lost":
+                            score = "客胜其他";
+                            break;
+                        case "draw":
+                            score = "平其他";
+                            break;
+                        default:
+                            score = record.score;
+                            break;
+                    }
+                    return <span>{score}</span>;
+                },
             },
             {
                 title: '赛果',

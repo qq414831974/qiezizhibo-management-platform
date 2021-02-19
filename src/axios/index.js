@@ -8,19 +8,15 @@ import {getNowDate, getPastMonthDate} from '../utils';
 
 export const npmDependencies = () => get('./npm.json').then(res => res.data).catch(err => console.log(err));
 
-export const weibo = () => get('./weibo.json').then(res => res.data).catch(err => console.log(err));
+export const uploadimg = `${config.system_service}/sys/file/upload/image?avatar=true`;
 
-export const webSocket = (activityid) => `${config.websocket_service}/websocket/${activityid}`;
+export const uploadmedia = `${config.system_service}/sys/file/upload/media`;
 
-export const uploadimg = `${config.system_service}/file/upload/image?avatar=true`;
+export const upload = `${config.system_service}/sys/file/upload/image`;
 
-export const uploadmedia = `${config.system_service}/file/upload/media`;
+export const uploaddocx_team = `${config.system_service}/sys/file/import/team`;
 
-export const upload = `${config.system_service}/file/upload/image`;
-
-export const uploaddocx_team = `${config.system_service}/file/import/team`;
-
-export const uploaddocx_match = `${config.system_service}/file/import/match`;
+export const uploaddocx_match = `${config.system_service}/sys/file/import/match`;
 
 export const login = (params) => post({url: `${config.auth_service}/auth`, data: params})
     .then(function (response) {
@@ -1173,7 +1169,7 @@ export const getRecentMatches = () => get({
     }).catch(function (error) {
         console.log(error)
     });
-export const getMatchMonopolys = (param) => get({url: `${config.football_service}/match/monopoly?${unpack(param)}`})
+export const getMatchMonopolys = (param) => get({url: `${config.football_service}/football/charge/monopoly?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1557,19 +1553,155 @@ export const getArticleList = (params) => get({url: `${config.system_service}/sy
     }).catch(function (error) {
         console.log(error)
     });
+export const getChargeGrowth = () => get({url: `${config.pay_service}/payment/growth`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addChargeGrowth = (param) => post({url: `${config.pay_service}/payment/growth`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateChargeGrowth = (param) => put({url: `${config.pay_service}/payment/growth`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteChargeGrowth = (param) => del({url: `${config.pay_service}/payment/growth?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getFreeTickets = (param) => get({url: `${config.pay_service}/payment/freeTicket?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getFreeTicketById = (id) => get({url: `${config.pay_service}/payment/freeTicket/${id}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addFreeTicket = (param) => post({url: `${config.pay_service}/payment/freeTicket`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateFreeTicket = (param) => put({url: `${config.pay_service}/payment/freeTicket`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteFreeTickets = (params) => del({url: `${config.pay_service}/payment/freeTicket?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getGifts = (param) => get({url: `${config.pay_service}/payment/gift?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addGift = (param) => post({url: `${config.pay_service}/payment/gift`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateGift = (param) => put({url: `${config.pay_service}/payment/gift`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteGifts = (param) => del({url: `${config.pay_service}/payment/gift?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+
+export const getUserDeposits = (param) => get({url: `${config.pay_service}/payment/deposit/list?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getOrders = (params) => get({url: `${config.pay_service}/payment/order?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getOrder = (id) => get({url: `${config.pay_service}/payment/order/${id}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateOrder = (params) => put({url: `${config.pay_service}/payment/order`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const closeOrder = (id) => post({url: `${config.pay_service}/payment/order/${id}/close`, data: {}})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const refundOrder = (id) => post({url: `${config.pay_service}/payment/order/${id}/refund`, data: {}})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const queryOrder = (id) => post({url: `${config.pay_service}/payment/order/${id}/query`, data: {}})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueBillAnalysisGift = (param) => get({url: `${config.pay_service}/payment/analysis/bill/gift?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueBillAnalysisCharge = (param) => get({url: `${config.pay_service}/payment/analysis/bill/charge?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getGiftOrder = (param) => get({url: `${config.pay_service}/payment/gift/order?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addFakeGiftOrder = (param) => post({url: `${config.pay_service}/payment/gift/order/fake`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 
 
 
-
-
-
-
-
-
-
-
-
-
+//暂时无用
 export const getProducts = (params) => get({url: `${config.pay_service}/product?${unpack(params)}`})
     .then(function (response) {
         return response.data;
@@ -1595,151 +1727,6 @@ export const updateProduct = (params) => put({url: `${config.pay_service}/produc
         console.log(error)
     });
 export const delProducts = (params) => del({url: `${config.pay_service}/product?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getOrders = (params) => get({url: `${config.pay_service}/order?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getOrder = (id) => get({url: `${config.pay_service}/order/${id}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateOrder = (params) => put({url: `${config.pay_service}/order`, data: params})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const closeOrder = (id) => post({url: `${config.pay_service}/pay/${id}/close`, data: {}})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const refundOrder = (id) => post({url: `${config.pay_service}/pay/${id}/refund`, data: {}})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const queryOrder = (id) => post({url: `${config.pay_service}/pay/${id}/query`, data: {}})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getFreeTickets = (param) => get({url: `${config.pay_service}/freeTicket?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getFreeTicketById = (id) => get({url: `${config.pay_service}/freeTicket/${id}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const addFreeTicket = (param) => post({url: `${config.pay_service}/freeTicket`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateFreeTicket = (param) => put({url: `${config.pay_service}/freeTicket`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteFreeTickets = (params) => del({url: `${config.pay_service}/freeTicket?${unpack(params)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getChargeGrowth = () => get({url: `${config.pay_service}/growth`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const addChargeGrowth = (param) => post({url: `${config.pay_service}/growth`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateChargeGrowth = (param) => put({url: `${config.pay_service}/growth`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteChargeGrowth = (param) => del({url: `${config.pay_service}/growth?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getGifts = (param) => get({url: `${config.pay_service}/gift?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const addGift = (param) => post({url: `${config.pay_service}/gift`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const updateGift = (param) => put({url: `${config.pay_service}/gift`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const deleteGifts = (param) => del({url: `${config.pay_service}/gift?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getGiftOrder = (param) => get({url: `${config.pay_service}/gift/order?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const addFakeGiftOrder = (param) => post({url: `${config.pay_service}/gift/order/fake`, data: param})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-
-export const getUserDeposits = (param) => get({url: `${config.pay_service}/deposit/list?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getLeagueBillAnalysisGift = (param) => get({url: `${config.pay_service}/analysis/bill/gift?${unpack(param)}`})
-    .then(function (response) {
-        return response.data;
-    }).catch(function (error) {
-        console.log(error)
-    });
-export const getLeagueBillAnalysisCharge = (param) => get({url: `${config.pay_service}/analysis/bill/charge?${unpack(param)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {

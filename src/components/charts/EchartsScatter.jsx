@@ -3,7 +3,6 @@
  */
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
-import { weibo } from '../../axios';
 require('echarts/map/js/china.js');
 
 
@@ -92,30 +91,6 @@ class EchartsScatter extends React.Component {
     }
     };
     componentDidMount() {
-        weibo().then(weiboData => {
-            weiboData = weiboData.map(function (serieData, idx) {
-                var px = serieData[0] / 1000;
-                var py = serieData[1] / 1000;
-                var res = [[px, py]];
-
-                for (var i = 2; i < serieData.length; i += 2) {
-                    var dx = serieData[i] / 1000;
-                    var dy = serieData[i + 1] / 1000;
-                    var x = px + dx;
-                    var y = py + dy;
-                    res.push([x.toFixed(2), y.toFixed(2), 1]);
-
-                    px = x;
-                    py = y;
-                }
-                return res;
-            });
-            this.setState({
-                option: {
-                    series: [{data: weiboData[0]}, {data: weiboData[1]}, {data: weiboData[2]}]
-                }
-            })
-        });
     }
     render() {
         return (

@@ -97,18 +97,18 @@ class MatchMonopolyTable extends React.Component {
                 width: '35%',
                 render: function (text, record, index) {
                     const match = record.match;
-                    const hostteam = match.hostteam;
-                    const guestteam = match.guestteam;
-                    if (hostteam == null || guestteam == null) {
+                    const hostTeam = match.hostTeam;
+                    const guestTeam = match.guestTeam;
+                    if (hostTeam == null || guestTeam == null) {
                         return <Tooltip title={`比赛时间：${match.startTime}`}><span>{match.name}</span></Tooltip>
                     }
                     return <Tooltip title={`比赛时间：${match.startTime}`}>
                         <div className="center">
-                            <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
-                            <p className="ml-s">{hostteam.name}</p>
+                            <Avatar src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}/>
+                            <p className="ml-s">{hostTeam.name}</p>
                             <p className="ml-s mr-s">VS</p>
-                            <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
-                            <p className="ml-s">{guestteam.name}</p>
+                            <Avatar src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}/>
+                            <p className="ml-s">{guestTeam.name}</p>
                         </div>
                     </Tooltip>;
                 },

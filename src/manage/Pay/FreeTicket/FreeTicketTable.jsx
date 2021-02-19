@@ -329,23 +329,23 @@ class FreeTicketTable extends React.Component {
                     if (record.type == 0) {
                         return <span>全部免费</span>;
                     } else if (record.type == 1) {
-                        const match = record.match;
-                        const hostteam = match.hostteam;
-                        const guestteam = match.guestteam;
-                        if (hostteam == null || guestteam == null) {
+                        const match = record.match ? record.match : {};
+                        const hostTeam = match.hostTeam;
+                        const guestTeam = match.guestTeam;
+                        if (hostTeam == null || guestTeam == null) {
                             return <Tooltip title={`比赛时间：${match.startTime}`}><span>{match.name}</span></Tooltip>
                         }
                         return <Tooltip title={`比赛时间：${match.startTime}`}>
                             <div className="center">
-                                <Avatar src={hostteam.headImg ? hostteam.headImg : defultAvatar}/>
-                                <p className="ml-s">{hostteam.name}</p>
+                                <Avatar src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}/>
+                                <p className="ml-s">{hostTeam.name}</p>
                                 <p className="ml-s mr-s">VS</p>
-                                <Avatar src={guestteam.headImg ? guestteam.headImg : defultAvatar}/>
-                                <p className="ml-s">{guestteam.name}</p>
+                                <Avatar src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}/>
+                                <p className="ml-s">{guestTeam.name}</p>
                             </div>
                         </Tooltip>;
                     } else if (record.type == 2) {
-                        const league = record.league;
+                        const league = record.league ? record.league : {};
                         return <div className="center"><Avatar src={league.headImg ? league.headImg : defultAvatar}/>
                             <p className="ml-s">{league.name}</p>
                         </div>;
