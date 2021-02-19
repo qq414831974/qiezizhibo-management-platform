@@ -217,7 +217,7 @@ export const addUserExp = (params) => post({url: `${config.user_service}/user/ex
     }).catch(function (error) {
         console.log(error);
     });
-export const getVisit = () => get({url: `${config.user_service}/visit`})
+export const getVisit = () => get({url: `${config.user_service}/user/visit`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
