@@ -153,8 +153,8 @@ class TimelineList extends Component {
                 this.setState({
                     data: data.data,
                 });
-                this.getPlayer(data.data.hostteam.id);
-                this.getPlayer(data.data.guestteam.id);
+                this.getPlayer(data.data.hostTeam.id);
+                this.getPlayer(data.data.guestTeam.id);
                 this.getTimeline();
                 this.getTime();
             } else {
@@ -182,7 +182,7 @@ class TimelineList extends Component {
                     if (item.eventType === CHUANKONG) {
                         const passAndPoss = JSON.parse(item.remark);
                         const teamId = item.teamId;
-                        if (teamId === this.state.data.hostteam.id) {
+                        if (teamId === this.state.data.hostTeam.id) {
                             hostPass = passAndPoss.pass;
                             hostPoss = passAndPoss.possession;
                         } else {
@@ -193,9 +193,9 @@ class TimelineList extends Component {
                 });
                 let hostPoint = 0;
                 let guestPoint = 0;
-                if (this.state.data.hostteam) {
+                if (this.state.data.hostTeam) {
                     data.data && data.data.forEach((item, index) => {
-                        const isHost = this.state.data.hostteam.id === item.teamId;
+                        const isHost = this.state.data.hostTeam.id === item.teamId;
                         if (item.eventType === 1 || item.eventType === 22) {
                             if (isHost) {
                                 if (item.eventType == 22) {
@@ -285,10 +285,10 @@ class TimelineList extends Component {
                         </div>
                         <span className="w-full center" style={{color: "#2e3e4e"}}>{des}</span>
                     </div>;
-                    const isHost = this.state.data.hostteam ? (this.state.data.hostteam.id === item.teamId) : false;
+                    const isHost = this.state.data.hostTeam ? (this.state.data.hostTeam.id === item.teamId) : false;
                     const dis = isHost ? "qz-live-timeline-left" : "qz-live-timeline-right";
                     const avatar = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].headImg : defultAvatar;
-                    let name = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].name : defultAvatar;
+                    let name = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].name : "未知";
                     let changeDom = [];
                     if (isChange) {
                         changeDom.push(<div className="inline-block center">
@@ -507,11 +507,11 @@ class TimelineList extends Component {
                         <div className="center">
                             <img className="qz-live-round-img"
                                  alt="主队"
-                                 src={this.state.data.hostteam ? this.state.data.hostteam.headImg : defultAvatar}
+                                 src={this.state.data.hostTeam ? this.state.data.hostTeam.headImg : defultAvatar}
                             />
                         </div>
                         <div className="center w-full mt-m">
-                            <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.hostteam ? this.state.data.hostteam.name : ""}</p>
+                            <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.hostTeam ? this.state.data.hostTeam.name : ""}</p>
                         </div>
                         <span className="center w-full">传球准确率</span>
                         <span className="center w-full">{this.state.hostPass}%</span>
@@ -540,11 +540,11 @@ class TimelineList extends Component {
                         <div className="center">
                             <img className="qz-live-round-img"
                                  alt="客队"
-                                 src={this.state.data.guestteam ? this.state.data.guestteam.headImg : defultAvatar}
+                                 src={this.state.data.guestTeam ? this.state.data.guestTeam.headImg : defultAvatar}
                             />
                         </div>
                         <div className="center w-full mt-m">
-                            <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.guestteam ? this.state.data.guestteam.name : ""}</p>
+                            <p style={{fontSize: responsive.data.isMobile ? 18 : 22}}>{this.state.data.guestTeam ? this.state.data.guestTeam.name : ""}</p>
                         </div>
                         <span className="center w-full">传球准确率</span>
                         <span className="center w-full">{this.state.guestPass}%</span>

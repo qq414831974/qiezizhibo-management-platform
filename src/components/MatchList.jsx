@@ -227,15 +227,15 @@ class MatchList extends Component {
                                       }
                                       `}
                                   </style>
-                                  {(item.hostteam == null || item.guestteam == null) ? <span>{item.name}</span> :
+                                  {(item.hostTeam == null || item.guestTeam == null) ? <span>{item.name}</span> :
                                       <Row gutter={0}>
                                           <Col span={7}>
-                                              <span className="center" style={{height: 32}}>{item.hostteam.name}</span>
+                                              <span className="center" style={{height: 32}}>{item.hostTeam.name}</span>
                                           </Col>
                                           <Col span={3}>
                                               <div className="center">
                                                   <Avatar
-                                                      src={item.hostteam.headImg ? item.hostteam.headImg : defultAvatar}
+                                                      src={item.hostTeam.headImg ? item.hostTeam.headImg : defultAvatar}
                                                   />
                                               </div>
                                           </Col>
@@ -256,12 +256,12 @@ class MatchList extends Component {
                                           <Col span={3}>
                                               <div className="center">
                                                   <Avatar
-                                                      src={item.guestteam.headImg ? item.guestteam.headImg : defultAvatar}
+                                                      src={item.guestTeam.headImg ? item.guestTeam.headImg : defultAvatar}
                                                   />
                                               </div>
                                           </Col>
                                           <Col span={7}>
-                                              <span className="center" style={{height: 32}}>{item.guestteam.name}</span>
+                                              <span className="center" style={{height: 32}}>{item.guestTeam.name}</span>
                                           </Col>
                                       </Row>}
                               </List.Item>

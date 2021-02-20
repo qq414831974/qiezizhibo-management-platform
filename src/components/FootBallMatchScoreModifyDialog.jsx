@@ -126,8 +126,8 @@ class FootBallMatchScoreModifyDialog extends React.Component {
         if (!this.props.visible) {
             return;
         }
-        this.props.data.hostteam.isHostTeam = true;
-        this.props.data.guestteam.isHostTeam = false;
+        this.props.data.hostTeam.isHostTeam = true;
+        this.props.data.guestTeam.isHostTeam = false;
         const callback1 = () => {
             this.check1 = true;
             if (this.check1 && this.check2) {
@@ -140,24 +140,24 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                 this.initDraw();
             }
         }
-        this.fetchTeamPlayer(this.props.matchId, this.props.data.hostteam.id, HOSTTEAM, callback1);
-        this.fetchTeamPlayer(this.props.matchId, this.props.data.guestteam.id, GUESTTEAM, callback2);
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.hostTeam.id, HOSTTEAM, callback1);
+        this.fetchTeamPlayer(this.props.matchId, this.props.data.guestTeam.id, GUESTTEAM, callback2);
     }
 
     initDraw = () => {
-        let team = this.props.data.guestteam;
+        let team = this.props.data.guestTeam;
         let playerId = this.props.record.playerId;
         let player = null;
         let eventData = null;
-        if (this.props.record.teamId == this.props.data.hostteam.id) {
-            team = this.props.data.hostteam;
+        if (this.props.record.teamId == this.props.data.hostTeam.id) {
+            team = this.props.data.hostTeam;
             this.state.hostTeamPlayer.forEach((item, index) => {
                 if (item.id == playerId) {
                     player = item;
                 }
             });
         } else {
-            team = this.props.data.guestteam;
+            team = this.props.data.guestTeam;
             this.state.guestTeamPlayer.forEach((item, index) => {
                 if (item.id == playerId) {
                     player = item;
@@ -302,7 +302,7 @@ class FootBallMatchScoreModifyDialog extends React.Component {
     }
 
     onTeamSelect = (isHostTeam, e) => {
-        this.setState({team: isHostTeam ? this.props.data.hostteam : this.props.data.guestteam, currentChecked: true});
+        this.setState({team: isHostTeam ? this.props.data.hostTeam : this.props.data.guestTeam, currentChecked: true});
         this.next();
     };
     onPlayerSelect = (player, e) => {
@@ -692,20 +692,20 @@ class FootBallMatchScoreModifyDialog extends React.Component {
                 <Row gutter={24}>
                     <Col span={12}>
                         <div
-                            className={this.state.team && (data.hostteam.id === this.state.team.id) ? "qz-live-step-item-hover qz-live-step-item-selected" : "qz-live-step-item-hover"}
+                            className={this.state.team && (data.hostTeam.id === this.state.team.id) ? "qz-live-step-item-hover qz-live-step-item-selected" : "qz-live-step-item-hover"}
                             onClick={onTeamSelect.bind(this, true)}
                         >
-                            <img className="qz-live-round-img mt-s" alt="主队" src={data.hostteam.headImg}/>
-                            <p style={{fontSize: 16}} className="w-full">{data.hostteam.name}</p>
+                            <img className="qz-live-round-img mt-s" alt="主队" src={data.hostTeam.headImg}/>
+                            <p style={{fontSize: 16}} className="w-full">{data.hostTeam.name}</p>
                         </div>
                     </Col>
                     <Col span={12}>
                         <div
-                            className={this.state.team && (data.guestteam.id === this.state.team.id) ? "qz-live-step-item-hover qz-live-step-item-selected" : "qz-live-step-item-hover"}
+                            className={this.state.team && (data.guestTeam.id === this.state.team.id) ? "qz-live-step-item-hover qz-live-step-item-selected" : "qz-live-step-item-hover"}
                             onClick={onTeamSelect.bind(this, false)}
                         >
-                            <img className="qz-live-round-img mt-s" alt="客队" src={data.guestteam.headImg}/>
-                            <p style={{fontSize: 16}} className="w-full">{data.guestteam.name}</p>
+                            <img className="qz-live-round-img mt-s" alt="客队" src={data.guestTeam.headImg}/>
+                            <p style={{fontSize: 16}} className="w-full">{data.guestTeam.name}</p>
                         </div>
                     </Col>
                 </Row>

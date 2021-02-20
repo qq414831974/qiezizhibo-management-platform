@@ -15,10 +15,10 @@ class FootBallMatchScorePassDialog extends React.Component {
         }
         getPassAndPossession(this.props.data.id).then((data) => {
             if (data && data.code == 200 && data.data) {
-                const hostteam = this.props.data.hostteam;
-                const guestteam = this.props.data.guestteam;
-                const hostData = data.data[hostteam.id];
-                const guestData = data.data[guestteam.id];
+                const hostTeam = this.props.data.hostTeam;
+                const guestTeam = this.props.data.guestTeam;
+                const hostData = data.data[hostTeam.id];
+                const guestData = data.data[guestTeam.id];
                 if (hostData == null || guestData == null) {
                     this.setState({
                         hostPass: 0,
@@ -60,11 +60,11 @@ class FootBallMatchScorePassDialog extends React.Component {
     submit = () => {
         const params = [{
             matchId: this.props.data.id,
-            teamId: this.props.data.hostteam.id,
+            teamId: this.props.data.hostTeam.id,
             remark: JSON.stringify({pass: this.state.hostPass, possession: this.state.hostPoss}),
         }, {
             matchId: this.props.data.id,
-            teamId: this.props.data.guestteam.id,
+            teamId: this.props.data.guestTeam.id,
             remark: JSON.stringify({pass: this.state.guestPass, possession: this.state.guestPoss}),
         }
         ]
@@ -72,8 +72,8 @@ class FootBallMatchScorePassDialog extends React.Component {
     }
 
     render() {
-        const hostteam = this.props.data.hostteam;
-        const guestteam = this.props.data.guestteam;
+        const hostTeam = this.props.data.hostTeam;
+        const guestTeam = this.props.data.guestTeam;
         return <div className="steps-div">
             <div className="qz-live-steps-content-large">
                 <div className="w-full center">
@@ -81,7 +81,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                 </div>
                 <div className="qz-live-slider-wrapper">
                     <div className="anticon left-0">
-                        <img className="qz-live-round-img-xs" alt="主队" src={hostteam.headImg ? hostteam.headImg : defultAvatar} />
+                        <img className="qz-live-round-img-xs" alt="主队" src={hostTeam.headImg ? hostTeam.headImg : defultAvatar} />
                         <div className="w-full">
                             <span>{this.state.hostPoss}%</span>
                         </div>
@@ -95,7 +95,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                     <div className="anticon right-0">
                         <img className="qz-live-round-img-xs"
                              alt="客队"
-                             src={guestteam.headImg ? guestteam.headImg : defultAvatar}
+                             src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}
                         />
                         <div className="w-full">
                             <span>{this.state.guestPoss}%</span>
@@ -113,7 +113,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                         <div>
                             <img className="qz-live-round-img-xs"
                                  alt="主队"
-                                 src={hostteam.headImg ? hostteam.headImg : defultAvatar}
+                                 src={hostTeam.headImg ? hostTeam.headImg : defultAvatar}
                             />
                             <span>{this.state.hostPass}%</span>
                         </div>
@@ -127,7 +127,7 @@ class FootBallMatchScorePassDialog extends React.Component {
                         <div>
                             <img className="qz-live-round-img-xs"
                                  alt="客队"
-                                 src={guestteam.headImg ? guestteam.headImg : defultAvatar}
+                                 src={guestTeam.headImg ? guestTeam.headImg : defultAvatar}
                             />
                             <span>{this.state.guestPass}%</span>
                         </div>
