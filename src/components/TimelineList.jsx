@@ -70,7 +70,7 @@ const eventType = {
     21: {text: "比赛结束", icon: finish, hidden: true},
     22: {text: "乌龙球", icon: own_goal},
     24: {text: "点球", icon: penalty},
-    25: {text: "进球(点球大战)", icon: penalty},
+    25: {text: "进球(点球大战)", icon: penalty, hideTime: true},
 };
 const event = [
     {key: 1, text: "进球", icon: goal, show: 1},
@@ -279,6 +279,7 @@ class TimelineList extends Component {
                     const isHost = this.state.data.hostTeam ? (this.state.data.hostTeam.id === item.teamId) : false;
                     const dis = isHost ? "qz-live-timeline-left" : "qz-live-timeline-right";
                     const avatar = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].headImg : defultAvatar;
+                    const hideTime = eventType[item.eventType].hideTime;
                     let name = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].name : "";
                     let shirtNum = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].shirtNum : "";
                     let changeDom = [];
@@ -306,9 +307,8 @@ class TimelineList extends Component {
                             <Tooltip title={item.text}>
                                 <div style={{height: 38}} className="center pr-s pr-s inline-flex-important">
                                     <div className="inline-block">
-                                <span
-                                    className={item.minute ? "ml-s" : "none-important"}
-                                >{item.minute ? item.minute : ""}'</span>
+                                        {hideTime == true ? <span className="ml-l"/> : <span
+                                            className={item.minute ? "ml-s" : "none-important"}>{item.minute ? item.minute : ""}'</span>}
                                     </div>
                                     {/*<div className="inline-block ml-s">*/}
                                     {/*<span>{des}</span>*/}
@@ -344,9 +344,8 @@ class TimelineList extends Component {
                                         {/*<span>{des}</span>*/}
                                         {/*</div>*/}
                                         <div className="inline-block">
-                                <span
-                                    className={item.minute ? "ml-s" : "none-important"}
-                                >{item.minute != null ? item.minute : ""}'</span>
+                                            {hideTime == true ? <span className="ml-l"/> : <span
+                                                className={item.minute ? "ml-s" : "none-important"}>{item.minute ? item.minute : ""}'</span>}
                                         </div>
                                     </div>
                                 </Tooltip>}
