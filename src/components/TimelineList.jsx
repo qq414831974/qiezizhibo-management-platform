@@ -129,7 +129,6 @@ class TimelineList extends Component {
         }
         this.timerID = setInterval(
             () => {
-                this.getTime();
                 this.getTimeline();
             },
             30000
@@ -280,7 +279,8 @@ class TimelineList extends Component {
                     const isHost = this.state.data.hostTeam ? (this.state.data.hostTeam.id === item.teamId) : false;
                     const dis = isHost ? "qz-live-timeline-left" : "qz-live-timeline-right";
                     const avatar = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].headImg : defultAvatar;
-                    let name = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].name : "未知";
+                    let name = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].name : "";
+                    let shirtNum = this.state.playerInfo[item.playerId] ? this.state.playerInfo[item.playerId].shirtNum : "";
                     let changeDom = [];
                     if (isChange) {
                         changeDom.push(<div className="inline-block center">
@@ -296,7 +296,7 @@ class TimelineList extends Component {
                                 <div className="center">
                                 <span
                                     className="w-full"
-                                >{this.state.playerInfo[item.remark] ? this.state.playerInfo[item.remark].name : ""}</span>
+                                >{this.state.playerInfo[item.remark] ? this.state.playerInfo[item.remark].name + `(${this.state.playerInfo[item.remark].shirtNum})` : ""}</span>
                                 </div>
                             </div>
                         </div>);
@@ -318,7 +318,7 @@ class TimelineList extends Component {
                                             <Avatar size="small" src={avatar}/>
                                         </div>
                                         <div className="center">
-                                            <span className="center">{name}</span>
+                                            <span className="center">{name + `(${shirtNum})`}</span>
                                         </div>
                                     </div>
                                     {changeDom}
@@ -336,7 +336,7 @@ class TimelineList extends Component {
                                                 <Avatar size="small" src={avatar}/>
                                             </div>
                                             <div className="center">
-                                                <span className="center">{name}</span>
+                                                <span className="center">{name + `(${shirtNum})`}</span>
                                             </div>
                                         </div>
                                         {changeDom}
@@ -346,7 +346,7 @@ class TimelineList extends Component {
                                         <div className="inline-block">
                                 <span
                                     className={item.minute ? "ml-s" : "none-important"}
-                                >{item.minute ? item.minute : ""}'</span>
+                                >{item.minute != null ? item.minute : ""}'</span>
                                         </div>
                                     </div>
                                 </Tooltip>}
@@ -472,7 +472,6 @@ class TimelineList extends Component {
     };
     refreshTimeLine = () => {
         this.getTimeline();
-        this.getTime();
     };
 
     render() {
