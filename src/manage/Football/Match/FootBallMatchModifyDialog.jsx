@@ -130,6 +130,8 @@ class FootBallMatchModifyDialog extends React.Component {
         getAllLeagueMatchs({
             pageSize: 300,
             pageNum: 1,
+            sortField: "createTime",
+            sortOrder: "desc"
         }).then((data) => {
             if (data && data.code == 200) {
                 this.setState({

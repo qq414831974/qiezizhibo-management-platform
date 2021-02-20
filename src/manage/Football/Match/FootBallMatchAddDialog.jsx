@@ -121,6 +121,8 @@ class FootBallMatchAddDialog extends React.Component {
         getAllLeagueMatchs({
             pageSize: 300,
             pageNum: 1,
+            sortField: "createTime",
+            sortOrder: "desc"
         }).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
@@ -775,7 +777,7 @@ class FootBallMatchAddDialog extends React.Component {
                         <div className="center w-full">
                             <FormItem {...formItemLayout} className="bs-form-item">
                                 {getFieldDecorator('type', {
-                                    initialValue: [1, 2, 3, 4],
+                                    initialValue: [1, 2, 3, 4, 5],
                                 })(
                                     <TreeSelect treeData={typeData}
                                                 style={{minWidth: 300, maxWidth: 300, textAlign: "center"}}

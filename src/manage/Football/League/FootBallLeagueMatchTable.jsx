@@ -1,5 +1,5 @@
 import React from 'react';
-import {Table, Input, Button, Icon, Modal, Tooltip} from 'antd';
+import {Table, Input, Button, Icon, Modal, Tooltip, Radio} from 'antd';
 import {getAllLeagueMatchSeries, getwxacodeunlimit} from '../../../axios/index';
 import {getQueryString, mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
@@ -23,6 +23,7 @@ class FootBallLeagueMatchTable extends React.Component {
         filterDropdownVisible: false,
         searchText: '',
         filtered: false,
+        filterOrder: "createTime",
         selectedRowKeys: [],
         dialogModifyVisible: false,
         dialogAddVisible: false,
@@ -33,18 +34,20 @@ class FootBallLeagueMatchTable extends React.Component {
         this.fetch({
             pageSize: this.state.pagination.pageSize,
             pageNum: this.props.page ? this.props.page : 1,
+            sortOrder: "desc",
+            sortField: "createTime"
         });
     };
 
     fetch = (params = {}) => {
-        params["sortOrder"] = "desc";
-        params["sortField"] = "sortIndex";
         this.setState({loading: true});
         getAllLeagueMatchSeries(params).then((data) => {
             if (data && data.code == 200) {
                 const pagination = {...this.state.pagination};
                 pagination.total = data.data ? data.data.total : 0;
                 pagination.current = data.data ? data.data.current : 1;
+                pagination.sortOrder = params.sortOrder;
+                pagination.sortField = params.sortField;
                 this.setState({
                     loading: false,
                     data: data.data ? data.data.records : "",
@@ -128,8 +131,8 @@ class FootBallLeagueMatchTable extends React.Component {
     handleTableChange = (pagination, filters, sorter) => {
         const pager = {...this.state.pagination};
         pager.current = pagination.current;
-        pager.sortField = sorter.field;
-        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
+        // pager.sortField = sorter.field;
+        // pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
         pager.filters = this.getTableFilters(pager, filters);
         this.props.switchPage(pager.current);
         this.setState({
@@ -144,10 +147,13 @@ class FootBallLeagueMatchTable extends React.Component {
         });
     }
     getTableFilters = (pager, filters) => {
-        const {searchText} = this.state;
+        const {searchText, filterOrder} = this.state;
         pager.filters = {};
         if (searchText != null && searchText != '') {
             pager.filters["name"] = searchText;
+        }
+        if (filterOrder != null) {
+            pager.sortField = filterOrder;
         }
         if (filters) {
             for (let param in filters) {
@@ -321,6 +327,11 @@ class FootBallLeagueMatchTable extends React.Component {
         );
         obj.dispatchEvent(ev);
     }
+    onOrderDropDownRadioChange = (e) => {
+        this.setState({
+            filterOrder: e.target.value,
+        });
+    }
 
     render() {
         const onNameClick = this.onNameClick;
@@ -371,13 +382,14 @@ class FootBallLeagueMatchTable extends React.Component {
             width: '35%',
             render: function (text, record, index) {
                 return <div className="cursor-hand" onClick={onNameClick.bind(this, record)}>
-                    <div className="center border-bottom-gray"><Avatar src={record.headImg ? record.headImg : defultAvatar}/>
+                    <div className={`center ${record.shortName ? "border-bottom-gray" : ""}`}><Avatar
+                        src={record.headImg ? record.headImg : defultAvatar}/>
                         <p className="ml-s">{record.name}</p>
                     </div>
                     {record.shortName ? <div className="center">简称：{record.shortName}</div> : null}
                 </div>;
             },
-        },{
+        }, {
             title: '类型',
             align: 'center',
             dataIndex: 'isParent',
@@ -454,6 +466,26 @@ class FootBallLeagueMatchTable extends React.Component {
             align: 'center',
             dataIndex: 'sortIndex',
             width: '10%',
+            filterDropdown: (
+                <div className="custom-filter-dropdown">
+                    <div className="custom-filter-dropdown-radio">
+                        <Radio.Group onChange={this.onOrderDropDownRadioChange} value={this.state.filterOrder}>
+                            <Radio value={"createTime"}>按创建时间</Radio>
+                            <Radio value={"sortIndex"}>按排序</Radio>
+                        </Radio.Group>
+                    </div>
+                    <div className="w-full center mt-s">
+                        <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    </div>
+                </div>
+            ),
+            filterIcon: <Icon type="filter" style={{color: this.state.filterOrder ? '#108ee9' : '#aaa'}}/>,
+            filterDropdownVisible: this.state.filterOrderDropdownVisible,
+            onFilterDropdownVisibleChange: (visible) => {
+                this.setState({
+                    filterOrderDropdownVisible: visible,
+                });
+            },
         }, {
             title: <span>轮播id</span>,
             align: 'center',
@@ -471,21 +503,21 @@ class FootBallLeagueMatchTable extends React.Component {
             render: function (text, record, index) {
                 return <span onClick={genWxaCode.bind(this, record)}>生成</span>
             }
-            }, {
-                title: "收益",
-                align: 'center',
-                width: '4%',
-                render: function (text, record, index) {
-                    if (record.isparent) {
-                        return <span onClick={() => {
-                            message.warn("请前往系列赛中查看", 1);
-                        }
-                        } className="cursor-hand">查看</span>
+        }, {
+            title: "收益",
+            align: 'center',
+            width: '4%',
+            render: function (text, record, index) {
+                if (record.isparent) {
+                    return <span onClick={() => {
+                        message.warn("请前往系列赛中查看", 1);
                     }
-                    return <Link to={
-                        `/analysis/bill?leagueId=${record.id}`
-                    }><span className="cursor-hand">查看</span></Link>
+                    } className="cursor-hand">查看</span>
                 }
+                return <Link to={
+                    `/analysis/bill?leagueId=${record.id}`
+                }><span className="cursor-hand">查看</span></Link>
+            }
         },
         ];
         const columns_mobile = [{
