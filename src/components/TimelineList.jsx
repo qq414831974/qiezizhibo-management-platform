@@ -156,29 +156,21 @@ class TimelineList extends Component {
                 this.getPlayer(data.data.hostTeam.id);
                 this.getPlayer(data.data.guestTeam.id);
                 this.getTimeline();
-                this.getTime();
             } else {
                 message.error('获取比赛失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     };
-    getTime = () => {
+    getTimeline = () => {
         getMatchTime(this.props.matchId).then((data) => {
             if (data && data.code == 200) {
                 this.setState({status: data.data});
-            } else {
-                message.error('获取比赛时间失败：' + (data ? data.result + "-" + data.message : data), 3);
-            }
-        });
-    };
-    getTimeline = () => {
-        getTimelineByMatchId({matchId: this.props.matchId}).then((data) => {
-            if (data && data.code == 200) {
                 let hostPass = 0;
                 let hostPoss = 50;
                 let guestPass = 0;
                 let guestPoss = 50;
-                data.data && data.data.forEach((item, index) => {
+                const timelines = data.data.timeLines;
+                timelines && timelines.forEach((item, index) => {
                     if (item.eventType === CHUANKONG) {
                         const passAndPoss = JSON.parse(item.remark);
                         const teamId = item.teamId;
@@ -194,7 +186,7 @@ class TimelineList extends Component {
                 let hostPoint = 0;
                 let guestPoint = 0;
                 if (this.state.data.hostTeam) {
-                    data.data && data.data.forEach((item, index) => {
+                    timelines && timelines.forEach((item, index) => {
                         const isHost = this.state.data.hostTeam.id === item.teamId;
                         if (item.eventType === 1 || item.eventType === 22) {
                             if (isHost) {
@@ -216,7 +208,7 @@ class TimelineList extends Component {
                 this.setState({
                     hostPoint: hostPoint,
                     guestPoint: guestPoint,
-                    timelineData: data.data,
+                    timelineData: timelines,
                     hostPass: hostPass,
                     hostPoss: hostPoss,
                     guestPass: guestPass,
