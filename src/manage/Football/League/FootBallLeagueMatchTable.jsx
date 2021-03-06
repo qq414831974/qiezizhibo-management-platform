@@ -294,6 +294,10 @@ class FootBallLeagueMatchTable extends React.Component {
                 `/football/league/encryption?leagueId=${this.state.record.id}`
             }>加密</Link>
             </Button>,
+            <Button key="bet" type="primary" className="pull-left"><Link to={
+                `/football/league/ad?leagueId=${this.state.record.id}`
+            }>广告</Link>
+            </Button>,
             <Button key="delete" type="danger" className="pull-left"
                     onClick={this.handleLeagueDelete}>删除</Button>,
             // <Button key="back" onClick={this.handleLeagueMatchModifyCancel}>取消</Button>,
