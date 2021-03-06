@@ -1698,7 +1698,30 @@ export const addFakeGiftOrder = (param) => post({url: `${config.pay_service}/pay
     }).catch(function (error) {
         console.log(error)
     });
-
+export const getLeagueAdRule = (param) => get({url: `${config.football_service}/football/ad/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueAdRule = (param) => post({
+    url: `${config.football_service}/football/ad/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueAdRule = (param) => put({
+    url: `${config.football_service}/football/ad/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 
 
 //暂时无用
