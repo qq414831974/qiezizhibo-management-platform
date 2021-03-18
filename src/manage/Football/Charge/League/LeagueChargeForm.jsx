@@ -47,6 +47,18 @@ class LeagueChargeForm extends React.Component {
 
     componentDidMount() {
         const {form, record} = this.props;
+        if (record && record.isLiveCharge) {
+            this.setState({isLiveCharge: true})
+        }
+        if (record && record.isRecordCharge) {
+            this.setState({isRecordCharge: true})
+            if(record.record && record.record.giftWatchEnable){
+                this.setState({isGiftWatchEnableRecord: true})
+            }
+        }
+        if (record && record.isMonopolyCharge) {
+            this.setState({isMonopolyCharge: true})
+        }
     }
 
     render() {
@@ -64,35 +76,42 @@ class LeagueChargeForm extends React.Component {
                                         initialValue: record.isLiveCharge != null ? record.isLiveCharge : false,
                                         valuePropName: 'checked',
                                         rules: [{required: true, message: '请选择是否直播收费开启!'}],
+                                        onChange: (e) => {
+                                            this.setState({isLiveCharge: e})
+                                        }
                                     })(
                                         <Switch/>
                                     )}
                                 </FormItem>
-                                <FormItem {...formItemLayout} label="永久价格" className="bs-form-item">
-                                    {getFieldDecorator('live.price', {
-                                        initialValue: record.live ? NP.divide(record.live.price, 100) : null,
-                                        rules: [{required: true, message: '请输入永久价格!'}],
-                                    })(
-                                        <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
-                                    )}
-                                </FormItem>
-                                <FormItem {...formItemLayout} label="一个月价格" className="bs-form-item">
-                                    {getFieldDecorator('live.priceMonthly', {
-                                        initialValue: record.live ? NP.divide(record.live.priceMonthly, 100) : null,
-                                        rules: [{required: true, message: '请输入一个月价格价格!'}],
-                                    })(
-                                        <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
-                                    )}
-                                </FormItem>
-                                <FormItem {...formItemLayout} label="送礼看直播" className="bs-form-item">
-                                    {getFieldDecorator('live.giftWatchEnable', {
-                                        initialValue: record.live ? record.live.giftWatchEnable : false,
-                                        valuePropName: 'checked',
-                                        rules: [{required: true, message: '请选择是否开启刷礼物看直播!'}],
-                                    })(
-                                        <Switch/>
-                                    )}
-                                </FormItem>
+                                {this.state.isLiveCharge ?
+                                    <div>
+                                        <FormItem {...formItemLayout} label="永久价格" className="bs-form-item">
+                                            {getFieldDecorator('live.price', {
+                                                initialValue: record.live ? NP.divide(record.live.price, 100) : null,
+                                                rules: [{required: true, message: '请输入永久价格!'}],
+                                            })(
+                                                <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
+                                            )}
+                                        </FormItem>
+                                        <FormItem {...formItemLayout} label="一个月价格" className="bs-form-item">
+                                            {getFieldDecorator('live.priceMonthly', {
+                                                initialValue: record.live ? NP.divide(record.live.priceMonthly, 100) : null,
+                                                rules: [{required: true, message: '请输入一个月价格价格!'}],
+                                            })(
+                                                <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
+                                            )}
+                                        </FormItem>
+                                        <FormItem {...formItemLayout} label="送礼看直播" className="bs-form-item">
+                                            {getFieldDecorator('live.giftWatchEnable', {
+                                                initialValue: record.live ? record.live.giftWatchEnable : false,
+                                                valuePropName: 'checked',
+                                                // rules: [{required: true, message: '请选择是否开启刷礼物看直播!'}],
+                                            })(
+                                                <Switch/>
+                                            )}
+                                        </FormItem>
+                                        <span>送礼看直播规则：送任意礼物即可观看直播</span>
+                                    </div> : null}
                             </Card>
                         </Col>
                         <Col span={8}>
@@ -102,51 +121,63 @@ class LeagueChargeForm extends React.Component {
                                         initialValue: record.isRecordCharge != null ? record.isRecordCharge : false,
                                         valuePropName: 'checked',
                                         rules: [{required: true, message: '请选择是否录播收费开启!'}],
+                                        onChange: (e) => {
+                                            this.setState({isRecordCharge: e})
+                                        }
                                     })(
                                         <Switch/>
                                     )}
                                 </FormItem>
-                                <FormItem {...formItemLayout} label="永久价格" className="bs-form-item">
-                                    {getFieldDecorator('record.price', {
-                                        initialValue: record.record ? NP.divide(record.record.price, 100) : null,
-                                        rules: [{required: true, message: '请输入永久价格!'}],
-                                    })(
-                                        <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
-                                    )}
-                                </FormItem>
-                                <FormItem {...formItemLayout} label="一个月价格" className="bs-form-item">
-                                    {getFieldDecorator('record.priceMonthly', {
-                                        initialValue: record.record ? NP.divide(record.record.priceMonthly, 100) : null,
-                                        rules: [{required: true, message: '请输入一个月价格价格!'}],
-                                    })(
-                                        <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
-                                    )}
-                                </FormItem>
-                                <FormItem {...formItemLayout} label="送礼看直播" className="bs-form-item">
-                                    {getFieldDecorator('record.giftWatchEnable', {
-                                        initialValue: record.record ? NP.divide(record.record.giftWatchEnable, 100) : false,
-                                        valuePropName: 'checked',
-                                        rules: [{required: true, message: '请选择是否开启刷礼物看直播!'}],
-                                    })(
-                                        <Switch/>
-                                    )}
-                                </FormItem>
-                                <FormItem {...formItemLayout} label="送礼永久看直播" className="bs-form-item">
-                                    {getFieldDecorator('record.giftWatchPrice', {
-                                        initialValue: record.record ? NP.divide(record.record.giftWatchPrice, 100) : null,
-                                        rules: [{required: true, message: '请输入永久价格!'}],
-                                    })(
-                                        <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
-                                    )}
-                                </FormItem>
-                                <FormItem {...formItemLayout} label="送礼一月看直播" className="bs-form-item">
-                                    {getFieldDecorator('record.giftWatchPriceMonthly', {
-                                        initialValue: record.record ? NP.divide(record.record.giftWatchPriceMonthly, 100) : null,
-                                        rules: [{required: true, message: '请输入一个月价格价格!'}],
-                                    })(
-                                        <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
-                                    )}
-                                </FormItem>
+                                {this.state.isRecordCharge ?
+                                    <div>
+                                        <FormItem {...formItemLayout} label="永久价格" className="bs-form-item">
+                                            {getFieldDecorator('record.price', {
+                                                initialValue: record.record ? NP.divide(record.record.price, 100) : null,
+                                                rules: [{required: true, message: '请输入永久价格!'}],
+                                            })(
+                                                <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
+                                            )}
+                                        </FormItem>
+                                        <FormItem {...formItemLayout} label="一个月价格" className="bs-form-item">
+                                            {getFieldDecorator('record.priceMonthly', {
+                                                initialValue: record.record ? NP.divide(record.record.priceMonthly, 100) : null,
+                                                rules: [{required: true, message: '请输入一个月价格价格!'}],
+                                            })(
+                                                <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
+                                            )}
+                                        </FormItem>
+                                        <FormItem {...formItemLayout} label="送礼看录播" className="bs-form-item">
+                                            {getFieldDecorator('record.giftWatchEnable', {
+                                                initialValue: record.record ? record.record.giftWatchEnable : false,
+                                                valuePropName: 'checked',
+                                                // rules: [{required: true, message: '请选择是否开启刷礼物看录播!'}],
+                                                onChange: (e) => {
+                                                    this.setState({isGiftWatchEnableRecord: e})
+                                                }
+                                            })(
+                                                <Switch/>
+                                            )}
+                                        </FormItem>
+                                        {this.state.isGiftWatchEnableRecord ?
+                                            <div>
+                                                <FormItem {...formItemLayout} label="送礼永久看录播" className="bs-form-item">
+                                                    {getFieldDecorator('record.giftWatchPrice', {
+                                                        initialValue: record.record ? NP.divide(record.record.giftWatchPrice, 100) : null,
+                                                        rules: [{required: true, message: '请输入永久价格!'}],
+                                                    })(
+                                                        <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
+                                                    )}
+                                                </FormItem>
+                                                <FormItem {...formItemLayout} label="送礼一月看录播" className="bs-form-item">
+                                                    {getFieldDecorator('record.giftWatchPriceMonthly', {
+                                                        initialValue: record.record ? NP.divide(record.record.giftWatchPriceMonthly, 100) : null,
+                                                        rules: [{required: true, message: '请输入一个月价格价格!'}],
+                                                    })(
+                                                        <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
+                                                    )}
+                                                </FormItem>
+                                            </div> : null}
+                                    </div> : null}
                             </Card>
                         </Col>
                         <Col span={8}>
@@ -156,18 +187,22 @@ class LeagueChargeForm extends React.Component {
                                         initialValue: record.isMonopoly != null ? record.isMonopoly : false,
                                         valuePropName: 'checked',
                                         rules: [{required: true, message: '请选择是否买断收费开启!'}],
+                                        onChange: (e) => {
+                                            this.setState({isMonopolyCharge: e})
+                                        }
                                     })(
                                         <Switch/>
                                     )}
                                 </FormItem>
-                                <FormItem {...formItemLayout} label="买断价格" className="bs-form-item">
-                                    {getFieldDecorator('monopoly.price', {
-                                        initialValue: record.monopoly ? NP.divide(record.monopoly.price, 100) : null,
-                                        rules: [{required: true, message: '请输入买断价格!'}],
-                                    })(
-                                        <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
-                                    )}
-                                </FormItem>
+                                {this.state.isMonopolyCharge ?
+                                    <FormItem {...formItemLayout} label="买断价格" className="bs-form-item">
+                                        {getFieldDecorator('monopoly.price', {
+                                            initialValue: record.monopoly ? NP.divide(record.monopoly.price, 100) : null,
+                                            rules: [{required: true, message: '请输入买断价格!'}],
+                                        })(
+                                            <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
+                                        )}
+                                    </FormItem> : null}
                             </Card>
                         </Col>
                     </Row>

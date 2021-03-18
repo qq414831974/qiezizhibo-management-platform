@@ -56,8 +56,12 @@ class FootBallMatchChargeManagement extends React.Component {
             if (values.record) {
                 values.record.price = NP.times(values.record.price, 100)
                 values.record.priceMonthly = NP.times(values.record.priceMonthly, 100)
-                values.record.giftWatchPrice = NP.times(values.record.giftWatchPrice, 100)
-                values.record.giftWatchPriceMonthly = NP.times(values.record.giftWatchPriceMonthly, 100)
+                if (values.record.giftWatchPrice) {
+                    values.record.giftWatchPrice = NP.times(values.record.giftWatchPrice, 100)
+                }
+                if (values.record.giftWatchPriceMonthly) {
+                    values.record.giftWatchPriceMonthly = NP.times(values.record.giftWatchPriceMonthly, 100)
+                }
             }
             if (values.live) {
                 values.live.price = NP.times(values.live.price, 100)
@@ -113,7 +117,7 @@ class FootBallMatchChargeManagement extends React.Component {
                                   bordered={false}>
                                 <Tabs>
                                     <TabPane tab="充值设置" key="1">
-                                        <div style={{minHeight: 32,marginBottom: 10}}>
+                                        <div style={{minHeight: 32, marginBottom: 10}}>
                                             <Tooltip title="刷新">
                                                 <Button type="primary" shape="circle" icon="reload"
                                                         className="pull-right"

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Row, Col, Divider, message, Card, Button, Table, Modal, Tooltip} from 'antd';
+import {Row, Col, Divider, message, Card, Button, Table, Modal, Tooltip, Switch} from 'antd';
 import BreadcrumbCustom from '../../Components/BreadcrumbCustom';
 import {bindActionCreators} from "redux";
 import {receiveData} from "../../../action";
@@ -21,6 +21,17 @@ class BulletinSetting extends React.Component {
         getBulletin().then((data) => {
             if (data && data.code == 200) {
                 this.setState({bulletin: data.data});
+                if (data.data && data.data.length) {
+                    data.data.forEach(res => {
+                        if (res.content == "升级维护中" || res.content == "因政策调整，iOS支付暂不可用") {
+                            this.setState({weiHuCheck: true})
+                        } else {
+                            this.setState({weiHuCheck: false})
+                        }
+                    })
+                } else {
+                    this.setState({weiHuCheck: false})
+                }
             } else {
                 message.error('获取系统配置失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
@@ -112,6 +123,47 @@ class BulletinSetting extends React.Component {
     handleDeleteCancel = () => {
         this.setState({deleteVisible: false});
     }
+    onWeiHuCheckClick = (e) => {
+        if (e) {
+            setBulletin({
+                areaType: 0,
+                content: "因政策调整，iOS支付暂不可用",
+                curtain: false,
+                type: "page",
+                wechatType: 0
+            }).then((data) => {
+                if (data && data.code == 200) {
+                    if (data.data) {
+                        this.refresh();
+                        // this.setState({weiHuCheck: e});
+                        message.success('修改成功', 1);
+                    }
+                } else {
+                    message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
+                }
+            });
+        } else {
+            if (this.state.bulletin && this.state.bulletin.length) {
+                this.state.bulletin.forEach(res => {
+                    if (res.content == "升级维护中" || res.content == "因政策调整，iOS支付暂不可用") {
+                        delBulletinById({id: res.id}).then((data) => {
+                            if (data && data.code == 200) {
+                                if (data.data) {
+                                    this.refresh();
+                                    message.success('修改成功', 1);
+                                } else {
+                                    message.warn(data.message, 1);
+                                }
+                            } else {
+                                message.error('修改失败：' + (data ? data.code + ":" + data.message : data), 3);
+                            }
+                        });
+                    }
+                })
+            }
+        }
+
+    }
 
     render() {
         const AddDialog = Form.create()(BulletinAddDialog);
@@ -126,7 +178,7 @@ class BulletinSetting extends React.Component {
             width: '40%',
             align: 'center',
             render: function (text, record, index) {
-                if(record.curtain){
+                if (record.curtain) {
                     return <span>图片</span>
                 }
                 return <span>{record.content}</span>
@@ -182,7 +234,7 @@ class BulletinSetting extends React.Component {
             key: 'province',
             width: '10%',
             align: 'center',
-        },  {
+        }, {
             title: '地区类型',
             dataIndex: 'areaType',
             key: 'areaType',
@@ -202,7 +254,7 @@ class BulletinSetting extends React.Component {
                 }
                 return <span>{area}</span>
             }
-        },{
+        }, {
             title: '微信类型',
             dataIndex: 'wechatType',
             key: 'wechatType',
@@ -235,13 +287,17 @@ class BulletinSetting extends React.Component {
                            loading={this.state.loading}
                            bordered
                            title={() =>
-                               <div>
-                                   <Tooltip title="添加">
-                                       <Button type="primary"
-                                               shape="circle"
-                                               icon="plus"
-                                               onClick={this.showBulletinAddDialog}/>
-                                   </Tooltip>
+                               <div className="clearfix">
+                                   <div className="inline-block">
+                                       <Tooltip title="添加">
+                                           <Button type="primary"
+                                                   shape="circle"
+                                                   icon="plus"
+                                                   onClick={this.showBulletinAddDialog}/>
+                                       </Tooltip>
+                                       <span className="ml-l">iOS支付维护开关：</span>
+                                       <Switch checked={this.state.weiHuCheck} onClick={this.onWeiHuCheckClick}/>
+                                   </div>
                                    <Tooltip title="刷新">
                                        <Button type="primary"
                                                shape="circle"

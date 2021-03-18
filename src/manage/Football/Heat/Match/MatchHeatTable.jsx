@@ -29,7 +29,7 @@ class MatchHeatTable extends React.Component {
         this.fetch();
         getMatchById(this.props.matchId).then(data => {
             if (data && data.code == 200) {
-                this.setState({leagueId: data.data.leaguematchId})
+                this.setState({leagueId: data.data.leagueId})
             } else {
                 message.error('获取比赛信息失败：' + (data ? data.code + ":" + data.message : data), 3);
             }

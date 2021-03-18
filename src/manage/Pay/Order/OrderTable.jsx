@@ -181,6 +181,10 @@ class OrderTable extends React.Component {
         this.setState({cancelVisible: true})
     }
     handleOrderRefundClick = () => {
+        if(this.state.record.payType == 2){
+            message.warn('余额支付不允许退款', 3);
+            return;
+        }
         this.setState({refundVisible: true})
     }
     handleCancelOK = () => {
