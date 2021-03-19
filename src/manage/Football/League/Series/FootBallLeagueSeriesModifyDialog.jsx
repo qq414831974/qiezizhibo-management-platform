@@ -312,6 +312,22 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 <InputNumber placeholder='请输入'/>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} label="比赛时长" className="bs-form-item">
+                            {getFieldDecorator('regulations.duration', {
+                                initialValue: record.regulations ? record.regulations.duration : null,
+                                getValueFromEvent(e) {
+                                    if (e == null) {
+                                        return null
+                                    }
+                                    if (typeof (e) === 'string') {
+                                        return e.replace(/[^\d]/g, '')
+                                    }
+                                    return e
+                                },
+                            })(
+                                <InputNumber placeholder='请输入'/>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="主办方" className="bs-form-item">
                             {getFieldDecorator('majorSponsor', {
                                 initialValue: record.majorSponsor,

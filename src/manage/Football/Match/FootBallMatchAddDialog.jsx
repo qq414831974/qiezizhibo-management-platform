@@ -558,7 +558,7 @@ class FootBallMatchAddDialog extends React.Component {
                                 <div className="center">
                                     {isMobile ? null : <FormItem className="bs-form-item">
                                         {getFieldDecorator('duration', {
-                                            initialValue: 90,
+                                            initialValue: this.state.currentLeague && this.state.currentLeague.regulations ? this.state.currentLeague.regulations.duration : 90,
                                             rules: [{required: true, message: '请输入比赛时长!'}],
                                         })(
                                             <Input className="input-text-align-center"
@@ -599,6 +599,7 @@ class FootBallMatchAddDialog extends React.Component {
                         {isMobile ? <div className="center">
                             <FormItem className="bs-form-item">
                                 {getFieldDecorator('duration', {
+                                    initialValue: this.state.currentLeague && this.state.currentLeague.regulations ? this.state.currentLeague.regulations.duration : 90,
                                     rules: [{required: true, message: '请输入比赛时长!'}],
                                 })(
                                     <Input className="input-text-align-center" prefix={<Icon type="clock-circle"/>}

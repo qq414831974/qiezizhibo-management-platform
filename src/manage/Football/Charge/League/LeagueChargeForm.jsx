@@ -56,7 +56,7 @@ class LeagueChargeForm extends React.Component {
                 this.setState({isGiftWatchEnableRecord: true})
             }
         }
-        if (record && record.isMonopolyCharge) {
+        if (record && record.isMonopoly) {
             this.setState({isMonopolyCharge: true})
         }
     }
