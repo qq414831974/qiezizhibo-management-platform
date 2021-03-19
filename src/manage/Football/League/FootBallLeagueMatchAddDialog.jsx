@@ -20,7 +20,7 @@ import {connect} from "react-redux";
 import {uploadimg, getAreasList} from "../../../axios/index";
 import avatar from '../../../static/avatar.jpg';
 import {randomNum, toChinesNum} from '../../../utils/index';
-import {upload} from "../../../axios";
+import {uploadposter} from "../../../axios";
 import imgcover from '../../../static/imgcover.jpg';
 import {message} from "antd/lib/index";
 
@@ -425,7 +425,7 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 })(
                                     <Upload
                                         accept="image/*"
-                                        action={upload}
+                                        action={uploadposter}
                                         listType="picture-card"
                                         withCredentials={true}
                                         showUploadList={false}

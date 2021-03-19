@@ -19,7 +19,7 @@ import {connect} from "react-redux";
 import {getAreasList, uploadimg} from "../../../../axios";
 import avatar from '../../../../static/avatar.jpg';
 import {randomNum, toChinesNum} from '../../../../utils';
-import {upload} from "../../../../axios";
+import {uploadposter} from "../../../../axios";
 import imgcover from '../../../../static/imgcover.jpg';
 import defultAvatar from '../../../../static/avatar.jpg';
 
@@ -381,7 +381,9 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="排序" className="bs-form-item">
-                            {getFieldDecorator('sortIndex', {})(
+                            {getFieldDecorator('sortIndex', {
+                                initialValue: this.state.leaguedata ? this.state.leaguedata.sortIndex : null,
+                            })(
                                 <InputNumber placeholder='排序'/>
                             )}
                         </FormItem>
@@ -412,7 +414,7 @@ class FootBallLeagueSeriesAddDialog extends React.Component {
                                 })(
                                     <Upload
                                         accept="image/*"
-                                        action={upload}
+                                        action={uploadposter}
                                         listType="picture-card"
                                         withCredentials={true}
                                         showUploadList={false}

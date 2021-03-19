@@ -49,6 +49,7 @@ import FootBallLeagueAdManagement from "../manage/Football/Ad/League/FootBallLea
 import FootBallLeagueEncryptionManagement from "../manage/Football/Encryption/League/FootBallLeagueEncryptionManagement";
 import FootBallMatchEncrypitonManagement from "../manage/Football/Encryption/Match/FootBallMatchEncryptionManagement";
 import FootballLeagueMatchBillAnalysis from "../manage/Football/League/Bill/FootballLeagueMatchBillAnalysis";
+import FootBallLeagueDetailSetting from "../manage/Football/League/Detail/FootBallLeagueDetailSetting";
 import Unauthorized from '../manage/Pages/Unauthorized';
 import LogManagement from '../manage/Log/LogManagement';
 
@@ -124,6 +125,7 @@ export default class CRouter extends Component {
                 <Route path="/user/user/:id" component={this.requireAuth("/user/user/:id" ,UserDetailManagement)}/>
                 <Route path="/football/footballTeam/:id" component={this.requireAuth("/football/footballTeam/:id",TeamDetailManagement)}/>
                 <Route path="/football/footballMatch/:id" component={this.requireAuth("/football/footballMatch/:id",MatchDetailManagement)}/>
+                <Route path="/football/league/detail/:id" component={this.requireAuth("/football/footballLeagueMatch/:id",FootBallLeagueDetailSetting)}/>
                 <Route path="/football/footballLeagueMatch/:id" component={this.requireAuth("/football/footballLeagueMatch/:id",FootballLeagueMatchDetailManagement)}/>
                 <Route path="/football/footballLeagueSeries/:id" component={this.requireAuth("/football/footballLeagueSeries/:id",FootBallLeagueMatchSeriesManagement)}/>
                 <Route path="/football/footballPlayer/:id" component={this.requireAuth("/football/footballPlayer/:id",FootballPlayerDetailManagement)}/>

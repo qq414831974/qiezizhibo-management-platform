@@ -13,7 +13,7 @@ import 'moment/locale/zh-cn';
 import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {getAllRoles, upload} from "../../../axios";
+import {getAllRoles, uploadposter} from "../../../axios";
 import logo from '../../../static/blank.png';
 import {message} from "antd/lib/index";
 
@@ -92,7 +92,7 @@ class BannerModifyDialog extends React.Component {
                             })(
                                 <Upload
                                     accept="image/*"
-                                    action={upload}
+                                    action={uploadposter}
                                     listType="picture-card"
                                     withCredentials={true}
                                     showUploadList={false}

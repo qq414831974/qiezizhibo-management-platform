@@ -18,11 +18,10 @@ import 'moment/locale/zh-cn';
 import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {uploadimg} from "../../../axios/index";
 
 import defultAvatar from '../../../static/avatar.jpg';
 import {randomNum, toChinesNum} from "../../../utils";
-import {getAreasList, upload} from "../../../axios";
+import {getAreasList, uploadimg, uploadposter} from "../../../axios";
 import imgcover from '../../../static/imgcover.jpg';
 
 moment.locale('zh-cn');
@@ -99,6 +98,7 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
         reader.addEventListener('load', () => callback(reader.result));
         reader.readAsDataURL(img);
     }
+
     getRoundDom = () => {
         const {form, record} = this.props;
         const {getFieldDecorator} = form;
@@ -454,7 +454,7 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                 })(
                                     <Upload
                                         accept="image/*"
-                                        action={upload}
+                                        action={uploadposter}
                                         listType="picture-card"
                                         withCredentials={true}
                                         showUploadList={false}

@@ -16,7 +16,7 @@ import 'moment/locale/zh-cn';
 import {receiveData} from "../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {getAllMatchs, upload, getMatchById, updateMediaInPlayer, getMediaInPlayer} from "../../../axios";
+import {getAllMatchs, uploadposter, getMatchById, updateMediaInPlayer, getMediaInPlayer} from "../../../axios";
 import imgcover from '../../../static/imgcover.jpg';
 
 import defultAvatar from '../../../static/avatar.jpg';
@@ -276,7 +276,7 @@ class FootBallPlayerModifyMediaDialog extends React.Component {
                                 })(
                                     <Upload
                                         accept="image/*"
-                                        action={upload}
+                                        action={uploadposter}
                                         listType="picture-card"
                                         withCredentials={true}
                                         showUploadList={false}

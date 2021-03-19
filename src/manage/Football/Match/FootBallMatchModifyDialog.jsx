@@ -34,7 +34,7 @@ import {
     getActivityInfoList,
     getActivityInfo,
     getAllLeagueMatchs,
-    upload,
+    uploadposter,
     getTeamInLeague,
 } from "../../../axios";
 import {message} from "antd/lib/index";
@@ -934,7 +934,7 @@ class FootBallMatchModifyDialog extends React.Component {
                                 })(
                                     <Upload
                                         accept="image/*"
-                                        action={upload}
+                                        action={uploadposter}
                                         listType="picture-card"
                                         withCredentials={true}
                                         showUploadList={false}

@@ -10,6 +10,8 @@ export const npmDependencies = () => get('./npm.json').then(res => res.data).cat
 
 export const uploadimg = `${config.system_service}/sys/file/upload/image?avatar=true`;
 
+export const uploadposter = `${config.system_service}/sys/file/upload/image?poster=true`;
+
 export const uploadmedia = `${config.system_service}/sys/file/upload/media`;
 
 export const upload = `${config.system_service}/sys/file/upload/image`;

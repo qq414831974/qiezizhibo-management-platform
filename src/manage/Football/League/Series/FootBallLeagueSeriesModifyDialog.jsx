@@ -21,7 +21,7 @@ import {getAreasList, uploadimg} from "../../../../axios";
 
 import defultAvatar from '../../../../static/avatar.jpg';
 import {randomNum, toChinesNum} from "../../../../utils";
-import {upload} from "../../../../axios";
+import {uploadposter} from "../../../../axios";
 import imgcover from '../../../../static/imgcover.jpg';
 
 moment.locale('zh-cn');
@@ -454,7 +454,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 })(
                                     <Upload
                                         accept="image/*"
-                                        action={upload}
+                                        action={uploadposter}
                                         listType="picture-card"
                                         withCredentials={true}
                                         showUploadList={false}

@@ -264,39 +264,19 @@ class FootBallLeagueMatchTable extends React.Component {
             ]
         }
         return [
-            <Button key="detail" type="primary" className="pull-left">
+            <Button key="battle" type="primary" className="pull-left">
                 <Link to={
                     `/football/footballLeagueMatch/${this.state.record.id}`
-                }>详细设置</Link>
+                }>战报积分榜设置</Link>
+            </Button>,
+            <Button key="detail" type="primary" className="pull-left"><Link to={
+                `/football/league/detail/${this.state.record.id}`
+            }>详细设置</Link>
             </Button>,
             <Button key="view" type="primary" className="pull-left">
                 <Link to={
                     `/football/footballMatch?leagueId=${this.state.record.id}`
                 }>浏览比赛</Link>
-            </Button>,
-            <Button key="charge" type="primary" className="pull-left"><Link to={
-                `/football/league/charge?leagueId=${this.state.record.id}`
-            }>收费</Link>
-            </Button>,
-            <Button key="heat" type="primary" className="pull-left"><Link to={
-                `/football/league/heat?leagueId=${this.state.record.id}`
-            }>热度</Link>
-            </Button>,
-            <Button key="bet" type="primary" className="pull-left"><Link to={
-                `/football/league/bet?leagueId=${this.state.record.id}`
-            }>竞猜</Link>
-            </Button>,
-            <Button key="bet" type="primary" className="pull-left"><Link to={
-                `/football/league/clip?leagueId=${this.state.record.id}`
-            }>剪辑</Link>
-            </Button>,
-            <Button key="bet" type="primary" className="pull-left"><Link to={
-                `/football/league/encryption?leagueId=${this.state.record.id}`
-            }>加密</Link>
-            </Button>,
-            <Button key="bet" type="primary" className="pull-left"><Link to={
-                `/football/league/ad?leagueId=${this.state.record.id}`
-            }>广告</Link>
             </Button>,
             <Button key="delete" type="danger" className="pull-left"
                     onClick={this.handleLeagueDelete}>删除</Button>,

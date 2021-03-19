@@ -16,7 +16,7 @@ import 'moment/locale/zh-cn';
 import {receiveData} from "../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {upload, getActivityMediaList, updateActivityMedia, getActivityMedia, getActivityMediaFileId} from "../../axios";
+import {uploadposter, getActivityMediaList, updateActivityMedia, getActivityMedia, getActivityMediaFileId} from "../../axios";
 import imgcover from '../../static/imgcover.jpg';
 
 moment.locale('zh-cn');
@@ -172,7 +172,7 @@ class LiveModifyMediaDialog extends React.Component {
                                 })(
                                     <Upload
                                         accept="image/*"
-                                        action={upload}
+                                        action={uploadposter}
                                         listType="picture-card"
                                         withCredentials={true}
                                         showUploadList={false}

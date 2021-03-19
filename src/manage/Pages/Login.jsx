@@ -42,10 +42,10 @@ class Login extends React.Component {
         }
     }
 
-    getUserInfo = (remember) => {
+    getUserInfo = (password, remember) => {
         getCurrentAdminUserInfo().then(userAuth => {
             if (userAuth && userAuth.code == 200 && userAuth.data) {
-                setUser({rememberMe: remember, ...userAuth.data})
+                setUser({rememberMe: remember, ...userAuth.data, password: password})
                 setRole(userAuth.data.roles)
                 this.toHome();
             } else {
@@ -62,7 +62,7 @@ class Login extends React.Component {
                     this.setState({loginLoading: true})
                     if (logindata && logindata.code == 200) {
                         setToken(logindata.data);
-                        this.getUserInfo(values.rememberMe);
+                        this.getUserInfo(values.password, values.rememberMe);
                     } else {
                         message.error('登陆失败：' + (logindata ? logindata.code + ":" + logindata.message : logindata), 3);
                     }
@@ -114,7 +114,7 @@ class Login extends React.Component {
                                     <Checkbox>记住我</Checkbox>
                                 )}
                                 <span className="login-form-forgot cursor-hand" onClick={this.onForgetPassword}
-                                   style={{float: 'right'}}>忘记密码</span>
+                                      style={{float: 'right'}}>忘记密码</span>
                                 <Button type="primary" htmlType="submit" className="login-form-button"
                                         loading={this.state.loginLoading}
                                         style={{width: '100%'}}>
