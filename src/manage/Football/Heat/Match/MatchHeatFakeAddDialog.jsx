@@ -11,7 +11,7 @@ import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import defultAvatar from "../../../../static/avatar.jpg";
 import logo from "../../../../static/logo.png";
-import {getAllAdminUser, getGifts} from "../../../../axios";
+import {getAllUser, getGifts} from "../../../../axios";
 
 
 const Option = Select.Option;
@@ -51,7 +51,7 @@ class LeagueHeatFakeAddDialog extends React.Component {
         this.setState({
             giftloading: true,
         });
-        getGifts({pageSize: 20, pageNum: pageNum, name: searchText, type: 1, wechatType: 1}).then((data) => {
+        getGifts({pageSize: 20, pageNum: pageNum, name: searchText, type: 1, wechatType: 0}).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
                     giftdata: pageNum == 1 ? (data.data ? data.data.records : []) :
@@ -117,7 +117,7 @@ class LeagueHeatFakeAddDialog extends React.Component {
         this.setState({
             userloading: true,
         });
-        getAllAdminUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 1}).then((data) => {
+        getAllUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 0}).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
                     userdata: pageNum == 1 ? (data.data ? data.data.records : []) :

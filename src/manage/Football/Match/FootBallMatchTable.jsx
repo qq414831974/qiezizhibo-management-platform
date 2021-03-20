@@ -1,9 +1,9 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip, Upload, Radio, Menu, Dropdown} from 'antd';
-import {getAllMatchs} from '../../../axios/index';
 import {getQueryString, mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
 import {
+    getAllMatchs,
     delMatchByIds,
     updateMatchById,
     createMatch,
@@ -12,7 +12,8 @@ import {
     updateMatchScoreStatusById,
     getwxacodeunlimit,
     getActivityMediaM3U8List,
-    getActivityInfo
+    getActivityInfo,
+    getWXShareMomentPicture
 } from "../../../axios";
 import {Form, message, notification} from "antd/lib/index";
 import FootBallMatchAddDialog from "../Match/FootBallMatchAddDialog"
@@ -470,6 +471,30 @@ class FootBallMatchTable extends React.Component {
             }
         });
     }
+    handleExportMomentSharePic = () => {
+        const selectedRowKeys = this.state.selectedRowKeys;
+        let content = "";
+        let count = 0;
+        message.loading('开始生成')
+        selectedRowKeys.forEach(selectedItem => {
+            this.state.data && this.state.data.forEach(item => {
+                if (selectedItem == item.id) {
+                    getWXShareMomentPicture({matchId: item.id}).then(res => {
+                        if (res) {
+                            count = count + 1;
+                            message.loading(`当前完成${count}/${selectedRowKeys.length}`,)
+                            content = content + `${item.name}\r\n${res.data}\r\n\r\n`;
+                            if (selectedRowKeys.length == count) {
+                                this.download("朋友圈图片地址.txt", content);
+                                message.destroy()
+                                message.success(`当前完成${count}/${selectedRowKeys.length}`,)
+                            }
+                        }
+                    })
+                }
+            });
+        });
+    }
     fake_click = (obj) => {
         const ev = document.createEvent("MouseEvents");
         ev.initMouseEvent(
@@ -793,6 +818,13 @@ class FootBallMatchTable extends React.Component {
                                        <Button type="primary" shape="circle" icon="export"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
                                                onClick={this.handleExportMulti}>
+                                           {selectedRowKeys.length}
+                                       </Button>
+                                   </Tooltip>
+                                   <Tooltip title="导出朋友圈图片">
+                                       <Button type="primary" shape="circle" icon="wechat"
+                                               hidden={this.state.selectedRowKeys.length > 0 ? false : true}
+                                               onClick={this.handleExportMomentSharePic}>
                                            {selectedRowKeys.length}
                                        </Button>
                                    </Tooltip>

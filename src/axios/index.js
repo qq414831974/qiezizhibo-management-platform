@@ -1724,6 +1724,12 @@ export const updateLeagueAdRule = (param) => put({
     }).catch(function (error) {
         console.log(error)
     });
+export const getWXShareMomentPicture = (param) => get({url: `${config.system_service}/sys/wx/ma/picture/moment?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 
 
 //暂时无用
