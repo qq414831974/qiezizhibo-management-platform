@@ -1,6 +1,6 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip, Radio} from 'antd';
-import {getAllLeagueMatchSeries, getwxacodeunlimit} from '../../../axios/index';
+import {getAllLeagueMatchSeries, getLeagueMatchById, getwxacodeunlimit} from '../../../axios/index';
 import {getQueryString, mergeJSON} from '../../../utils/index';
 import {Avatar} from 'antd';
 import {delLeagueMatchByIds, updateLeagueMatchById, createLeagueMatch} from "../../../axios";
@@ -14,6 +14,8 @@ import {receiveData} from "../../../action";
 import {connect} from "react-redux";
 import {Link} from 'react-router-dom';
 import copy from 'copy-to-clipboard';
+
+import {Base64} from 'js-base64';
 
 class FootBallLeagueMatchTable extends React.Component {
     state = {
@@ -297,6 +299,14 @@ class FootBallLeagueMatchTable extends React.Component {
             this.downloadBase64(`小程序码-联赛-${record.id}.jpg`, `data:image/png;base64,${data}`)
         })
     }
+    download = (name, data) => {
+        const urlObject = window.URL || window.webkitURL || window;
+        const downloadData = new Blob([data]);
+        const save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+        save_link.href = urlObject.createObjectURL(downloadData);
+        save_link.download = name;
+        this.fake_click(save_link);
+    }
     downloadBase64 = (name, data) => {
         const save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
         save_link.href = data;
@@ -315,6 +325,19 @@ class FootBallLeagueMatchTable extends React.Component {
         this.setState({
             filterOrder: e.target.value,
         });
+    }
+    handleExportHeatWebPage = () => {
+        if (this.state.selectedRowKeys) {
+            let content = "";
+            for (let id of this.state.selectedRowKeys) {
+                for (let leaguedata of this.state.data) {
+                    if (leaguedata && leaguedata.id == id && !leaguedata.isParent) {
+                        content = content + `${leaguedata.name}\r\n${"https://qiezitv.net/#" + Base64.encode(leaguedata.id)}\r\n\r\n`;
+                    }
+                }
+            }
+            this.download("热度PK网页导出.txt", content);
+        }
     }
 
     render() {
@@ -555,6 +578,12 @@ class FootBallLeagueMatchTable extends React.Component {
                                        <Button type="danger" shape="circle" icon="delete"
                                                hidden={this.state.selectedRowKeys.length > 0 ? false : true}
                                                onClick={this.handleLeaguesDelete}>{selectedRowKeys.length}
+                                       </Button>
+                                   </Tooltip>
+                                   <Tooltip title="导出热度pk网页链接">
+                                       <Button type="primary" shape="circle" icon="export"
+                                               hidden={this.state.selectedRowKeys.length > 0 ? false : true}
+                                               onClick={this.handleExportHeatWebPage}>{selectedRowKeys.length}
                                        </Button>
                                    </Tooltip>
                                    <Tooltip title="刷新">

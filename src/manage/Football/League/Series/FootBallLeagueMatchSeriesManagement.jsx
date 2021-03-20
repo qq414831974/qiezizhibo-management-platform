@@ -20,12 +20,14 @@ import FootBallLeagueMatchModifyDialog from "./FootBallLeagueSeriesModifyDialog"
 import FootBallLeagueMatchAddDialog from "./FootBallLeagueSeriesAddDialog";
 import {Link} from 'react-router-dom';
 import FootBallLeagueSeriesAddLeagueDialog from "./FootBallLeagueSeriesAddLeagueDialog";
+import {Base64} from 'js-base64';
 
 class FootBallLeagueMatchSeriesManagement extends React.Component {
     state = {
         data: [],
         record: {},
         leagueData: {},
+        selectedRowKeys: [],
     }
 
     componentDidMount() {
@@ -42,6 +44,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                 this.setState({
                     loading: false,
                     data: data.data.records,
+                    selectedRowKeys: [],
                 });
             }
         })
@@ -52,6 +55,9 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                 });
             }
         })
+    }
+    onSelectChange = (selectedRowKeys) => {
+        this.setState({selectedRowKeys});
     }
     onNameClick = (record, e) => {
         this.setState({record: record});
@@ -211,6 +217,14 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             this.downloadBase64(`小程序码-联赛-${record.id}.jpg`, `data:image/png;base64,${data}`)
         })
     }
+    download = (name, data) => {
+        const urlObject = window.URL || window.webkitURL || window;
+        const downloadData = new Blob([data]);
+        const save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
+        save_link.href = urlObject.createObjectURL(downloadData);
+        save_link.download = name;
+        this.fake_click(save_link);
+    }
     downloadBase64 = (name, data) => {
         const save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a")
         save_link.href = data;
@@ -225,6 +239,19 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
         );
         obj.dispatchEvent(ev);
     }
+    handleExportHeatWebPage = () => {
+        if (this.state.selectedRowKeys) {
+            let content = "";
+            for (let id of this.state.selectedRowKeys) {
+                for (let leaguedata of this.state.data) {
+                    if (leaguedata && leaguedata.id == id && !leaguedata.isParent) {
+                        content = content + `${leaguedata.name}\r\n${"https://qiezitv.net/#" + Base64.encode(leaguedata.id)}\r\n\r\n`;
+                    }
+                }
+            }
+            this.download("热度PK网页导出.txt", content);
+        }
+    }
 
     render() {
         const isMobile = this.props.responsive.data.isMobile;
@@ -233,7 +260,21 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
         const AddDialog = Form.create()(FootBallLeagueMatchAddDialog);
         const ModifyDialog = Form.create()(FootBallLeagueMatchModifyDialog);
         const AddLeagueDialog = Form.create()(FootBallLeagueSeriesAddLeagueDialog);
+        const {selectedRowKeys} = this.state;
 
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: this.onSelectChange,
+            hideDefaultSelections: true,
+            selections: [{
+                key: 'disSelect',
+                text: '清空选中',
+                onSelect: () => {
+                    this.setState({selectedRowKeys: []});
+                },
+            }],
+            onSelection: this.onSelection,
+        };
         const columns = [{
             title: '名字',
             align: 'center',
@@ -384,6 +425,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                                 </div>
                                 <Table columns={isMobile ? columns_mobile : columns}
                                        rowKey={record => record.id}
+                                       rowSelection={isMobile ? null : rowSelection}
                                        dataSource={this.state.data}
                                        loading={this.state.loading}
                                        bordered
@@ -395,6 +437,12 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                                                        onClick={this.showLeagueMatchAddDialog}/>
                                                <Button type="primary" shape="circle" icon="zoom-in"
                                                        onClick={this.showLeagueSeriesAddDialog}/>
+                                               <Tooltip title="导出热度pk网页链接">
+                                                   <Button type="primary" shape="circle" icon="export"
+                                                           hidden={this.state.selectedRowKeys.length > 0 ? false : true}
+                                                           onClick={this.handleExportHeatWebPage}>{selectedRowKeys.length}
+                                                   </Button>
+                                               </Tooltip>
                                                <Button type="primary" shape="circle" icon="reload"
                                                        className="pull-right"
                                                        loading={this.state.loading}
