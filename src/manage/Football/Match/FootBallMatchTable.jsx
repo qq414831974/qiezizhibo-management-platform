@@ -864,6 +864,7 @@ class FootBallMatchTable extends React.Component {
             >
                 <AddDialog
                     visible={this.state.dialogAddVisible}
+                    leagueId={this.props.leagueId}
                     ref={this.saveMatchDialogRef}/>
             </Modal>
             <Modal

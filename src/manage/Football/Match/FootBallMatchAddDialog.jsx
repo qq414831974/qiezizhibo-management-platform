@@ -32,7 +32,7 @@ import {
     getActivityInfoList,
     getAllLeagueMatchs,
     uploadposter,
-    getTeamInLeague,
+    getTeamInLeague, getLeagueMatchById, getLeagueTeam,
 } from "../../../axios";
 import {message} from "antd/lib/index";
 import {getRound, getJueSaiRankRound} from '../../../utils/index';
@@ -76,19 +76,35 @@ const typeData = [
 class FootBallMatchAddDialog extends React.Component {
     state = {
         liveloading: false,
+        leagueloading: false,
         plusHide: true
     }
+    isLeagueCompositions = true;
 
     componentDidMount() {
         if (!this.props.visible) {
             return;
+        }
+        if (this.props.leagueId != null) {
+            getLeagueMatchById(this.props.leagueId).then(data => {
+                if (data && data.code == 200 && data.data) {
+                    this.setState({
+                        leaguedata: [data.data],
+                        currentLeague: data.data
+                    },()=>{
+                        this.props.form.setFieldsValue({leagueId: Number(this.props.leagueId)})
+                    });
+                    this.fetch(data.data);
+                }
+            })
+        } else {
+            this.fetchLeagues(null, 1);
         }
         this.fetch();
     };
 
     fetch = (param) => {
         this.setState({
-            leagueloading: true,
             teamloading: true,
         });
         if (param || this.state.league) {
@@ -118,22 +134,86 @@ class FootBallMatchAddDialog extends React.Component {
                 }
             });
         }
+    }
+    fetchLeagues = (searchText, pageNum) => {
+        this.setState({
+            leagueloading: true,
+        });
+        if (pageNum == 1) {
+            this.setState({
+                leaguedata: [],
+            });
+        }
         getAllLeagueMatchs({
-            pageSize: 300,
-            pageNum: 1,
+            pageSize: 20,
+            pageNum: pageNum,
             sortField: "createTime",
-            sortOrder: "desc"
+            sortOrder: "desc",
+            name: searchText
         }).then((data) => {
             if (data && data.code == 200) {
                 this.setState({
-                    leaguedata: data.data ? data.data.records : "",
+                    leaguedata: pageNum == 1 ? (data.data ? data.data.records : []) :
+                        (data ? this.state.leaguedata.concat(data.data.records) : []),
                     leagueloading: false,
+                    leaguePageNum: data.data.current,
+                    leaguePageSize: data.data.size,
+                    leaguePageTotal: data.data.total,
                 });
             } else {
                 message.error('获取联赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
     }
+    handleLeagueChange = (value, op) => {
+        this.setState({league: op.props.data});
+        this.fetch(op.props.data);
+        const {form} = this.props;
+        this.state.leaguedata && this.state.leaguedata.forEach(item => {
+            if (item.id == value) {
+                form.setFieldsValue({leagueId: item.id})
+            }
+        });
+    }
+    handleLeagueShowMore = (e) => {
+        const num = Math.floor(e.target.scrollTop / 50) + 1;
+        if (num + 5 >= this.state.leaguedata.length) {
+            this.handleLeagueOnLoadMore(e);
+        }
+    }
+    handleLeagueOnLoadMore = (e) => {
+        let data = this.state.leaguedata;
+        e.target.scrollTop = data.length * 50;
+        if (this.state.leagueloading) {
+            return;
+        }
+        if (data.length > this.state.leaguePageTotal) {
+            this.setState({
+                leagueHasMore: false,
+                leagueloading: false,
+            });
+            return;
+        }
+        this.fetchLeagues(this.state.leagueSearchText, this.state.leaguePageNum + 1);
+    }
+    handleLeagueSearch = (e) => {
+        const value = e.target.value;
+        this.setState({leagueSearchText: value});
+        // setTimeout(()=>{
+        if (this.isLeagueCompositions) {
+            this.fetchLeagues(value, 1);
+        }
+        // },100);
+    }
+    //中文输入中的状态 参考 https://blog.csdn.net/qq1194222919/article/details/80747192
+    onLeagueInputCompositionStart = () => {
+        this.isLeagueCompositions = false;
+    }
+    onLeagueInputCompositionEnd = () => {
+        this.isLeagueCompositions = true;
+        this.fetchLeagues(this.state.leagueSearchText, 1);
+    }
+
     getLiveInfoList = (params) => {
         this.setState({
             listloading: true,
@@ -175,7 +255,7 @@ class FootBallMatchAddDialog extends React.Component {
         data.startTime = this.state.liveStartTime ? this.state.liveStartTime : startTime;
         data.endTime = this.state.liveEndTime ? this.state.liveEndTime : endTime;
         data.name = this.state.createLivename ? this.state.createLivename : this.props.form.getFieldValue('name');
-        data.areatype = 0;
+        data.areaType = 0;
         data.startTime = data.startTime ? moment(data.startTime).format('YYYY/MM/DD HH:mm:ss') : null;
         data.endTime = data.endTime ? moment(data.endTime).format('YYYY/MM/DD HH:mm:ss') : null;
 
@@ -210,12 +290,6 @@ class FootBallMatchAddDialog extends React.Component {
             guestTeam: op.props.data,
         });
     }
-    onLeagueSelect = (e, op) => {
-        this.setState({
-            league: op.props.data,
-        });
-        this.fetch(op.props.data);
-    }
 
     showLiveCreatePop = () => {
         this.getLiveInfoList({
@@ -243,12 +317,12 @@ class FootBallMatchAddDialog extends React.Component {
     }
     getLeagueOption = () => {
         let dom = [];
-        dom.push(<Option onClick={() => {
+        dom.push(<Option style={{height: 50}} onClick={() => {
             this.setState({currentLeague: null})
         }} value={null} data={null} key={"league-none"}>{<p
             className="ml-s mt-n mb-n">无联赛</p>}</Option>);
         this.state.leaguedata.forEach((item, index) => {
-            dom.push(<Option onClick={() => {
+            dom.push(<Option style={{height: 50}} onClick={() => {
                 this.setState({currentLeague: item})
             }} value={item.id} data={item} key={"league" + item.id}>{<div className="inline-p"><Avatar
                 src={item.headImg}/><p
@@ -420,7 +494,6 @@ class FootBallMatchAddDialog extends React.Component {
         const {getFieldDecorator} = form;
         const onHostSelect = this.onHostSelect
         const onGuestSelect = this.onGuestSelect
-        const onLeagueSelect = this.onLeagueSelect
         const getLeagueOption = this.getLeagueOption
         const getTeamOption = this.getTeamOption
         const onLivelistClick = this.onLivelistClick
@@ -517,14 +590,26 @@ class FootBallMatchAddDialog extends React.Component {
                                 {getFieldDecorator('leagueId', {
                                     // rules: [{required: true, message: '请选择联赛!'}],
                                 })(
-                                    <Select size="large" style={{minWidth: 300}} onSelect={onLeagueSelect}
-                                            disabled={this.state.leagueloading}>
+                                    <Select showSearch
+                                            placeholder="按名称搜索并选择"
+                                            defaultActiveFirstOption={false}
+                                            showArrow={false}
+                                            filterOption={false}
+                                            style={{minWidth: 300}}
+                                            onSelect={this.handleLeagueChange}
+                                            onPopupScroll={this.handleLeagueShowMore}
+                                            notFoundContent={null}
+                                        // mode="tags"
+                                            loading={this.state.leagueloading}
+                                            getInputElement={() => (
+                                                <input onInput={this.handleLeagueSearch}
+                                                       onCompositionStart={this.onLeagueInputCompositionStart}
+                                                       onCompositionEnd={this.onLeagueInputCompositionEnd}/>)}
+                                    >
                                         {this.state.leaguedata ? getLeagueOption() : null}
                                     </Select>
                                 )}
                             </FormItem>
-                            <Icon className="ml-s" style={{fontSize: 16}} type="loading"
-                                  hidden={!this.state.leagueloading}/>
                         </div>
                         <Row gutter={2}>
                             <Col span={8}>

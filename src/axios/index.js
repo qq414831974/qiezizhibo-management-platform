@@ -16,7 +16,7 @@ export const uploadmedia = `${config.system_service}/sys/file/upload/media`;
 
 export const upload = `${config.system_service}/sys/file/upload/image`;
 
-export const uploaddocx_team = `${config.system_service}/sys/file/import/team`;
+export const uploaddocx_team = `${config.system_service}/sys/file/import/team?wechatType=0`;
 
 export const uploaddocx_match = `${config.system_service}/sys/file/import/match`;
 
@@ -385,7 +385,8 @@ export const getAllPlayers = (params) => get({url: `${config.football_service}/f
 export const getAllPlayersNotInTeam = (params, teamId) => get({
     url: `${config.football_service}/football/player?${unpack({
         teamId: teamId,
-        notInTeam: true, ...params
+        notInTeam: true, ...params,
+        wechatType: 0,
     })}`
 })
     .then(function (response) {
