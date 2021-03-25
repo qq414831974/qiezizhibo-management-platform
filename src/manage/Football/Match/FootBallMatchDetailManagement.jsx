@@ -58,10 +58,7 @@ class FootBallMatchDetailManagement extends React.Component {
                 return;
             }
             values["startTime"] = values["startTime"] ? values["startTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["endTime"] = values["endTime"] ? values["endTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["createTime"] = values["createTime"] ? values["createTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["updateTime"] = values["updateTime"] ? values["updateTime"].format('YYYY/MM/DD HH:mm:ss') : null;
-            values["deleteTime"] = values["deleteTime"] ? values["deleteTime"].format('YYYY/MM/DD HH:mm:ss') : null;
+            values["available"] = values["available"] != null ? !values["available"] : false;
             updateMatchById(values).then((data) => {
                 if (data && data.code == 200) {
                     if (data.data) {
