@@ -88,12 +88,13 @@ class FootBallMatchModifyDialog extends React.Component {
         if (!this.props.visible) {
             return;
         }
-        this.fetch();
         this.setState({
             hostTeam: this.props.record.hostTeam,
             guestTeam: this.props.record.guestTeam
         });
-        this.setState({currentLeague: this.props.record.league, leaguedata: [this.props.record.league]})
+        this.setState({currentLeague: this.props.record.league, leaguedata: [this.props.record.league]}, () => {
+            this.fetch();
+        })
     };
 
     fetch = (param) => {
@@ -320,7 +321,7 @@ class FootBallMatchModifyDialog extends React.Component {
         let dom = [];
         dom.push(<Option value={null} data={null} key={"team-none"}>{<p
             className="ml-s mt-n mb-n">无</p>}</Option>);
-        this.state.data.forEach((item, index) => {
+        this.state.data && this.state.data.forEach((item, index) => {
             dom.push(<Option value={item.id} data={item} key={"team" + item.id}>{<Tooltip title={item.remark}>
                 <div className="inline-p"><Avatar
                     src={item.headImg}/><p

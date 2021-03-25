@@ -90,8 +90,8 @@ class FootBallMatchAddDialog extends React.Component {
                 if (data && data.code == 200 && data.data) {
                     this.setState({
                         leaguedata: [data.data],
-                        currentLeague: data.data
-                    },()=>{
+                        currentLeague: data.data,
+                    }, () => {
                         this.props.form.setFieldsValue({leagueId: Number(this.props.leagueId)})
                     });
                     this.fetch(data.data);
@@ -99,16 +99,16 @@ class FootBallMatchAddDialog extends React.Component {
             })
         } else {
             this.fetchLeagues(null, 1);
+            this.fetch();
         }
-        this.fetch();
     };
 
     fetch = (param) => {
         this.setState({
             teamloading: true,
         });
-        if (param || this.state.league) {
-            const league = param || this.state.league
+        if (param || this.state.currentLeague) {
+            const league = param || this.state.currentLeague
             getTeamInLeague(league.id).then(res => {
                 if (res && res.code == 200) {
                     this.setState({
@@ -166,7 +166,7 @@ class FootBallMatchAddDialog extends React.Component {
         });
     }
     handleLeagueChange = (value, op) => {
-        this.setState({league: op.props.data});
+        this.setState({currentLeague: op.props.data});
         this.fetch(op.props.data);
         const {form} = this.props;
         this.state.leaguedata && this.state.leaguedata.forEach(item => {
@@ -306,7 +306,7 @@ class FootBallMatchAddDialog extends React.Component {
         let dom = [];
         dom.push(<Option value={null} data={null} key={"team-none"}>{<p
             className="ml-s mt-n mb-n">无</p>}</Option>);
-        this.state.data.forEach((item, index) => {
+        this.state.data && this.state.data.forEach((item, index) => {
             dom.push(<Option value={item.id} data={item} key={"team" + item.id}>{<Tooltip title={item.remark}>
                 <div className="inline-p"><Avatar
                     src={item.headImg}/><p
@@ -472,8 +472,8 @@ class FootBallMatchAddDialog extends React.Component {
     }
     getPlaceSelecter = () => {
         let dom = []
-        if (this.state.league && this.state.league.place) {
-            this.state.league.place.forEach((item, index) => {
+        if (this.state.currentLeague && this.state.currentLeague.place) {
+            this.state.currentLeague.place.forEach((item, index) => {
                 dom.push(<Option key={`opt-${index}`} value={item}
                                  onClick={this.onPlaceSelect.bind(this, item)}>
                     <Tooltip title={item}>{item}</Tooltip>
