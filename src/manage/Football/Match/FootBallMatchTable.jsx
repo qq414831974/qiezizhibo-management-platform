@@ -660,8 +660,18 @@ class FootBallMatchTable extends React.Component {
             dataIndex: 'status',
             width: '8%',
             render: function (text, record, index) {
-                return <p className="cursor-hand"
-                          onClick={onScoreClick.bind(this, record)}>{record.status == null ? "未开" : (record.status == -1 ? "未开" : status[record.status].text)}</p>
+                if (!record.available) {
+                    return <div className="cursor-hand" onClick={onScoreClick.bind(this, record)}>
+                        <span className="w-full center">
+                            {record.status == null ? "未开" : (record.status == -1 ? "未开" : status[record.status].text)}
+                        </span>
+                        <span className="w-full center danger">
+                            直播间关闭
+                        </span>
+                    </div>
+                }
+                return <span className="cursor-hand"
+                             onClick={onScoreClick.bind(this, record)}>{record.status == null ? "未开" : (record.status == -1 ? "未开" : status[record.status].text)}</span>
             }
         }, {
             title: '比分',
