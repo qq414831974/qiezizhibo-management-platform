@@ -87,7 +87,7 @@ class LeagueChargeForm extends React.Component {
                                     <div>
                                         <FormItem {...formItemLayout} label="永久价格" className="bs-form-item">
                                             {getFieldDecorator('live.price', {
-                                                initialValue: record.live ? NP.divide(record.live.price, 100) : null,
+                                                initialValue: record.live && record.live.price ? NP.divide(record.live.price, 100) : null,
                                                 rules: [{required: true, message: '请输入永久价格!'}],
                                             })(
                                                 <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
@@ -95,7 +95,7 @@ class LeagueChargeForm extends React.Component {
                                         </FormItem>
                                         <FormItem {...formItemLayout} label="一个月价格" className="bs-form-item">
                                             {getFieldDecorator('live.priceMonthly', {
-                                                initialValue: record.live ? NP.divide(record.live.priceMonthly, 100) : null,
+                                                initialValue: record.live && record.live.priceMonthly ? NP.divide(record.live.priceMonthly, 100) : null,
                                                 rules: [{required: true, message: '请输入一个月价格价格!'}],
                                             })(
                                                 <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
@@ -132,7 +132,7 @@ class LeagueChargeForm extends React.Component {
                                     <div>
                                         <FormItem {...formItemLayout} label="永久价格" className="bs-form-item">
                                             {getFieldDecorator('record.price', {
-                                                initialValue: record.record ? NP.divide(record.record.price, 100) : null,
+                                                initialValue: record.record && record.record.price ? NP.divide(record.record.price, 100) : null,
                                                 rules: [{required: true, message: '请输入永久价格!'}],
                                             })(
                                                 <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
@@ -140,7 +140,7 @@ class LeagueChargeForm extends React.Component {
                                         </FormItem>
                                         <FormItem {...formItemLayout} label="一个月价格" className="bs-form-item">
                                             {getFieldDecorator('record.priceMonthly', {
-                                                initialValue: record.record ? NP.divide(record.record.priceMonthly, 100) : null,
+                                                initialValue: record.record && record.record.priceMonthly ? NP.divide(record.record.priceMonthly, 100) : null,
                                                 rules: [{required: true, message: '请输入一个月价格价格!'}],
                                             })(
                                                 <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
@@ -162,7 +162,7 @@ class LeagueChargeForm extends React.Component {
                                             <div>
                                                 <FormItem {...formItemLayout} label="送礼永久看录播" className="bs-form-item">
                                                     {getFieldDecorator('record.giftWatchPrice', {
-                                                        initialValue: record.record ? NP.divide(record.record.giftWatchPrice, 100) : null,
+                                                        initialValue: record.record && record.record.giftWatchPrice ? NP.divide(record.record.giftWatchPrice, 100) : null,
                                                         rules: [{required: true, message: '请输入永久价格!'}],
                                                     })(
                                                         <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
@@ -170,7 +170,7 @@ class LeagueChargeForm extends React.Component {
                                                 </FormItem>
                                                 <FormItem {...formItemLayout} label="送礼一月看录播" className="bs-form-item">
                                                     {getFieldDecorator('record.giftWatchPriceMonthly', {
-                                                        initialValue: record.record ? NP.divide(record.record.giftWatchPriceMonthly, 100) : null,
+                                                        initialValue: record.record && record.record.giftWatchPriceMonthly ? NP.divide(record.record.giftWatchPriceMonthly, 100) : null,
                                                         rules: [{required: true, message: '请输入一个月价格价格!'}],
                                                     })(
                                                         <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
@@ -197,7 +197,7 @@ class LeagueChargeForm extends React.Component {
                                 {this.state.isMonopolyCharge ?
                                     <FormItem {...formItemLayout} label="买断价格" className="bs-form-item">
                                         {getFieldDecorator('monopoly.price', {
-                                            initialValue: record.monopoly ? NP.divide(record.monopoly.price, 100) : null,
+                                            initialValue: record.monopoly && record.monopoly.price ? NP.divide(record.monopoly.price, 100) : null,
                                             rules: [{required: true, message: '请输入买断价格!'}],
                                         })(
                                             <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
