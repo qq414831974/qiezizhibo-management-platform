@@ -368,6 +368,18 @@ class CommentTable extends React.Component {
             width: '50%',
             align: 'center',
             render: function (text, record, index) {
+                if (record.isBroadcast) {
+                    const giftOrder = JSON.parse(record.content)
+                    return <div onClick={onNameClick.bind(this, record)}>
+                        <div>
+                            <img className="round-img-s" src={giftOrder.giftHeadImg}/>
+                            <span className="ml-s">x{giftOrder.giftNumber}</span>
+                            <span className="ml-m mr-m">送给</span>
+                            <img className="round-img-s" src={giftOrder.targetHeadImg}/>
+                            <span className="ml-s">{giftOrder.targetName}</span>
+                        </div>
+                    </div>
+                }
                 return <a onClick={onNameClick.bind(this, record)}>{record.content}</a>;
             },
         }, {
@@ -437,6 +449,18 @@ class CommentTable extends React.Component {
             width: '80%',
             align: 'center',
             render: function (text, record, index) {
+                if (record.isBroadcast) {
+                    const giftOrder = JSON.parse(record.content)
+                    return <div onClick={onNameClick.bind(this, record)}>
+                        <div>
+                            <img className="round-img-s" src={giftOrder.giftHeadImg}/>
+                            <span className="ml-s">x{giftOrder.giftNumber}</span>
+                            <span className="ml-m mr-m">送给</span>
+                            <img className="round-img-s" src={giftOrder.targetHeadImg}/>
+                            <span className="ml-s">{giftOrder.targetName}</span>
+                        </div>
+                    </div>
+                }
                 return <a onClick={onNameClick.bind(this, record)}>{record.content}</a>;
             },
         }, {
