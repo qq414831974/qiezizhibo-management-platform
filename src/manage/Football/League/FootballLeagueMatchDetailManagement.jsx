@@ -479,7 +479,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                                         <Radio value={true}>自动</Radio>
                                         <Radio value={false}>手动</Radio>
                                     </Radio.Group>
-                                    <span className="pull-right pa-s">{"赛   胜/平/负   进/失 积分"}</span>
+                                    <span className="pull-right pa-s">赛&nbsp;&nbsp;&nbsp;&nbsp;胜/负&nbsp;&nbsp;&nbsp;&nbsp;进/失&nbsp;&nbsp;&nbsp;&nbsp;积分</span>
                                 </div>}>
                                     {this.getGroupLegueTeam()}
                                 </Card>

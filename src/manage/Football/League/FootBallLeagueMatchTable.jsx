@@ -499,7 +499,11 @@ class FootBallLeagueMatchTable extends React.Component {
             width: '5%',
             render: function (text, record, index) {
                 return <p className="cursor-hand" onClick={() => {
-                    copy(`../leagueManager/leagueManager?id=${record.id}`);
+                    let leagueBanner = `../leagueManager/leagueManager?id=${record.id}`
+                    if(record.isParent){
+                        leagueBanner = `../series/series?id=${record.id}`
+                    }
+                    copy(leagueBanner);
                     message.success('轮播链接已复制到剪贴板');
                 }}>{record.id ? `${record.id}` : "-"}</p>
             }
