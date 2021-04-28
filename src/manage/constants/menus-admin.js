@@ -59,6 +59,7 @@ export const menus_admin = [
             {key: '/setting/bulletin', title: '广告/公告', icon: 'notification',},
             {key: '/setting/scoreboard', title: '比分牌', icon: 'table',},
             {key: '/setting/sharesentence', title: '分享语句', icon: 'share-alt',},
+            {key: '/setting/payment', title: '支付设置', icon: 'dollar',},
             // { key: '/setting/wechat', title: '小程序', icon: 'wechat', },
         ],
     },

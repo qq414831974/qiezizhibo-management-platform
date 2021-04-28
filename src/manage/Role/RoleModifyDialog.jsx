@@ -40,7 +40,7 @@ class RoleModifyDialog extends React.Component {
 
     fetch = (searchText, pageNum) => {
         getPermissionList({
-            pageSize: 100,
+            pageSize: 200,
             pageNum: pageNum,
             name: searchText,
             sortOrder: "asc",

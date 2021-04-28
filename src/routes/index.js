@@ -50,6 +50,7 @@ import FootBallLeagueEncryptionManagement from "../manage/Football/Encryption/Le
 import FootBallMatchEncrypitonManagement from "../manage/Football/Encryption/Match/FootBallMatchEncryptionManagement";
 import FootballLeagueMatchBillAnalysis from "../manage/Football/League/Bill/FootballLeagueMatchBillAnalysis";
 import FootBallLeagueDetailSetting from "../manage/Football/League/Detail/FootBallLeagueDetailSetting";
+import PaymentConfigManagement from "../manage/Setting/Payment/PaymentConfigManagement";
 import Unauthorized from '../manage/Pages/Unauthorized';
 import LogManagement from '../manage/Log/LogManagement';
 
@@ -100,6 +101,7 @@ export default class CRouter extends Component {
                 <Route exact path="/setting/wechat" component={this.requireAuth("/setting/wechat",WechatSetting)}/>
                 <Route exact path="/setting/bulletin" component={this.requireAuth("/setting/bulletin",BulletinSetting)}/>
                 <Route exact path="/setting/sharesentence" component={this.requireAuth("/setting/sharesentence",ShareSentenceManagement)}/>
+                <Route exact path="/setting/payment" component={this.requireAuth("/setting/payment",PaymentConfigManagement)}/>
                 <Route exact path="/pay/product" component={this.requireAuth("/pay/product",ProductManagement)}/>
                 <Route exact path="/pay/order" component={this.requireAuth("/pay/order",OrderManagement)}/>
                 <Route exact path="/pay/freeTicket" component={this.requireAuth("/pay/freeTicket",FreeTicketManagement)}/>

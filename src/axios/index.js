@@ -1731,6 +1731,18 @@ export const getWXShareMomentPicture = (param) => get({url: `${config.system_ser
     }).catch(function (error) {
         console.log(error)
     });
+export const getPaymentConfig = (params) => get({url: `${config.system_service}/sys/config/payment?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const updatePaymentConfig = (params) => post({url: `${config.system_service}/sys/config/payment`, data: params})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
 
 
 //暂时无用

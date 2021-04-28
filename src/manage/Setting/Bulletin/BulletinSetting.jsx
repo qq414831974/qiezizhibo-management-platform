@@ -295,7 +295,7 @@ class BulletinSetting extends React.Component {
                                                    icon="plus"
                                                    onClick={this.showBulletinAddDialog}/>
                                        </Tooltip>
-                                       <span className="ml-l">iOS支付维护开关：</span>
+                                       <span className="ml-l">iOS支付维护通告：</span>
                                        <Switch checked={this.state.weiHuCheck} onClick={this.onWeiHuCheckClick}/>
                                    </div>
                                    <Tooltip title="刷新">
