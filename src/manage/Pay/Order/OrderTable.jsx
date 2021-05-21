@@ -19,10 +19,12 @@ class OrderTable extends React.Component {
         filterDropdownVisible: false,
         filterPriceDropdownVisible: false,
         filterTypeDropdownVisible: false,
+        filterUserDropdownVisible: false,
         searchText: '',
         filtered: false,
         filteredPrice: false,
         filteredType: false,
+        filteredUser: false,
         dialogModifyVisible: false,
         dialogAddVisible: false,
         record: {},
@@ -65,6 +67,9 @@ class OrderTable extends React.Component {
     onInputChange = (e) => {
         this.setState({searchText: e.target.value});
     }
+    onUserInputChange = (e) => {
+        this.setState({filterUser: e.target.value});
+    }
     onPriceBeginInputChange = (e) => {
         this.setState({searchPriceInputBegin: e.target.value});
     }
@@ -72,7 +77,7 @@ class OrderTable extends React.Component {
         this.setState({searchPriceInputEnd: e.target.value});
     }
     onSearch = () => {
-        const {searchText, filterStatus, filterType, searchPriceInputBegin, searchPriceInputEnd} = this.state;
+        const {searchText, filterStatus, filterType, filterUser, searchPriceInputBegin, searchPriceInputEnd} = this.state;
         const pager = {...this.state.pagination};
         pager.filters = this.getTableFilters(pager);
         pager.current = 1;
@@ -80,9 +85,11 @@ class OrderTable extends React.Component {
             filterDropdownVisible: false,
             filterPriceDropdownVisible: false,
             filterTypeDropdownVisible: false,
+            filterUserDropdownVisible: false,
             filtered: !!searchText || filterStatus != null,
             filteredPrice: !!searchPriceInputBegin && !!searchPriceInputEnd,
             filteredType: filterType != null,
+            filteredUser: filterUser != null,
             pagination: pager,
         });
         this.fetch({
@@ -115,7 +122,7 @@ class OrderTable extends React.Component {
         });
     }
     getTableFilters = (pager, filters) => {
-        const {searchText, filterStatus, filterType, searchPriceInputBegin, searchPriceInputEnd} = this.state;
+        const {searchText, filterStatus, filterType, filterUser, searchPriceInputBegin, searchPriceInputEnd} = this.state;
         pager.filters = {};
         if (searchText != null && searchText != '') {
             pager.filters["id"] = searchText;
@@ -128,6 +135,9 @@ class OrderTable extends React.Component {
         }
         if (filterType != null) {
             pager.filters["type"] = filterType;
+        }
+        if (filterUser != null) {
+            pager.filters["userNo"] = filterUser;
         }
         if (filters) {
             for (let param in filters) {
@@ -181,7 +191,7 @@ class OrderTable extends React.Component {
         this.setState({cancelVisible: true})
     }
     handleOrderRefundClick = () => {
-        if(this.state.record.payType == 2){
+        if (this.state.record.payType == 2) {
             message.warn('余额支付不允许退款', 3);
             return;
         }
@@ -283,7 +293,7 @@ class OrderTable extends React.Component {
                     filterDropdownVisible: visible,
                 }, () => this.searchInput && this.searchInput.focus());
             },
-            width: '25%',
+            width: '20%',
             align: 'center',
             render: function (text, record, index) {
                 return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.id}</a>;
@@ -362,7 +372,7 @@ class OrderTable extends React.Component {
             key: 'createTime',
             dataIndex: 'createTime',
             align: 'center',
-            width: '15%',
+            width: '14%',
         }, {
             title: '支付方式',
             key: 'payType',
@@ -397,6 +407,7 @@ class OrderTable extends React.Component {
                             <Radio value={4}>礼物</Radio>
                             <Radio value={5}>竞猜</Radio>
                             <Radio value={6}>余额充值</Radio>
+                            <Radio value={7}>联赛会员</Radio>
                         </Radio.Group>
                     </div>
                     <div className="w-full center mt-s">
@@ -432,6 +443,9 @@ class OrderTable extends React.Component {
                     case 6:
                         typeString = "余额充值"
                         break;
+                    case 7:
+                        typeString = "联赛会员"
+                        break;
                 }
                 return <span>{typeString}</span>;
             },
@@ -445,9 +459,14 @@ class OrderTable extends React.Component {
                 let dom = [];
                 if (record.league) {
                     const league = record.league;
-                    dom.push(<div className="center cursor-hand" onClick={toLeague.bind(this, record.league)}>
-                        <Avatar src={league.headImg ? league.headImg : defultAvatar}/>
-                        <p className="ml-s">{league.name}</p>
+                    dom.push(<div>
+                        <div className="center cursor-hand" onClick={toLeague.bind(this, record.league)}>
+                            <Avatar src={league.headImg ? league.headImg : defultAvatar}/>
+                            <p className="ml-s">{league.name}</p>
+                        </div>
+                        <div className="w-full center">
+                            {record.type == 7 ? <span className="danger">联赛会员</span> : null}
+                        </div>
                     </div>);
                 }
                 if (record.match) {
@@ -506,7 +525,35 @@ class OrderTable extends React.Component {
                 }
                 return <span>{dom}</span>;
             },
-        }
+        }, {
+            title: '用户',
+            key: 'userNo',
+            dataIndex: 'userNo',
+            align: 'center',
+            width: '6%',
+            filterDropdown: (
+                <div className="custom-filter-dropdown">
+                    <Input
+                        ref={ele => this.searchInputUser = ele}
+                        placeholder="按用户id搜索"
+                        value={this.state.filterUser}
+                        onChange={this.onUserInputChange}
+                        onPressEnter={this.onSearch}
+                    />
+                    <Button type="primary" icon="search" onClick={this.onSearch}>按用户id查找</Button>
+                </div>
+            ),
+            filterIcon: <Icon type="search" style={{color: this.state.filteredUser ? '#108ee9' : '#aaa'}}/>,
+            filterDropdownVisible: this.state.filterUserDropdownVisible,
+            onFilterDropdownVisibleChange: (visible) => {
+                this.setState({
+                    filterUserDropdownVisible: visible,
+                }, () => this.searchInputUser && this.searchInputUser.focus());
+            },
+            render: function (text, record, index) {
+                return <div/>
+            }
+        },
         ];
         const columns_moblie = [{
             title: '订单号',

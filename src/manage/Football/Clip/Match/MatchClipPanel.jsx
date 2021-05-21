@@ -118,10 +118,19 @@ class MatchClipPanel extends React.Component {
             }
         }
     }
+    getTeamInfo = (teamId) => {
+        if (this.props.match && this.props.match.hostTeam && this.props.match.guestTeam) {
+            if (teamId == this.props.match.hostTeam.id) {
+                return this.props.match.hostTeam.id;
+            } else if (teamId == this.props.match.guestTeam.id) {
+                return this.props.match.guestTeam.id;
+            }
+        }
+    }
     getTeamPlayerDom = (data) => {
         let dom = [];
         data && data.forEach(item => {
-            dom.push(<div key={item.id}
+            dom.push(<div key={`team-player-${item.id}`}
                           className="inline-block cell-hover border-radius-10px border-gray pa-xs ml-s cursor-hand">
                 <Avatar src={item.headImg ? item.headImg : defultAvatar}/>
                 <span>{`${item.name}(${item.shirtNum})`}</span>
@@ -282,6 +291,21 @@ class MatchClipPanel extends React.Component {
     }
     mergeClipsConfirm = () => {
         this.setState({mergeOptionVisible: true})
+        if (this.state.data && this.state.selectIds && this.state.selectIds.length == 1) {
+            const selectId = this.state.selectIds[0];
+            let currentClip;
+            for (let clip of this.state.data) {
+                if (clip.id == selectId) {
+                    currentClip = clip;
+                }
+            }
+            if (currentClip.playerId != null) {
+                this.onAutoPreffixPlayerSelect(currentClip.playerId)
+            }
+            if (currentClip.teamId != null) {
+                this.onAutoPreffixTeamSelect(currentClip.teamId)
+            }
+        }
     }
     mergeClipsCancel = () => {
         this.setState({mergeOptionVisible: false, autoPreffixChecked: false, autoPreffixPlayerId: null,})
@@ -319,7 +343,7 @@ class MatchClipPanel extends React.Component {
     getPlayerOption = () => {
         let dom = [];
         for (let player of this.state.hostdata.concat(this.state.guestdata)) {
-            dom.push(<Option key={player.id} value={player.id}>{player.name}</Option>)
+            dom.push(<Option key={`player-${player.id}`} value={player.id}>{player.name}</Option>)
         }
         return dom;
     }
@@ -328,10 +352,10 @@ class MatchClipPanel extends React.Component {
         const hostTeam = this.props.match.hostTeam;
         const guestTeam = this.props.match.guestTeam;
         if (hostTeam) {
-            dom.push(<Option key={hostTeam.id} value={hostTeam.id}>{hostTeam.name}</Option>)
+            dom.push(<Option key={`team-${hostTeam.id}`} value={hostTeam.id}>{hostTeam.name}</Option>)
         }
         if (guestTeam) {
-            dom.push(<Option key={guestTeam.id} value={guestTeam.id}>{guestTeam.name}</Option>)
+            dom.push(<Option key={`team-${guestTeam.id}`} value={guestTeam.id}>{guestTeam.name}</Option>)
         }
         return dom;
     }
@@ -414,14 +438,14 @@ class MatchClipPanel extends React.Component {
                   className="mt-m" style={{minHeight: 250}}>
                 <Checkbox.Group style={{width: '100%'}} value={this.state.selectIds} onChange={this.onCheckBoxChange}>
                     <List
-                        rowKey={record => record.id}
                         grid={{gutter: 16, lg: 3, md: 2, xs: 1}}
                         dataSource={this.state.data ? this.state.data.map(media => {
                             media.player = this.getPlayerInfo(media.playerId);
+                            // media.team = this.getTeamInfo(media.teamId);
                             return media;
                         }) : []}
                         loading={this.state.mediaLoading}
-                        renderItem={item => (<List.Item key={item.id}>
+                        renderItem={item => (<List.Item key={`item-${item.id}`}>
                             <div className="video-list-item pa-xs" style={{transform: "translate(0px, 0px)"}}>
                                 <Checkbox className="video-list-item-checkbox" value={item.id}/>
                                 {item.url == null || item.url == "" ?
@@ -457,14 +481,13 @@ class MatchClipPanel extends React.Component {
             </Card>
             <Card title="合并后视频" className="mt-m" style={{minHeight: 250}}>
                 <List
-                    rowKey={record => record.id}
                     grid={{gutter: 16, lg: 3, md: 2, xs: 1}}
                     dataSource={this.state.clipCollectionData ? this.state.clipCollectionData.map(media => {
                         media.player = this.getPlayerInfo(media.playerId);
                         return media;
                     }) : []}
                     loading={this.state.clipCollectionLoading}
-                    renderItem={item => (<List.Item>
+                    renderItem={item => (<List.Item key={`clipcolelction-${item.id}`}>
                         <div className="video-list-item pa-xs" style={{transform: "translate(0px, 0px)"}}>
                             <div className="video-list-item-top-left">
                                 <Avatar
@@ -472,7 +495,7 @@ class MatchClipPanel extends React.Component {
                                 <span>{`${item.player ? item.player.name : ""}`}</span>
                             </div>
                             <img className="video-list-item-img"
-                                 src={pic}/>
+                                 src={item.poster ? item.poster : pic}/>
                             <div className="video-list-item-buttons center h-full">
                                 <Button shape="circle" icon="download"
                                         className="video-list-item-button"

@@ -53,6 +53,7 @@ import FootBallLeagueDetailSetting from "../manage/Football/League/Detail/FootBa
 import PaymentConfigManagement from "../manage/Setting/Payment/PaymentConfigManagement";
 import Unauthorized from '../manage/Pages/Unauthorized';
 import LogManagement from '../manage/Log/LogManagement';
+import FeedbackManagement from '../manage/Setting/Feedback/FeedbackManagement';
 
 var UrlPattern = require('url-pattern');
 
@@ -134,6 +135,7 @@ export default class CRouter extends Component {
                 <Route path="/football/schedule" component={this.requireAuth("/football/schedule",FootballMatchSchedule)}/>
                 <Route path="/analysis/bill" component={this.requireAuth("/analysis/bill",FootballLeagueMatchBillAnalysis)}/>
                 <Route path="/sys/log" component={this.requireAuth("/sys/log",LogManagement)}/>
+                <Route path="/sys/feedback" component={this.requireAuth("/sys/feedback",FeedbackManagement)}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )

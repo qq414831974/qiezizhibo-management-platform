@@ -9,18 +9,25 @@ import {
     getLeagueChargeRule,
     addLeagueChargeRule,
     updateLeagueChargeRule,
-    leagueChargeAllMatch, getLeagueMatchById,
+    leagueChargeAllMatch,
+    getLeagueMatchById,
+    getLeagueMemberRule,
+    addLeagueMemberRule,
+    updateLeagueMemberRule,
 } from "../../../../axios";
 import LeagueChargeForm from "./LeagueChargeForm";
 import FootballLeagueMatchBillAnalysis from "../../League/Bill/FootballLeagueMatchBillAnalysis";
 import defultAvatar from "../../../../static/avatar.jpg";
 import NP from 'number-precision'
+import LeagueMemberForm from "./LeagueMemberForm";
+import UserLeagueMemberTable from "./UserLeagueMemberTable";
 
 const TabPane = Tabs.TabPane;
 
 class FootBallLeagueChargeManagement extends React.Component {
     state = {
         data: {},
+        memberData: {},
         leagueData: {},
     }
 
@@ -40,7 +47,7 @@ class FootBallLeagueChargeManagement extends React.Component {
         }
     }
     fetch = (params = {}) => {
-        this.setState({loading: true})
+        this.setState({loading: true, memberLoading: true})
         getLeagueChargeRule(params).then((data) => {
             this.setState({loading: false})
             if (data && data.code == 200) {
@@ -49,6 +56,16 @@ class FootBallLeagueChargeManagement extends React.Component {
                 });
             } else {
                 message.error('获取联赛充值规则失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        });
+        getLeagueMemberRule(params).then((data) => {
+            this.setState({memberLoading: false})
+            if (data && data.code == 200) {
+                this.setState({
+                    memberData: data.data ? data.data : {},
+                });
+            } else {
+                message.error('获取联赛会员规则失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
         getLeagueMatchById(params.leagueId).then(data => {
@@ -64,6 +81,9 @@ class FootBallLeagueChargeManagement extends React.Component {
 
     saveChargeSettingRef = (form) => {
         this.form = form;
+    }
+    saveMemberSettingRef = (form) => {
+        this.form_member = form;
     }
     chargeAll = () => {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
@@ -140,10 +160,55 @@ class FootBallLeagueChargeManagement extends React.Component {
             }
         });
     }
+    handleMemberSettingSubmit = (e) => {
+        const currentLeague = getQueryString(this.props.location.search, "leagueId");
+        e.preventDefault();
+        const form = this.form_member;
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            values.leagueId = currentLeague;
+            if (values.price) {
+                values.price = NP.times(values.price, 100)
+            }
+            this.setState({modifyMemberLoading: true})
+            if (this.state.memberData && this.state.memberData.id) {
+                updateLeagueMemberRule(values).then(data => {
+                    this.setState({modifyMemberLoading: false})
+                    if (data && data.code == 200) {
+                        if (data.data) {
+                            message.success('修改成功', 1);
+                            this.refresh();
+                        } else {
+                            message.warn(data.message, 1);
+                        }
+                    } else {
+                        message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
+                    }
+                })
+            } else {
+                addLeagueMemberRule(values).then(data => {
+                    this.setState({modifyMemberLoading: false})
+                    if (data && data.code == 200) {
+                        if (data.data) {
+                            message.success('修改成功', 1);
+                            this.refresh();
+                        } else {
+                            message.warn(data.message, 1);
+                        }
+                    } else {
+                        message.error('添加失败：' + (data ? data.result + "-" + data.message : data), 3);
+                    }
+                })
+            }
+        });
+    }
 
     render() {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
         const ChargeSetting = Form.create()(LeagueChargeForm);
+        const MemberSetting = Form.create()(LeagueMemberForm);
 
         return (
             <div className="gutter-example">
@@ -167,7 +232,7 @@ class FootBallLeagueChargeManagement extends React.Component {
                                             <Tooltip title="刷新">
                                                 <Button type="primary" shape="circle" icon="reload"
                                                         className="pull-right"
-                                                        loading={this.state.loading}
+                                                        loading={this.state.loading || this.state.memberLoading}
                                                         onClick={this.refresh}/>
                                             </Tooltip>
                                         </div>
@@ -179,9 +244,18 @@ class FootBallLeagueChargeManagement extends React.Component {
                                             chargeAllLoading={this.state.chargeAllLoading}
                                             modifyLoading={this.state.modifyLoading}
                                             ref={this.saveChargeSettingRef}/>
+                                        <MemberSetting
+                                            visible={true}
+                                            record={this.state.memberData}
+                                            handleSubmit={this.handleMemberSettingSubmit}
+                                            modifyLoading={this.state.modifyMemberLoading}
+                                            ref={this.saveMemberSettingRef}/>
                                     </TabPane>
                                     <TabPane tab="收益查看" key="2">
                                         <FootballLeagueMatchBillAnalysis leagueId={currentLeague}/>
+                                    </TabPane>
+                                    <TabPane tab="联赛会员查看" key="3">
+                                        <UserLeagueMemberTable leagueId={currentLeague}/>
                                     </TabPane>
                                 </Tabs>
                             </Card>

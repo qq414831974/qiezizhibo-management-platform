@@ -191,6 +191,9 @@ class GrowthTable extends React.Component {
                     case 3:
                         type = "比赛买断";
                         break;
+                    case 7:
+                        type = "联赛会员";
+                        break;
                 }
                 return <span onClick={onNameClick.bind(this, record)} className="cursor-hand">
                     {type}

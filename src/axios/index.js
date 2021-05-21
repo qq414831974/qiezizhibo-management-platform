@@ -231,6 +231,12 @@ export const getAllSysLog = (params) => get({url: `${config.system_service}/sys/
     }).catch(function (error) {
         console.log(error);
     });
+export const getAllSysFeedback = (params) => get({url: `${config.system_service}/sys/feedback?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
 export const getAreasList = () => get({url: `${config.system_service}/sys/area`})
     .then(function (response) {
         return response.data;
@@ -1743,7 +1749,36 @@ export const updatePaymentConfig = (params) => post({url: `${config.system_servi
     }).catch(function (error) {
         console.log(error);
     });
-
+export const getUserLeagueMemberList = (param) => get({url: `${config.football_service}/football/charge/member?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueMemberRule = (param) => get({url: `${config.football_service}/football/charge/member/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueMemberRule = (param) => post({
+    url: `${config.football_service}/football/charge/member/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueMemberRule = (param) => put({
+    url: `${config.football_service}/football/charge/member/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 
 //暂时无用
 export const getProducts = (params) => get({url: `${config.pay_service}/product?${unpack(params)}`})

@@ -54,6 +54,7 @@ class GrowthAddDialog extends React.Component {
                                 <Option value={1}>购买直播</Option>
                                 <Option value={2}>购买录播</Option>
                                 <Option value={3}>比赛买断</Option>
+                                <Option value={7}>联赛会员</Option>
                             </Select>
                         )}
                     </FormItem>
