@@ -120,11 +120,19 @@ class PaymentConfigManagement extends React.Component {
                         <div className="w-full center"><Spin/></div>
                         : (this.state.data ?
                             <div>
-                                <Descriptions column={6} bordered>
+                                <Descriptions column={6} bordered title="茄子TV">
                                     <Descriptions.Item label="支付"
                                                        span={6}>{this.state.data.enablePay ? "开启" : "关闭"}</Descriptions.Item>
                                     <Descriptions.Item label="礼物"
                                                        span={6}>{this.state.data.enableGift ? "开启" : "关闭"}</Descriptions.Item>
+
+                                </Descriptions>
+                                <Descriptions column={6} bordered title="茄子FC" className="mt-l">
+                                    <Descriptions.Item label="支付"
+                                                       span={6}>{this.state.data.enablePayFc ? "开启" : "关闭"}</Descriptions.Item>
+                                    <Descriptions.Item label="礼物"
+                                                       span={6}>{this.state.data.enableGiftFc ? "开启" : "关闭"}</Descriptions.Item>
+
                                 </Descriptions>
                                 <Row>
                                     <Col span={24}>

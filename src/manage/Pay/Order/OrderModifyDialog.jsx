@@ -67,6 +67,17 @@ class OrderModifyDialog extends React.Component {
                             <Input disabled/>
                         )}
                     </FormItem>
+                    <FormItem {...formItemLayout} label="订单来源" className="bs-form-item">
+                        {getFieldDecorator('wechatType', {
+                            initialValue: record.wechatType,
+                        })(
+                            <Select disabled>
+                                <Option value={0}>茄子TV</Option>
+                                <Option value={1}>青少年</Option>
+                                <Option value={2}>茄子FC</Option>
+                            </Select>
+                        )}
+                    </FormItem>
                     <FormItem {...formItemLayout} label="状态" className="bs-form-item">
                         {getFieldDecorator('orderStatus', {
                             initialValue: record.orderStatus,

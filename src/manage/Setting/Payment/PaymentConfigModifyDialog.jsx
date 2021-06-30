@@ -66,6 +66,28 @@ class PaymentConfigModifyDialog extends React.Component {
                             </Select>
                         )}
                     </FormItem>
+                    <FormItem {...formItemLayout} label="FC支付" className="bs-form-item mt-l">
+                        {getFieldDecorator('enablePayFc', {
+                            initialValue: record.enablePayFc,
+                            rules: [{required: true, message: '请选择支付能力!'}],
+                        })(
+                            <Select placeholder='请选择!'>
+                                <Option value={true} key={"open-ture"}>开启</Option>
+                                <Option value={false} key={"open-false"}>关闭</Option>
+                            </Select>
+                        )}
+                    </FormItem>
+                    <FormItem {...formItemLayout} label="FC礼物" className="bs-form-item">
+                        {getFieldDecorator('enableGiftFc', {
+                            initialValue: record.enableGiftFc,
+                            rules: [{required: true, message: '请选择礼物能力!'}],
+                        })(
+                            <Select placeholder='请选择!'>
+                                <Option value={true} key={"gift-ture"}>开启</Option>
+                                <Option value={false} key={"gift-false"}>关闭</Option>
+                            </Select>
+                        )}
+                    </FormItem>
                 </Form>
                 :
                 null

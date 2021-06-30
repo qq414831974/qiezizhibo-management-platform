@@ -47,6 +47,9 @@ import FootBallLeagueClipManagement from "../manage/Football/Clip/League/FootBal
 import FootBallMatchClipManagement from "../manage/Football/Clip/Match/FootBallMatchClipManagement";
 import FootBallLeagueAdManagement from "../manage/Football/Ad/League/FootBallLeagueAdManagement";
 import FootBallLeagueEncryptionManagement from "../manage/Football/Encryption/League/FootBallLeagueEncryptionManagement";
+import FootBallLeagueRegistrationManagement from "../manage/Football/Registration/FootBallLeagueRegistrationManagement";
+import TeamRegistrationManagement from "../manage/Football/Registration/Team/TeamRegistrationManagement";
+import PlayerRegistrationManagement from "../manage/Football/Registration/Player/PlayerRegistrationManagement";
 import FootBallMatchEncrypitonManagement from "../manage/Football/Encryption/Match/FootBallMatchEncryptionManagement";
 import FootballLeagueMatchBillAnalysis from "../manage/Football/League/Bill/FootballLeagueMatchBillAnalysis";
 import FootBallLeagueDetailSetting from "../manage/Football/League/Detail/FootBallLeagueDetailSetting";
@@ -122,6 +125,9 @@ export default class CRouter extends Component {
                 <Route exact path="/football/league/encryption" component={this.requireAuth("/football/league/encryption",FootBallLeagueEncryptionManagement)}/>
                 <Route exact path="/football/match/encryption" component={this.requireAuth("/football/match/encryption",FootBallMatchEncrypitonManagement)}/>
                 <Route exact path="/football/league/ad" component={this.requireAuth("/football/league/ad",FootBallLeagueAdManagement)}/>
+                <Route exact path="/football/league/registration" component={this.requireAuth("/football/league/registration",FootBallLeagueRegistrationManagement)}/>
+                <Route exact path="/football/league/registration/team" component={this.requireAuth("/football/league/registration/team",TeamRegistrationManagement)}/>
+                <Route exact path="/football/league/registration/player" component={this.requireAuth("/football/league/registration/player",PlayerRegistrationManagement)}/>
                 <Route exact path="/pay/bet" component={this.requireAuth("/pay/bet",UserBetManagement)}/>
                 <Route path="/football/comment/:id" component={this.requireAuth("/football/comment/:id",CommentManagement)}/>
                 <Route path="/live/:id" component={this.requireAuth("/live/:id",LiveDetailManagement)}/>

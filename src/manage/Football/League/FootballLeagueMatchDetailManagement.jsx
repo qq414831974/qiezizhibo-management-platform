@@ -479,7 +479,8 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                                         <Radio value={true}>自动</Radio>
                                         <Radio value={false}>手动</Radio>
                                     </Radio.Group>
-                                    <span className="pull-right pa-s">赛&nbsp;&nbsp;&nbsp;&nbsp;胜/负&nbsp;&nbsp;&nbsp;&nbsp;进/失&nbsp;&nbsp;&nbsp;&nbsp;积分</span>
+                                    <span
+                                        className="pull-right pa-s">赛&nbsp;&nbsp;&nbsp;&nbsp;胜/负&nbsp;&nbsp;&nbsp;&nbsp;进/失&nbsp;&nbsp;&nbsp;&nbsp;积分</span>
                                 </div>}>
                                     {this.getGroupLegueTeam()}
                                 </Card>
@@ -518,12 +519,13 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                                                               onClick={this.onPlayerClick.bind(this, item)}>
                                         <Col span={8}>
                                             <Avatar size="large"
-                                                    src={item.player.headImg ? item.player.headImg : avatar}/>
-                                            <span className="ml-s">{item.player.name}</span>
+                                                    src={item.player && item.player.headImg ? item.player.headImg : avatar}/>
+                                            <span className="ml-s">{item.player ? item.player.name : null}</span>
                                         </Col>
                                         <Col span={8}>
-                                            <Avatar size="large" src={item.team.headImg ? item.team.headImg : logo}/>
-                                            <span className="ml-s">{item.team.name}</span>
+                                            <Avatar size="large"
+                                                    src={item.team && item.team.headImg ? item.team.headImg : logo}/>
+                                            <span className="ml-s">{item.team ? item.team.name : null}</span>
                                         </Col>
                                         <Col span={8}>
                                             <span className="w-full center">{item.goal}</span>

@@ -391,7 +391,7 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                 </FormItem>
                             </Col>
                         </FormItem>
-                        {isSeries ? null : <FormItem {...formItemLayout} label="时间" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="时间" className="bs-form-item">
                             <div className="inline">
                                 <div className="inline-block">
                                     {isMobile ? <span>开始：</span> : null}
@@ -419,7 +419,7 @@ class FootBallLeagueMatchModifyDialog extends React.Component {
                                     </FormItem>
                                 </div>
                             </div>
-                        </FormItem>}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="联系电话" className="bs-form-item">
                             {getFieldDecorator('phoneNumber', {
                                 initialValue: record.phoneNumber,

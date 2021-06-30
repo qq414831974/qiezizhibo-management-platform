@@ -376,7 +376,7 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 </FormItem>
                             </Col>
                         </FormItem>
-                        {this.state.isSeries ? null : <FormItem {...formItemLayout} label="时间" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="时间" className="bs-form-item">
                             <div className="inline">
                                 <div className="inline-block">
                                     {isMobile ? <span>开始：</span> : null}
@@ -403,7 +403,6 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 </div>
                             </div>
                         </FormItem>
-                        }
                         <FormItem {...formItemLayout} label="联系电话" className="bs-form-item">
                             {getFieldDecorator('phoneNumber', {})(
                                 <Input placeholder='请输入联系电话'/>
