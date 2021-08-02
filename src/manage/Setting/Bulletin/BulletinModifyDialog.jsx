@@ -71,7 +71,7 @@ class BulletinModifyDialog extends React.Component {
 
         this.setState({
             curtain: this.props.record.curtain,
-            senceType: this.props.record.sceneType
+            sceneType: this.props.record.sceneType
         })
     }
 
@@ -414,8 +414,8 @@ class BulletinModifyDialog extends React.Component {
                         )}
                     </FormItem>
                     {this.state.curtain ? <FormItem {...formItemLayout} label="位置" className="bs-form-item">
-                        {getFieldDecorator('senceType', {
-                            initialValue: record.senceType,
+                        {getFieldDecorator('sceneType', {
+                            initialValue: record.sceneType,
                         })(
                             <RadioGroup onChange={this.onMatchRadioChange}>
                                 <Radio value="home">首页</Radio>

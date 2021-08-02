@@ -209,11 +209,11 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
     genWxaCode = (record) => {
         let page;
         if (record.isParent) {
-            page = `pages/series/series`
+            page = "series"
         } else {
-            page = `pages/leagueManager/leagueManager`
+            page = "leagueManager"
         }
-        getwxacodeunlimit({page: page, scene: `${record.id}`}).then(data => {
+        getwxacodeunlimit({page: "pages/home/home", scene: `page=${page}&id=${record.id}`}).then(data => {
             this.downloadBase64(`小程序码-联赛-${record.id}.jpg`, `data:image/png;base64,${data}`)
         })
     }

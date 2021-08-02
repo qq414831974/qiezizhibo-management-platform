@@ -556,7 +556,7 @@ class FootBallMatchTable extends React.Component {
         this.setState({viewText: text, viewType: e.key})
     }
     genWxaCode = (record) => {
-        getwxacodeunlimit({page: `pages/live/live`, scene: `${record.id}`}).then(data => {
+        getwxacodeunlimit({page: `pages/home/home`, scene: `page=live&id=${record.id}`}).then(data => {
             this.downloadBase64(`小程序码-比赛-${record.id}.jpg`, `data:image/png;base64,${data}`)
         })
     }

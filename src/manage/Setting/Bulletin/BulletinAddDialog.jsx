@@ -374,7 +374,7 @@ class BulletinAddDialog extends React.Component {
                         )}
                     </FormItem>
                     {this.state.curtain ? <FormItem {...formItemLayout} label="位置" className="bs-form-item">
-                        {getFieldDecorator('senceType', {
+                        {getFieldDecorator('sceneType', {
                             initialValue: "home",
                         })(
                             <RadioGroup onChange={this.onMatchRadioChange}>

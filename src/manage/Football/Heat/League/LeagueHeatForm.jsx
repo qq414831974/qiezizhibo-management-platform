@@ -165,7 +165,7 @@ class LeagueHeatForm extends React.Component {
                     <FormItem {...formItemLayout} label="奖品" className="bs-form-item">
                         {getFieldDecorator('award', {
                             initialValue: record.award ? record.award : null,
-                            rules: [{required: true, message: '请输入奖品!'}],
+                            // rules: [{required: true, message: '请输入奖品!'}],
                         })(
                             <Input placeholder='请输入奖品!'/>
                         )}

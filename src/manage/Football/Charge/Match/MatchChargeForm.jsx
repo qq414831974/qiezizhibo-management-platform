@@ -87,7 +87,7 @@ class MatchChargeForm extends React.Component {
                                     <div>
                                         <FormItem {...formItemLayout} label="永久价格" className="bs-form-item">
                                             {getFieldDecorator('live.price', {
-                                                initialValue: record.live && record.live.price ? NP.divide(record.live.price, 100) : null,
+                                                initialValue: record.live && record.live.price != null ? NP.divide(record.live.price, 100) : null,
                                                 rules: [{required: true, message: '请输入永久价格!'}],
                                             })(
                                                 <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
@@ -95,23 +95,24 @@ class MatchChargeForm extends React.Component {
                                         </FormItem>
                                         <FormItem {...formItemLayout} label="一个月价格" className="bs-form-item">
                                             {getFieldDecorator('live.priceMonthly', {
-                                                initialValue: record.live && record.live.priceMonthly ? NP.divide(record.live.priceMonthly, 100) : null,
+                                                initialValue: record.live && record.live.priceMonthly != null ? NP.divide(record.live.priceMonthly, 100) : null,
                                                 rules: [{required: true, message: '请输入一个月价格价格!'}],
                                             })(
                                                 <Input addonBefore="一月" placeholder='价格' addonAfter="元/茄币"/>
                                             )}
                                         </FormItem>
-                                        <FormItem {...formItemLayout} label="送礼看直播" className="bs-form-item">
-                                            {getFieldDecorator('live.giftWatchEnable', {
-                                                initialValue: record.live ? record.live.giftWatchEnable : false,
-                                                valuePropName: 'checked',
-                                                // rules: [{required: true, message: '请选择是否开启刷礼物看直播!'}],
-                                            })(
-                                                <Switch/>
-                                            )}
-                                        </FormItem>
-                                        <span>送礼看直播规则：送任意礼物即可观看直播</span>
                                     </div> : null}
+                                <FormItem {...formItemLayout} label="送礼看直播" className="bs-form-item">
+                                    {getFieldDecorator('live.giftWatchEnable', {
+                                        initialValue: record.live ? record.live.giftWatchEnable : false,
+                                        valuePropName: 'checked',
+                                        // rules: [{required: true, message: '请选择是否开启刷礼物看直播!'}],
+                                    })(
+                                        <Switch/>
+                                    )}
+                                </FormItem>
+                                <span>送礼看直播规则：送任意礼物即可观看直播</span>
+
                             </Card>
                         </Col>
                         <Col span={8}>
@@ -132,7 +133,7 @@ class MatchChargeForm extends React.Component {
                                     <div>
                                         <FormItem {...formItemLayout} label="永久价格" className="bs-form-item">
                                             {getFieldDecorator('record.price', {
-                                                initialValue: record.record && record.record.price? NP.divide(record.record.price, 100) : null,
+                                                initialValue: record.record && record.record.price ? NP.divide(record.record.price, 100) : null,
                                                 rules: [{required: true, message: '请输入永久价格!'}],
                                             })(
                                                 <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
@@ -192,14 +193,14 @@ class MatchChargeForm extends React.Component {
                                     )}
                                 </FormItem>
                                 {this.state.isMonopolyCharge ?
-                                <FormItem {...formItemLayout} label="买断价格" className="bs-form-item">
-                                    {getFieldDecorator('monopoly.price', {
-                                        initialValue: record.monopoly && record.monopoly.price ? NP.divide(record.monopoly.price, 100) : null,
-                                        rules: [{required: true, message: '请输入买断价格!'}],
-                                    })(
-                                        <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
-                                    )}
-                                </FormItem> : null}
+                                    <FormItem {...formItemLayout} label="买断价格" className="bs-form-item">
+                                        {getFieldDecorator('monopoly.price', {
+                                            initialValue: record.monopoly && record.monopoly.price ? NP.divide(record.monopoly.price, 100) : null,
+                                            rules: [{required: true, message: '请输入买断价格!'}],
+                                        })(
+                                            <Input addonBefore="永久" placeholder='价格' addonAfter="元/茄币"/>
+                                        )}
+                                    </FormItem> : null}
                             </Card>
                         </Col>
                     </Row>

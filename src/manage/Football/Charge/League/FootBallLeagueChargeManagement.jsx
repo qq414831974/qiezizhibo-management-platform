@@ -122,8 +122,16 @@ class FootBallLeagueChargeManagement extends React.Component {
                 }
             }
             if (values.live) {
-                values.live.price = NP.times(values.live.price, 100)
-                values.live.priceMonthly = NP.times(values.live.priceMonthly, 100)
+                if (values.live.price) {
+                    values.live.price = NP.times(values.live.price, 100)
+                }
+                if (values.live.priceMonthly) {
+                    values.live.priceMonthly = NP.times(values.live.priceMonthly, 100)
+                }
+                if (values.live.giftWatchEnable) {
+                    values.live.giftWatchPrice = 0
+                    values.live.giftWatchPriceMonthly = 0
+                }
             }
             if (values.monopoly) {
                 values.monopoly.price = NP.times(values.monopoly.price, 100)

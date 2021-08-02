@@ -170,6 +170,7 @@ class FeedbackTable extends React.Component {
                 {text: '支付问题', value: 2},
                 {text: '产品建议', value: 3},
                 {text: '违规举报', value: 4},
+                {text: '交易问题', value: 5},
             ],
             width: '10%',
             align: 'center',
@@ -187,6 +188,9 @@ class FeedbackTable extends React.Component {
                         break;
                     case 4 :
                         type = "违规举报";
+                        break;
+                    case 5 :
+                        type = "交易问题";
                         break;
                 }
                 return type;
