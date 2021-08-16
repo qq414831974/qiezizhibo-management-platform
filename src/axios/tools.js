@@ -11,7 +11,7 @@ axios.defaults.withCredentials = true
 axios.defaults.retry = 0;
 axios.interceptors.response.use(undefined, (err) => {
     if (err.response == null) {
-        message.error("未能连接到服务器");
+        message.error("未能连接到服务器，请重新登陆");
         return Promise.reject(err);
     }
     const {refreshToken} = getToken();

@@ -167,10 +167,33 @@ class UserLeagueMemberTable extends React.Component {
             title: '订单号',
             key: 'orderId',
             dataIndex: 'orderId',
-            width: '50%',
+            width: '40%',
             align: 'center',
             render: function (text, record, index) {
+                if (record.sourceType == 0) {
+                    return <a className="ml-s" onClick={onOrderClick.bind(this, record)}>{record.orderId}</a>;
+                }else if (record.sourceType == 1) {
+                    return <span className="ml-s" >v-{record.id}</span>;
+                }
                 return <a className="ml-s" onClick={onOrderClick.bind(this, record)}>{record.orderId}</a>;
+            },
+        }, {
+            title: '来源',
+            key: 'sourceType',
+            dataIndex: 'sourceType',
+            width: '10%',
+            align: 'center',
+            render: function (text, record, index) {
+                let source = "未知";
+                switch (record.sourceType) {
+                    case 0:
+                        source = "购买";
+                        break;
+                    case 1:
+                        source = "球员验证";
+                        break;
+                }
+                return <span>{source}</span>;
             },
         },
         ];
