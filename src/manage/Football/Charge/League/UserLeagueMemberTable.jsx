@@ -173,7 +173,7 @@ class UserLeagueMemberTable extends React.Component {
                 if (record.sourceType == 0) {
                     return <a className="ml-s" onClick={onOrderClick.bind(this, record)}>{record.orderId}</a>;
                 }else if (record.sourceType == 1) {
-                    return <span className="ml-s" >v-{record.id}</span>;
+                    return <span className="ml-s" >v-${record.leagueId}{record.id}</span>;
                 }
                 return <a className="ml-s" onClick={onOrderClick.bind(this, record)}>{record.orderId}</a>;
             },

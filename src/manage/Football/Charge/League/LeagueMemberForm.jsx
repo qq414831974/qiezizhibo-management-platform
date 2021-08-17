@@ -63,7 +63,7 @@ class LeagueMemberForm extends React.Component {
             visible ?
                 <Form onSubmit={this.props.handleSubmit}>
                     <Card hoverable title="联赛会员">
-                        <FormItem {...formItemLayout} label="是否开启" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="是否开启购买" className="bs-form-item">
                             {getFieldDecorator('available', {
                                 initialValue: record.available != null ? record.available : false,
                                 valuePropName: 'checked',
