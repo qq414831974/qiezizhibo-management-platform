@@ -108,7 +108,7 @@ class OrderTable extends React.Component {
         const pager = {...this.state.pagination};
         pager.current = pagination.current;
         pager.sortField = sorter.field;
-        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "";
+        pager.sortOrder = sorter.order == "descend" ? "desc" : sorter.order == "ascend" ? "asc" : "desc";
         pager.filters = this.getTableFilters(pager, filters);
         this.setState({
             pagination: pager,

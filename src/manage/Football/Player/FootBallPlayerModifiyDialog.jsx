@@ -250,6 +250,13 @@ class FootBallPlayerModifyDialog extends React.Component {
                                 </Select>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} label="身份证" className="bs-form-item">
+                            {getFieldDecorator('idCard', {
+                                initialValue: record.idCard,
+                            })(
+                                <Input placeholder='身份证'/>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="备注" className="bs-form-item">
                             {getFieldDecorator('remark', {
                                 initialValue: record.remark,

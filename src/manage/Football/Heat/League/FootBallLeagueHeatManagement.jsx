@@ -15,18 +15,29 @@ import {
 import LeagueHeatForm from "../League/LeagueHeatForm";
 import LeagueFansManagement from "../League/LeagueFansManagement";
 import LeagueHeatTable from "../League/LeagueHeatTable";
+import LeagueCashSettlementTable from "../League/LeagueCashSettlementTable";
+import LeagueCashOrderTable from "../League/LeagueCashOrderTable";
 import LeagueGiftOrderTable from "../League/LeagueGiftOrderTable";
 import defultAvatar from "../../../../static/avatar.jpg";
 
 const TabPane = Tabs.TabPane;
 
 class FootBallLeagueHeatManagement extends React.Component {
+    leagueId = null;
     state = {
+        currentTab: "1",
         data: {},
         leagueData: {},
     }
 
     componentDidMount() {
+        if (this.props.location.search) {
+            const currentTab = getQueryString(this.props.location.search, "tab");
+            if (currentTab) {
+                this.setState({currentTab: currentTab.toString()});
+            }
+            this.leagueId = getQueryString(this.props.location.search, "leagueId");
+        }
         this.refresh();
     }
 
@@ -84,6 +95,18 @@ class FootBallLeagueHeatManagement extends React.Component {
             }
             values.leagueId = currentLeague;
             this.setState({modifyLoading: true})
+            if (values.type != 2) {
+                values.cashAvailable = false;
+            }
+            if (values.cashPercentMap) {
+                let cashPercentMap = {};
+                for (let key of Object.keys(values.cashPercentMap)) {
+                    if (key != null && values.cashPercentMap[key] != null) {
+                        cashPercentMap[key] = values.cashPercentMap[key];
+                    }
+                }
+                values.cashPercentMap = cashPercentMap;
+            }
             if (this.state.data && this.state.data.id) {
                 updateLeagueHeatRule(values).then(data => {
                     this.setState({modifyLoading: false})
@@ -126,11 +149,16 @@ class FootBallLeagueHeatManagement extends React.Component {
                 <Row gutter={16}>
                     <Col className="gutter-row">
                         <div className="gutter-box">
-                            <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false} title={<div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
-                                <Avatar src={this.state.leagueData.headImg ? this.state.leagueData.headImg : defultAvatar}/>
-                                <span className="ml-s">{this.state.leagueData.name}</span>
-                            </div>}>
-                                <Tabs>
+                            <Card className={this.props.responsive.data.isMobile ? "no-padding" : ""} bordered={false}
+                                  title={<div className="center purple-light pt-s pb-s pl-m pr-m border-radius-10px">
+                                      <Avatar
+                                          src={this.state.leagueData.headImg ? this.state.leagueData.headImg : defultAvatar}/>
+                                      <span className="ml-s">{this.state.leagueData.name}</span>
+                                  </div>}>
+                                <Tabs activeKey={this.state.currentTab} onChange={(value) => {
+                                    this.setState({currentTab: value});
+                                    this.props.history.replace(`/football/league/heat?leagueId=${this.leagueId}&tab=${value}`)
+                                }}>
                                     <TabPane tab="热度比拼设置" key="1">
                                         <div className="w-full center" style={{
                                             fontSize: 16,
@@ -150,11 +178,32 @@ class FootBallLeagueHeatManagement extends React.Component {
                                             <LeagueHeatTable
                                                 leagueId={currentLeague}
                                                 heatRule={this.state.data}/>
+                                            {this.state.data && this.state.data.cashAvailable ?
+                                                <div>
+                                                    <div className="w-full center"
+                                                         style={{
+                                                             fontSize: 16,
+                                                             fontWeight: 'bold'
+                                                         }}>
+                                                        提现金额结算
+                                                    </div>
+                                                    <LeagueCashSettlementTable
+                                                        leagueId={currentLeague}
+                                                        heatRule={this.state.data}
+                                                    />
+                                                </div> : null}
                                         </TabPane> : null}
                                     <TabPane tab="送礼物详情" key="3">
                                         <LeagueGiftOrderTable leagueId={currentLeague}/>
                                     </TabPane>
-                                    <TabPane tab="粉丝团" key="4">
+                                    {this.state.data && this.state.data.cashAvailable ?
+                                        <TabPane tab="联赛提现管理" key="4">
+                                            <LeagueCashOrderTable
+                                                leagueId={currentLeague}
+                                                heatRule={this.state.data}/>
+                                        </TabPane>
+                                        : null}
+                                    <TabPane tab="粉丝团" key="5">
                                         <LeagueFansManagement
                                             visible={true}
                                             leagueId={currentLeague}/>

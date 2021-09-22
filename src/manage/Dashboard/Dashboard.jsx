@@ -111,6 +111,7 @@ class Dashboard extends React.Component {
                         <div className="gutter-box">
                             <Card title="新增功能" bordered={false}
                                   style={{height: 214, width: "100%", overflow: "scroll"}}>
+                                <div className="w-full">2021-09-16：热度PK更新</div>
                                 <div className="w-full">2021-08-10：联赛会员更新</div>
                                 <div className="w-full">2021-06-01：新增报名系统</div>
                                 <div className="w-full">2021-05-19：新增反馈投诉查看</div>

@@ -10,7 +10,8 @@ import * as config from "./config";
 axios.defaults.withCredentials = true
 axios.defaults.retry = 0;
 axios.interceptors.response.use(undefined, (err) => {
-    if (err.response == null) {
+    if (err && err.response == null) {
+        console.log(err.code);
         message.error("未能连接到服务器，请重新登陆");
         return Promise.reject(err);
     }

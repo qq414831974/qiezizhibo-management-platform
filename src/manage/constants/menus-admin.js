@@ -48,6 +48,7 @@ export const menus_admin = [
             {key: '/pay/gift', title: '礼物管理', icon: 'gift',},
             {key: '/pay/bet', title: '竞猜管理', icon: 'dribbble',},
             {key: '/pay/deposit', title: '余额管理', icon: 'dollar',},
+            {key: '/pay/cash', title: '提现管理', icon: 'shopping-cart',},
         ],
     },
     {key: '/live', title: '直播管理', icon: 'video-camera',},

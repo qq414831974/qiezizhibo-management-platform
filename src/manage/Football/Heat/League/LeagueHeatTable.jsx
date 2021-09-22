@@ -15,7 +15,7 @@ import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import logo from "../../../../static/logo.png";
 import defultAvatar from "../../../../static/avatar.jpg";
-
+import NP from 'number-precision'
 
 class LeagueHeatTable extends React.Component {
     state = {
@@ -261,7 +261,7 @@ class LeagueHeatTable extends React.Component {
             dataIndex: 'id',
             key: 'id',
             align: 'center',
-            width: '70%',
+            width: '40%',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
@@ -302,13 +302,46 @@ class LeagueHeatTable extends React.Component {
             title: '热度',
             key: 'heat',
             dataIndex: 'heat',
-            width: '30%',
+            width: '20%',
             align: 'center',
             render: function (text, record, index) {
                 return <a className="ml-s" onClick={onNameClick.bind(this, record)}>{record.heat + record.heatBase}</a>;
             },
-        },
+
+        },{
+            title: '礼物总金额（元）',
+            key: 'giftPriceTotal',
+            dataIndex: 'giftPriceTotal',
+            width: '20%',
+            align: 'center',
+            render: function (text, record, index) {
+                if (record.giftPriceTotal) {
+                    return <a className="ml-s" onClick={onNameClick.bind(this, record)}>
+                        {NP.divide(record.giftPriceTotal, 100)}
+                    </a>;
+                }
+                return "-";
+            },
+        }
+
         ];
+        if (this.props.heatRule && this.props.heatRule.cashAvailable) {
+            columns.push({
+                title: '预计提现金额（元）',
+                key: 'cashPredict',
+                dataIndex: 'cashPredict',
+                width: '20%',
+                align: 'center',
+                render: function (text, record, index) {
+                    if (record.cashPredict) {
+                        return <a className="ml-s" onClick={onNameClick.bind(this, record)}>
+                            {NP.divide(record.cashPredict, 100)} {record.cashPercent ? `（${record.cashPercent}%）` : null}
+                        </a>;
+                    }
+                    return "-";
+                },
+            },)
+        }
         return <div><Table columns={columns}
                            rowKey={record => record.id}
                            dataSource={this.state.data}
@@ -372,10 +405,10 @@ class LeagueHeatTable extends React.Component {
                 {/*            onClick={this.showLeagueHeatAddDialog}>添加热度</Button>*/}
                 {/*    </Col>*/}
                 {/*    <Col span={12}>*/}
-                        <Button
-                            type="primary"
-                            className="w-full h-full center"
-                            onClick={this.showLeagueHeatFakeAddDialog}>刷票</Button>
+                <Button
+                    type="primary"
+                    className="w-full h-full center"
+                    onClick={this.showLeagueHeatFakeAddDialog}>刷票</Button>
                 {/*    </Col>*/}
                 {/*</Row>*/}
             </Modal>

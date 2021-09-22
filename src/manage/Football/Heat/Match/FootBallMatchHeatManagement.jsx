@@ -74,12 +74,26 @@ class FootBallMatchHeatManagement extends React.Component {
                 return;
             }
             values.matchId = currentMatch;
+            this.setState({modifyLoading: true})
+            if (values.type != 2) {
+                values.cashAvailable = false;
+            }
+            if (values.cashPercentMap) {
+                let cashPercentMap = {};
+                for (let key of Object.keys(values.cashPercentMap)) {
+                    if (key != null && values.cashPercentMap[key] != null) {
+                        cashPercentMap[key] = values.cashPercentMap[key];
+                    }
+                }
+                values.cashPercentMap = cashPercentMap;
+            }
             if (this.state.data && this.state.data.id) {
                 updateMatchHeatRule(values).then(data => {
+                    this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
-                            this.refresh();
                             message.success('修改成功', 1);
+                            this.refresh();
                         } else {
                             message.warn(data.message, 1);
                         }
@@ -89,10 +103,11 @@ class FootBallMatchHeatManagement extends React.Component {
                 })
             } else {
                 addMatchHeatRule(values).then(data => {
+                    this.setState({modifyLoading: false})
                     if (data && data.code == 200) {
                         if (data.data) {
+                            message.success('修改成功', 1);
                             this.refresh();
-                            message.success('添加成功', 1);
                         } else {
                             message.warn(data.message, 1);
                         }
@@ -125,6 +140,7 @@ class FootBallMatchHeatManagement extends React.Component {
                                             visible={true}
                                             record={this.state.data}
                                             handleSubmit={this.handleHeatSettingSubmit}
+                                            modifyLoading={this.state.modifyLoading}
                                             ref={this.saveHeatSettingRef}/>
                                     </TabPane>
                                     {this.state.data && this.state.data.id ? <TabPane tab="热度比拼详情" key="2">
