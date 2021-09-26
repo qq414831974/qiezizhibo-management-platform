@@ -44,7 +44,8 @@ class LeagueHeatForm extends React.Component {
         growth: [],
         discount: [],
         numberSelectValue: 1,
-        percentMapValue: {}
+        percentMapValue: {},
+        type: 2
     }
 
     componentDidMount() {
