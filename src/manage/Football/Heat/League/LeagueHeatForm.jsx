@@ -161,7 +161,7 @@ class LeagueHeatForm extends React.Component {
                     <Form onSubmit={this.props.handleSubmit}>
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
-                                initialValue: record.type ? record.type : 0,
+                                initialValue: record.type ? record.type : 2,
                                 rules: [{required: true, message: '请选择类型!'}],
                                 onChange: (e) => {
                                     this.setState({type: e})

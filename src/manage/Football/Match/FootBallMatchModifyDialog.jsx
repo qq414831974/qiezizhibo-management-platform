@@ -853,6 +853,20 @@ class FootBallMatchModifyDialog extends React.Component {
                             </FormItem>
                         </div>
                         <div className="center w-full">
+                            <p className="mt-m" style={{fontSize: 22}}>仅显示统计模式</p>
+                        </div>
+                        <div className="center w-full">
+                            <span>是否开启仅显示统计模式：</span>
+                            <FormItem className="bs-form-item">
+                                {getFieldDecorator('statisticsModeAvailable', {
+                                    initialValue: record.statisticsModeAvailable != null ? record.statisticsModeAvailable : false,
+                                    valuePropName: "checked"
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
                             <p className="mt-m" style={{fontSize: 22}}>直播间</p>
                             <span>是否关闭：</span>
                             <FormItem className="bs-form-item">

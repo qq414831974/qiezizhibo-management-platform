@@ -118,7 +118,12 @@ class FeedbackTable extends React.Component {
         });
     }
     onDetailClick = (record) => {
-        this.setState({detailVisible: true, detailString: record.value, detailUserNo: record.userNo})
+        this.setState({
+            detailVisible: true,
+            detailString: record.value,
+            detailUserNo: record.userNo,
+            detailPicList: record.picList
+        })
     }
     hideDetail = () => {
         this.setState({detailVisible: false})
@@ -240,12 +245,17 @@ class FeedbackTable extends React.Component {
                            }
         />
             <Modal
-                title="查看参数"
+                title="查看详细"
                 visible={this.state.detailVisible}
                 onCancel={this.hideDetail}
                 zIndex={1001}
             >
                 <span>{this.state.detailString}</span>
+                <div className="w-full">
+                    {this.state.detailPicList && this.state.detailPicList.map((data, index) => {
+                        return <img key={index} src={data} style={{height: "auto", width: "50%", padding: "10px",boxSizing: "border-box"}}/>
+                    })}
+                </div>
                 <div className="mt-l purple">
                     <span>用户id: {this.state.detailUserNo}</span>
                 </div>
