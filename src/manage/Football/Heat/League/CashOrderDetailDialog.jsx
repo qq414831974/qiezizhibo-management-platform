@@ -18,6 +18,7 @@ import {
 import defultAvatar from "../../../../static/avatar.jpg";
 import logo from "../../../../static/logo.png";
 import NP from 'number-precision'
+import {Link} from "react-router-dom";
 
 const Option = Select.Option;
 
@@ -168,10 +169,13 @@ class CashOrderDetailDialog extends React.Component {
     }
 
     render() {
-        const {visible} = this.props;
+        const {visible, needRedirect, afterRedirect} = this.props;
         return (
             visible ?
                 <div>
+                    {needRedirect ? <div className="w-full center mb-l">
+                        <Button onClick={afterRedirect} type="primary"><Link to={`/football/league/heat?leagueId=${this.state.data.leagueId}&tab=4`}>跳转到相关页面</Link></Button>
+                    </div> : null}
                     <div className="w-full center">
                         {this.getVerifyStatus(this.state.data)}
                     </div>

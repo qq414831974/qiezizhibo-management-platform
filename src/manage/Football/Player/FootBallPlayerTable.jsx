@@ -268,6 +268,12 @@ class FootBallPlayerTable extends React.Component {
         });
         return <div className="center">{dom}</div>;
     };
+    handleViewTeam = () => {
+        this.setState({playerTeamVisible: true})
+    }
+    handleViewTeamCancel = () => {
+        this.setState({playerTeamVisible: false})
+    }
 
     render() {
         const getPosition = this.getPosition;
@@ -355,7 +361,7 @@ class FootBallPlayerTable extends React.Component {
             render: function (text, record, index) {
                 return <p>{record.weight ? record.weight + "kg" : "-"}</p>
             }
-        },  {
+        }, {
             title: '小程序',
             dataIndex: 'wechatType',
             width: '10%',
@@ -469,6 +475,8 @@ class FootBallPlayerTable extends React.Component {
                             `/football/footballPlayer/${this.state.record.id}`
                         }>详细设置</Link>
                     </Button>,
+                    <Button key="team" type="primary" className="pull-left"
+                            onClick={this.handleViewTeam}>查看所在队伍</Button>,
                     <Button key="detail" type="danger" className="pull-left"
                             onClick={this.handleDelete}>删除</Button>,
                     <Button key="back" onClick={this.handlePlayerModifyCancel}>取消</Button>,
@@ -491,6 +499,21 @@ class FootBallPlayerTable extends React.Component {
                 zIndex={1001}
             >
                 <p className="mb-n" style={{fontSize: 14}}>是否确认删除{this.state.deleteCols}条数据？</p>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="查看所在队伍"
+                visible={this.state.playerTeamVisible}
+                onCancel={this.handleViewTeamCancel}
+                zIndex={1001}
+                destroyOnClose
+            >
+                {this.state.record && this.state.record.teams && this.state.record.teams.map(data => {
+                    return <div className="w-full center mb-l">
+                        <Avatar src={data.headImg}/>
+                        <span className="ml-s">{data.name}</span>
+                    </div>
+                })}
             </Modal>
         </div>
     }

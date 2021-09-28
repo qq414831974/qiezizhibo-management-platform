@@ -7,6 +7,7 @@ import {receiveData} from "../../../action";
 import {connect} from "react-redux";
 import {bindActionCreators} from "redux";
 import logo from "../../../static/logo.png";
+import FeedbackDetailDialog from "./FeedbackDetailDialog";
 
 
 class FeedbackTable extends React.Component {
@@ -120,6 +121,7 @@ class FeedbackTable extends React.Component {
     onDetailClick = (record) => {
         this.setState({
             detailVisible: true,
+            detailId: record.id,
             detailString: record.value,
             detailUserNo: record.userNo,
             detailPicList: record.picList
@@ -248,17 +250,22 @@ class FeedbackTable extends React.Component {
                 title="查看详细"
                 visible={this.state.detailVisible}
                 onCancel={this.hideDetail}
+                destroyOnClose
                 zIndex={1001}
             >
-                <span>{this.state.detailString}</span>
-                <div className="w-full">
-                    {this.state.detailPicList && this.state.detailPicList.map((data, index) => {
-                        return <img key={index} src={data} style={{height: "auto", width: "50%", padding: "10px",boxSizing: "border-box"}}/>
-                    })}
-                </div>
-                <div className="mt-l purple">
-                    <span>用户id: {this.state.detailUserNo}</span>
-                </div>
+                {/*<span>{this.state.detailString}</span>*/}
+                {/*<div className="w-full">*/}
+                {/*    {this.state.detailPicList && this.state.detailPicList.map((data, index) => {*/}
+                {/*        return <img key={index} src={data} style={{height: "auto", width: "50%", padding: "10px",boxSizing: "border-box"}}/>*/}
+                {/*    })}*/}
+                {/*</div>*/}
+                {/*<div className="mt-l purple">*/}
+                {/*    <span>用户id: {this.state.detailUserNo}</span>*/}
+                {/*</div>*/}
+                <FeedbackDetailDialog
+                    id={this.state.detailId}
+                    visible={this.state.detailVisible}
+                />
             </Modal>
         </div>
     }

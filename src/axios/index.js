@@ -231,7 +231,13 @@ export const getAllSysLog = (params) => get({url: `${config.system_service}/sys/
     }).catch(function (error) {
         console.log(error);
     });
-export const getAllSysFeedback = (params) => get({url: `${config.system_service}/sys/feedback?${unpack(params)}`})
+export const getAllSysFeedback = (params) => get({url: `${config.system_service}/sys/feedback/query?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error);
+    });
+export const getFeedbackById = (params) => get({url: `${config.system_service}/sys/feedback?${unpack(params)}`})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
@@ -1960,6 +1966,24 @@ export const getCashOrders = (params) => get({url: `${config.pay_service}/paymen
         console.log(error)
     });
 export const queryCashOrder = (id) => post({url: `${config.pay_service}/payment/order/cash/${id}/query`, data: {}})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getTodoListCount = (params) => get({url: `${config.system_service}/sys/todo/count?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getTodoList = (params) => get({url: `${config.system_service}/sys/todo?${unpack(params)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const readTodo = (params) => post({url: `${config.system_service}/sys/todo/read`, data: params})
     .then(function (response) {
         return response.data;
     }).catch(function (error) {
