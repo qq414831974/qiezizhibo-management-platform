@@ -225,7 +225,7 @@ class TeamRegistrationTable extends React.Component {
         return <span className={`${color} ${className ? className : ""}`}>{type}</span>;
     }
     showImportConfirm = (record) => {
-        if (record.verifyStatus != 1) {
+        if (record && record.verifyStatus != 1) {
             message.success('请先审核通过！', 1);
             return;
         }
@@ -234,7 +234,7 @@ class TeamRegistrationTable extends React.Component {
         } else {
             let verifyList = [];
             for (let team of this.state.data) {
-                if (record.verifyStatus == 1) {
+                if (team.verifyStatus == 1) {
                     verifyList.push(team)
                 }
             }
