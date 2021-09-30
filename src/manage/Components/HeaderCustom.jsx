@@ -280,7 +280,7 @@ class HeaderCustom extends Component {
                 <Drawer
                     title="待办事项"
                     width={520}
-                    closable={false}
+                    // closable={false}
                     onClose={this.onTodoListClose}
                     visible={this.state.todoListVisible}
                     destroyOnClose
@@ -306,7 +306,7 @@ class HeaderCustom extends Component {
                             <Button type="primary" className="pull-right" onClick={this.readTodo}>标为已读</Button>
                         </div>}
                         width={520}
-                        closable={false}
+                        // closable={false}
                         onClose={this.onChildrenDrawerClose}
                         visible={this.state.childrenDrawer}
                         destroyOnClose
@@ -333,6 +333,11 @@ class HeaderCustom extends Component {
                     .ant-menu-submenu-horizontal > .ant-menu {
                         width: 120px;
                         left: -40px;
+                    }
+                `}</style>
+                <style>{`
+                    .ant-drawer-content-wrapper {
+                        max-width: 100%;
                     }
                 `}</style>
             </Header>
