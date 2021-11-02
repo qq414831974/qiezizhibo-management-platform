@@ -150,6 +150,32 @@ class LeagueHeatForm extends React.Component {
         percentMapValue[index] = value;
         this.setState({percentMapValue})
     }
+    getPosterSelector = () => {
+        const {form} = this.props;
+        if (!form.getFieldValue('cashAvailable')) {
+            return null;
+        }
+        return <Select style={{width: 140}} placeholder="选择默认规则图片">
+            <Option key={`opt-all`}
+                    value="https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/cash_rule/all.jpg"
+                    onClick={() => {
+                        form.setFieldsValue({
+                            awardPic: "https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/cash_rule/all.jpg"
+                        })
+                    }}>
+                全提现版本
+            </Option>
+            <Option key={`opt-ten`}
+                    value="https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/cash_rule/ten.jpg"
+                    onClick={() => {
+                        form.setFieldsValue({
+                            awardPic: "https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/cash_rule/ten.jpg"
+                        })
+                    }}>
+                前十名提现版本
+            </Option>
+        </Select>
+    }
 
     render() {
         const {visible, form, record} = this.props;
@@ -210,7 +236,7 @@ class LeagueHeatForm extends React.Component {
                                 <Col span={12}>
                                     <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
                                         {getFieldDecorator('expand.baseMin', {
-                                            initialValue: record.expand != null ? record.expand.baseMin : null,
+                                            initialValue: record.expand != null ? record.expand.baseMin : 0,
                                             rules: [{required: true, message: '请输入数值!'}],
                                         })(
                                             <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -220,7 +246,7 @@ class LeagueHeatForm extends React.Component {
                                 <Col span={12}>
                                     <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
                                         {getFieldDecorator('expand.baseMax', {
-                                            initialValue: record.expand != null ? record.expand.baseMax : null,
+                                            initialValue: record.expand != null ? record.expand.baseMax : 0,
                                             rules: [{required: true, message: '请输入数值!'}],
                                         })(
                                             <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -234,7 +260,7 @@ class LeagueHeatForm extends React.Component {
                                 <Col span={12}>
                                     <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
                                         {getFieldDecorator('expand.expandMin', {
-                                            initialValue: record.expand != null ? record.expand.expandMin : null,
+                                            initialValue: record.expand != null ? record.expand.expandMin : 1,
                                             rules: [{required: true, message: '请输入数值!'}],
                                         })(
                                             <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -244,7 +270,7 @@ class LeagueHeatForm extends React.Component {
                                 <Col span={12}>
                                     <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
                                         {getFieldDecorator('expand.expandMax', {
-                                            initialValue: record.expand != null ? record.expand.expandMax : null,
+                                            initialValue: record.expand != null ? record.expand.expandMax : 1,
                                             rules: [{required: true, message: '请输入数值!'}],
                                         })(
                                             <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -323,7 +349,7 @@ class LeagueHeatForm extends React.Component {
                             <span className="mb-n mt-m" style={{fontSize: 20}}>奖品/规则图片</span>
                         </div>
                         <div className="center w-full">
-                            <FormItem {...formItemLayout} className="bs-form-item form-match-poster">
+                            <FormItem {...formItemLayout} className="bs-form-item form-page">
                                 {getFieldDecorator('awardPic', {
                                     // initialValue: this.state.currentLeague?this.state.currentLeague.poster:null,
                                     getValueFromEvent(e) {
@@ -353,7 +379,7 @@ class LeagueHeatForm extends React.Component {
                                                 src={form.getFieldValue('awardPic') ? form.getFieldValue('awardPic') :
                                                     (record.awardPic ? record.awardPic : imgcover)}
                                                 alt="poster"
-                                                className="form-match-poster-img"/>
+                                                className="form-page-img"/>
                                         }
 
                                     </Upload>
@@ -361,9 +387,12 @@ class LeagueHeatForm extends React.Component {
                             </FormItem>
                         </div>
                         <div className="center mt-m">
-                            <Input style={{minWidth: 300, textAlign: "center"}} placeholder='图片地址'
-                                   onChange={this.onPosterChange.bind(this, form)}
-                                   value={form.getFieldValue('awardPic') ? form.getFieldValue('awardPic') : record.awardPic}/>
+                            <Input
+                                addonBefore={this.getPosterSelector()}
+                                style={{minWidth: 300, textAlign: "center"}}
+                                placeholder='图片地址'
+                                onChange={this.onPosterChange.bind(this, form)}
+                                value={form.getFieldValue('awardPic') ? form.getFieldValue('awardPic') : record.awardPic}/>
                         </div>
                         {record.id ? <FormItem {...formItemLayout} hidden className="bs-form-item">
                             {getFieldDecorator('id', {

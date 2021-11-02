@@ -262,7 +262,7 @@ class FootBallLeagueChargeManagement extends React.Component {
                                     <TabPane tab="收益查看" key="2">
                                         <FootballLeagueMatchBillAnalysis leagueId={currentLeague}/>
                                     </TabPane>
-                                    <TabPane tab="联赛会员查看" key="3">
+                                    <TabPane tab="联赛会员" key="3">
                                         <UserLeagueMemberTable leagueId={currentLeague}/>
                                     </TabPane>
                                 </Tabs>

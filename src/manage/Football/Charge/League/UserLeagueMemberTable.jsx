@@ -1,7 +1,7 @@
 import React from 'react';
 import {Table, Input, Button, Icon, Modal, Tooltip, Radio, Avatar, Row, Col} from 'antd';
 import {
-    getUserLeagueMemberList,
+    getUserLeagueMemberList, addUserLeagueMember, deleteUserLeagueMember
 } from '../../../../axios/index';
 import {Form, message} from "antd/lib/index";
 import {receiveData} from "../../../../action";
@@ -10,6 +10,7 @@ import {bindActionCreators} from "redux";
 import logo from "../../../../static/logo.png";
 import defultAvatar from "../../../../static/avatar.jpg";
 import copy from "copy-to-clipboard/index";
+import UserLeagueMemberAddDialog from "./UserLeagueMemberAddDialog";
 
 
 class UserLeagueMemberTable extends React.Component {
@@ -118,15 +119,73 @@ class UserLeagueMemberTable extends React.Component {
     onNameClick = (record, e) => {
         copy(record.userNo);
         message.success('用户id已复制', 1);
+        if (record && record.sourceType == 2) {
+            this.setState({deleteId: record.id})
+            this.handleDeleteClick();
+        }
     }
     onOrderClick = (record, e) => {
         copy(record.orderId);
         message.success('订单号已复制', 1);
     }
+    onAddUserLeagueMemberClick = () => {
+        this.setState({addUserLeagueMemberShow: true});
+    }
+    onAddUserLeagueMemberCancel = () => {
+        this.setState({addUserLeagueMemberShow: false});
+    }
+    saveAddDialogRef = (form) => {
+        this.formAdd = form;
+    }
+    onAddUserLeagueMemberCreate = () => {
+        const form = this.formAdd;
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            addUserLeagueMember(values).then((data) => {
+                if (data && data.code == 200) {
+                    if (data.data) {
+                        this.refresh();
+                        message.success('添加成功', 1);
+                    } else {
+                        message.success('添加失败', 1);
+                    }
+                } else {
+                    message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
+                }
+            });
+            form.resetFields();
+            this.setState({addUserLeagueMemberShow: false});
+        });
+    }
+    handleDeleteClick = () => {
+        this.setState({deleteVisible: true})
+    }
+    handleDeleteCancel = () => {
+        this.setState({deleteVisible: false})
+    }
+    handleDeleteOK = () => {
+        deleteUserLeagueMember({id: this.state.deleteId}).then((data) => {
+            this.setState({deleteVisible: false});
+            if (data && data.code == 200) {
+                if (data.data) {
+                    this.refresh();
+                    message.success('删除成功', 1);
+                } else {
+                    message.warn(data.message, 1);
+                }
+            } else {
+                message.error('删除失败：' + (data ? data.code + ":" + data.message : data), 3);
+            }
+        });
+    }
 
     render() {
         const onNameClick = this.onNameClick;
         const onOrderClick = this.onOrderClick;
+        const AddDialog = Form.create()(UserLeagueMemberAddDialog);
+        const isMobile = this.props.responsive.data.isMobile;
 
         const columns = [{
             title: '用户',
@@ -172,8 +231,8 @@ class UserLeagueMemberTable extends React.Component {
             render: function (text, record, index) {
                 if (record.sourceType == 0) {
                     return <a className="ml-s" onClick={onOrderClick.bind(this, record)}>{record.orderId}</a>;
-                }else if (record.sourceType == 1) {
-                    return <span className="ml-s" >v-${record.leagueId}{record.id}</span>;
+                } else if (record.sourceType == 1) {
+                    return <span className="ml-s">v-${record.leagueId}{record.id}</span>;
                 }
                 return <a className="ml-s" onClick={onOrderClick.bind(this, record)}>{record.orderId}</a>;
             },
@@ -192,28 +251,61 @@ class UserLeagueMemberTable extends React.Component {
                     case 1:
                         source = "球员验证";
                         break;
+                    case 2:
+                        source = "联系验证";
+                        break;
                 }
                 return <span>{source}</span>;
             },
         },
         ];
-        return <div><Table columns={columns}
-                           rowKey={record => record.id}
-                           dataSource={this.state.data}
-                           loading={this.state.loading}
-                           bordered
-                           pagination={this.state.pagination}
-                           onChange={this.handleTableChange}
-                           title={() =>
-                               <div style={{height: 32}}>
-                                   <Tooltip title="刷新">
-                                       <Button type="primary" shape="circle" icon="reload" className="pull-right"
-                                               loading={this.state.loading}
-                                               onClick={this.refresh}/>
-                                   </Tooltip>
-                               </div>
-                           }
-        />
+        return <div>
+            <Table columns={columns}
+                   rowKey={record => record.id}
+                   dataSource={this.state.data}
+                   loading={this.state.loading}
+                   bordered
+                   pagination={this.state.pagination}
+                   onChange={this.handleTableChange}
+                   title={() =>
+                       <div style={{height: 32}}>
+                           <Tooltip title="添加">
+                               <Button type="primary" shape="circle" icon="plus"
+                                       loading={this.state.loading}
+                                       onClick={this.onAddUserLeagueMemberClick}/>
+                           </Tooltip>
+                           <Tooltip title="刷新">
+                               <Button type="primary" shape="circle" icon="reload" className="pull-right"
+                                       loading={this.state.loading}
+                                       onClick={this.refresh}/>
+                           </Tooltip>
+                       </div>
+                   }
+            />
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="添加联赛会员"
+                visible={this.state.addUserLeagueMemberShow}
+                footer={[
+                    <Button key="back" onClick={this.onAddUserLeagueMemberCancel}>取消</Button>,
+                    <Button key="submit" type="primary" onClick={this.onAddUserLeagueMemberCreate}>确定</Button>,
+                ]}
+                onCancel={this.onAddUserLeagueMemberCancel}>
+                <AddDialog
+                    leagueId={this.props.leagueId}
+                    visible={this.state.addUserLeagueMemberShow}
+                    ref={this.saveAddDialogRef}/>
+            </Modal>
+            <Modal
+                className={isMobile ? "top-n" : ""}
+                title="确认删除"
+                visible={this.state.deleteVisible}
+                onOk={this.handleDeleteOK}
+                onCancel={this.handleDeleteCancel}
+                zIndex={1001}
+            >
+                <p className="mb-n" style={{fontSize: 14}}>是否确认删除？</p>
+            </Modal>
         </div>
     }
 }
