@@ -49,11 +49,14 @@ class UserLeagueMemberAddDialog extends React.Component {
     componentDidMount() {
     }
 
-    fetchLeagues = (searchText, pageNum) => {
+    fetchLeagues = (searchText, pageNum, option) => {
+        if (searchText == "" || (searchText != null && searchText.trim() == "")) {
+            option = {status: 'live', sortField: 'dateBegin', sortOrder: 'desc'}
+        }
         this.setState({
             loading: true,
         });
-        getAllLeagueMatchs({pageSize: 20, pageNum: pageNum, name: searchText}).then((data) => {
+        getAllLeagueMatchs({pageSize: 20, pageNum: pageNum, name: searchText, ...option}).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
                     leaguedata: pageNum == 1 ? (data.data ? data.data.records : []) :
@@ -118,6 +121,7 @@ class UserLeagueMemberAddDialog extends React.Component {
     }
     handleLeagueFocus = () => {
         this.setState({leagueSearchOpen: true})
+        this.fetchLeagues(null, 1, {status: 'live', sortField: 'dateBegin', sortOrder: 'desc'});
     }
     handleLeagueBlur = () => {
         this.setState({
