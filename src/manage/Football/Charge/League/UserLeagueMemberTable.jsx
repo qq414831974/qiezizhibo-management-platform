@@ -11,12 +11,15 @@ import logo from "../../../../static/logo.png";
 import defultAvatar from "../../../../static/avatar.jpg";
 import copy from "copy-to-clipboard/index";
 import UserLeagueMemberAddDialog from "./UserLeagueMemberAddDialog";
-
+import {getQueryString} from "../../../../utils";
 
 class UserLeagueMemberTable extends React.Component {
     state = {
         data: [],
-        pagination: {pageSize: 10, filters: {}},
+        pagination: {
+            pageSize: getQueryString(this.props.location ? this.props.location.search : "", "toolbox") ? 5 : 10,
+            filters: getQueryString(this.props.location ? this.props.location.search : "", "toolbox") ? {sourceType: 2} : {}
+        },
         loading: false,
         filterDropdownVisible: false,
         searchText: '',
@@ -26,10 +29,12 @@ class UserLeagueMemberTable extends React.Component {
         record: {},
     };
 
+
     componentDidMount() {
         this.fetch({
             pageSize: this.state.pagination.pageSize,
             pageNum: 1,
+            ...this.state.pagination.filters,
         });
     };
 
@@ -72,7 +77,7 @@ class UserLeagueMemberTable extends React.Component {
     }
     getTableFilters = (pager, filters) => {
         const {searchText} = this.state;
-        pager.filters = {};
+        pager.filters = pager.filters || {};
         if (searchText != null && searchText != '') {
             pager.filters["userNo"] = searchText;
         }
@@ -149,7 +154,7 @@ class UserLeagueMemberTable extends React.Component {
                         this.refresh();
                         message.success('添加成功', 1);
                     } else {
-                        message.success('添加失败', 1);
+                        message.error('添加失败', 1);
                     }
                 } else {
                     message.error('添加失败：' + (data ? data.code + ":" + data.message : data), 3);
@@ -186,8 +191,9 @@ class UserLeagueMemberTable extends React.Component {
         const onOrderClick = this.onOrderClick;
         const AddDialog = Form.create()(UserLeagueMemberAddDialog);
         const isMobile = this.props.responsive.data.isMobile;
+        const isToolbox = getQueryString(this.props.location ? this.props.location.search : "", "toolbox");
 
-        const columns = [{
+        let columns = [{
             title: '用户',
             dataIndex: 'id',
             key: 'id',
@@ -232,7 +238,7 @@ class UserLeagueMemberTable extends React.Component {
                 if (record.sourceType == 0) {
                     return <a className="ml-s" onClick={onOrderClick.bind(this, record)}>{record.orderId}</a>;
                 } else if (record.sourceType == 1) {
-                    return <span className="ml-s">v-${record.leagueId}{record.id}</span>;
+                    return <span className="ml-s">v-{record.leagueId}{record.id}</span>;
                 }
                 return <a className="ml-s" onClick={onOrderClick.bind(this, record)}>{record.orderId}</a>;
             },
@@ -259,6 +265,42 @@ class UserLeagueMemberTable extends React.Component {
             },
         },
         ];
+        if (isToolbox) {
+            columns = [{
+                title: '用户',
+                dataIndex: 'id',
+                key: 'id',
+                align: 'center',
+                width: '50%',
+                render: function (text, record, index) {
+                    if (record.user) {
+                        const user = record.user;
+                        return <div className="center"><Avatar src={user && user.avatar ? user.avatar : logo}/>
+                            <a className="ml-s"
+                               onClick={onNameClick.bind(this, record)}>{user ? user.name : "未知"}</a>
+                        </div>;
+                    }
+                    return <span>未知</span>;
+                }
+            }, {
+                title: '联赛',
+                dataIndex: 'leagueId',
+                key: 'leagueId',
+                align: 'center',
+                width: '50%',
+                render: function (text, record, index) {
+                    if (record.league) {
+                        const league = record.league;
+                        return <div className="center"><Avatar src={league && league.headImg ? league.headImg : logo}/>
+                            <a className="ml-s"
+                               onClick={onNameClick.bind(this, record)}>{league ? (league.shortName ? league.shortName : league.name) : "未知"}</a>
+                        </div>;
+                    }
+                    return <span>未知</span>;
+                }
+            }]
+        }
+
         return <div>
             <Table columns={columns}
                    rowKey={record => record.id}
@@ -286,12 +328,14 @@ class UserLeagueMemberTable extends React.Component {
                 className={isMobile ? "top-n" : ""}
                 title="添加联赛会员"
                 visible={this.state.addUserLeagueMemberShow}
+                destroyOnClose
                 footer={[
                     <Button key="back" onClick={this.onAddUserLeagueMemberCancel}>取消</Button>,
                     <Button key="submit" type="primary" onClick={this.onAddUserLeagueMemberCreate}>确定</Button>,
                 ]}
                 onCancel={this.onAddUserLeagueMemberCancel}>
                 <AddDialog
+                    isToolbox={isToolbox}
                     leagueId={this.props.leagueId}
                     visible={this.state.addUserLeagueMemberShow}
                     ref={this.saveAddDialogRef}/>

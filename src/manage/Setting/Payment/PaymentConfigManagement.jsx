@@ -11,6 +11,7 @@ import UserAbilityAddDialog from "./PaymentConfigAddDialog"
 import UserAbilityModifyDialog from "./PaymentConfigModifyDialog"
 import {Link} from "react-router-dom";
 import BreadcrumbCustom from "../../Components/BreadcrumbCustom";
+import {getQueryString} from "../../../utils";
 
 class PaymentConfigManagement extends React.Component {
     state = {
@@ -102,9 +103,11 @@ class PaymentConfigManagement extends React.Component {
     render() {
         const AddDialog = Form.create()(UserAbilityAddDialog);
         const ModifyDialog = Form.create()(UserAbilityModifyDialog);
+        const isToolbox = getQueryString(this.props.location ? this.props.location.search : "", "toolbox");
+
         return (
             <div className="gutter-example">
-                <BreadcrumbCustom second="支付设置"/>
+                {isToolbox ? null : <BreadcrumbCustom second="支付设置"/>}
                 <Card>
                     <div className="mb-m" style={{minHeight: 32}}>
                         {this.state.data == null ?

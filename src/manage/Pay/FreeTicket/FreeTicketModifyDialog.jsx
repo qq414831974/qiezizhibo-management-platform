@@ -238,7 +238,7 @@ class FreeTicketModifyDialog extends React.Component {
         this.setState({
             userloading: true,
         });
-        getAllUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 0}).then((data) => {
+        getAllUser({pageSize: 20, pageNum: pageNum, name: searchText}).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
                     userdata: pageNum == 1 ? (data.data ? data.data.records : []) :

@@ -39,7 +39,11 @@ class Login extends React.Component {
         if (roles && isAnchor) {
             window.location = "https://manage.qiezizhibo.com/anchor/";
         } else {
-            history.push('/index');
+            if (this.state.loginType === 'login') {
+                history.push('/index');
+            } else if (this.state.loginType === 'toolbox') {
+                history.push('/toolbox');
+            }
         }
     }
 
@@ -117,21 +121,38 @@ class Login extends React.Component {
                                 )}
                                 <span className="login-form-forgot cursor-hand" onClick={this.onForgetPassword}
                                       style={{float: 'right'}}>忘记密码</span>
-                                <Button type="primary" htmlType="submit" className="login-form-button"
-                                        loading={this.state.loginLoading}
-                                        style={{width: '100%'}}>
-                                    登录
-                                </Button>
+                                <div>
+                                    <Button type="primary" htmlType="submit" className="login-form-button"
+                                            onClick={() => {
+                                                this.setState({loginType: 'login'})
+                                            }}
+                                            loading={this.state.loginLoading}>
+                                        登录
+                                    </Button>
+                                    <Button type="primary" htmlType="submit" className="login-form-button"
+                                            onClick={() => {
+                                                this.setState({loginType: 'toolbox'})
+                                            }}
+                                            loading={this.state.loginLoading}>
+                                        登录工具箱
+                                    </Button>
+                                </div>
                             </FormItem>
                         </Form>
                     </div>
-                    <div className="w-full center" style={{position:"fixed",bottom:0,padding:"10px",textAlign:"center",background:"#fff"}}>
+                    <div className="w-full center" style={{
+                        position: "fixed",
+                        bottom: 0,
+                        padding: "10px",
+                        textAlign: "center",
+                        background: "#fff"
+                    }}>
                         <div>©2021 茄子直播</div>
                         <a href="https://beian.miit.gov.cn/" target="_blank">
-                            <span className="ml-l" style={{textDecoration:"underline"}}>闽ICP备17018408号-1</span>
+                            <span className="ml-l" style={{textDecoration: "underline"}}>闽ICP备17018408号-1</span>
                         </a>
                         <a href="https://beian.miit.gov.cn/" target="_blank">
-                            <span className="ml-l" style={{textDecoration:"underline"}}>闽ICP备17018408号-2</span>
+                            <span className="ml-l" style={{textDecoration: "underline"}}>闽ICP备17018408号-2</span>
                         </a>
                     </div>
                 </div>

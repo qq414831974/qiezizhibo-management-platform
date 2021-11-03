@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import NotFound from './manage/Pages/NotFound';
 import Login from './manage/Pages/Login';
+import Toolbox from './manage/Toolbox/Toolbox';
 import App from './App';
 
 export default () => (
@@ -14,6 +15,7 @@ export default () => (
             {/*<Route exact path="/league/:id" component={LeagueMatchPage} />*/}
             {/*<Route exact path="/contact" component={ContactUsPage} />*/}
             <Route exact path="/" render={() => <Redirect to="/index" push />} />
+            <Route path="/toolbox" component={Toolbox} />
             <Route path="/login" component={Login} />
             <Route path="/" component={App} />
             {/*<Route path="/404" component={NotFound} />*/}

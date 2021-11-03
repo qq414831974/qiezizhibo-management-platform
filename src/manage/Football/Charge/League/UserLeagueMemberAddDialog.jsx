@@ -39,18 +39,110 @@ class UserLeagueMemberAddDialog extends React.Component {
         userdata: [],
         match: {},
         league: {},
-        user: {}
+        user: {},
+        userSearchOpen: false,
+        leagueSearchOpen: false
     }
+    isLeagueCompositions = true;
     isUserCompositions = true;
 
     componentDidMount() {
     }
 
+    fetchLeagues = (searchText, pageNum) => {
+        this.setState({
+            loading: true,
+        });
+        getAllLeagueMatchs({pageSize: 20, pageNum: pageNum, name: searchText}).then((data) => {
+            if (data && data.code == 200 && data.data) {
+                this.setState({
+                    leaguedata: pageNum == 1 ? (data.data ? data.data.records : []) :
+                        (data ? this.state.leaguedata.concat(data.data.records) : []),
+                    loading: false,
+                    leaguePageNum: data.data.current,
+                    leaguePageSize: data.data.size,
+                    leaguePageTotal: data.data.total,
+                });
+            } else {
+                message.error('获取联赛列表失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        });
+    }
+    handleLeagueChange = (value) => {
+        this.setState({currentLeague: value});
+        const {form} = this.props;
+        this.state.leaguedata && this.state.leaguedata.forEach(item => {
+            if (item.id == value) {
+                form.setFieldsValue({leagueId: item.id})
+                this.setState({
+                    leagueSearchText: null,
+                    leaguedata: [],
+                    loading: false,
+                    leaguePageNum: 1,
+                    leaguePageSize: 20,
+                    leaguePageTotal: null,
+                    leagueHasMore: false,
+                })
+            }
+        });
+    }
+    handleLeagueShowMore = (e) => {
+        const num = Math.floor(e.target.scrollTop / 50);
+        if (num + 5 >= this.state.leaguedata.length) {
+            this.handleLeagueOnLoadMore(e);
+        }
+    }
+    handleLeagueOnLoadMore = (e) => {
+        let data = this.state.leaguedata;
+        e.target.scrollTop = data.length * 50;
+        if (this.state.loading) {
+            return;
+        }
+        if (data.length > this.state.leaguePageTotal) {
+            this.setState({
+                leagueHasMore: false,
+                loading: false,
+            });
+            return;
+        }
+        this.fetchLeagues(this.state.leagueSearchText, this.state.leaguePageNum + 1);
+    }
+    handleLeagueSearch = (e) => {
+        const value = e.target.value;
+        this.setState({leagueSearchText: value});
+        // setTimeout(()=>{
+        if (this.isLeagueCompositions) {
+            this.fetchLeagues(value, 1);
+        }
+        // },100);
+    }
+    handleLeagueFocus = () => {
+        this.setState({leagueSearchOpen: true})
+    }
+    handleLeagueBlur = () => {
+        this.setState({
+            leagueSearchOpen: false,
+            leagueSearchText: null,
+            leaguedata: [],
+            loading: false,
+            leaguePageNum: 1,
+            leaguePageSize: 20,
+            leaguePageTotal: null,
+            leagueHasMore: false,
+        })
+    }
+    onLeagueInputCompositionStart = () => {
+        this.isLeagueCompositions = false;
+    }
+    onLeagueInputCompositionEnd = () => {
+        this.isLeagueCompositions = true;
+        this.fetchLeagues(this.state.leagueSearchText, 1);
+    }
     fetchUsers = (searchText, pageNum) => {
         this.setState({
             userloading: true,
         });
-        getAllUser({pageSize: 20, pageNum: pageNum, name: searchText, wechatType: 0}).then((data) => {
+        getAllUser({pageSize: 20, pageNum: pageNum, name: searchText}).then((data) => {
             if (data && data.code == 200 && data.data) {
                 this.setState({
                     userdata: pageNum == 1 ? (data.data ? data.data.records : []) :
@@ -71,6 +163,15 @@ class UserLeagueMemberAddDialog extends React.Component {
         this.state.userdata && this.state.userdata.forEach(item => {
             if (item.userNo == value) {
                 form.setFieldsValue({userNo: item.userNo})
+                this.setState({
+                    userSearchText: null,
+                    userdata: [],
+                    userloading: false,
+                    userPageNum: 1,
+                    userPageSize: 20,
+                    userPageTotal: null,
+                    userHasMore: false,
+                })
             }
         });
     }
@@ -104,6 +205,21 @@ class UserLeagueMemberAddDialog extends React.Component {
         }
         // },100);
     }
+    handleUserFocus = () => {
+        this.setState({userSearchOpen: true})
+    }
+    handleUserBlur = () => {
+        this.setState({
+            userSearchOpen: false,
+            userSearchText: null,
+            userdata: [],
+            userloading: false,
+            userPageNum: 1,
+            userPageSize: 20,
+            userPageTotal: null,
+            userHasMore: false,
+        })
+    }
     //中文输入中的状态 参考 https://blog.csdn.net/qq1194222919/article/details/80747192
     onUserInputCompositionStart = () => {
         this.isUserCompositions = false;
@@ -117,20 +233,66 @@ class UserLeagueMemberAddDialog extends React.Component {
         const {visible, form, record} = this.props;
         const {getFieldDecorator} = form;
         const currentUser = this.state.user;
+        const currentLeague = this.state.league;
+        const leagueOptions = this.state.leaguedata.map(d => <Option style={{height: 50}} key={d.id} value={d.id}>
+            <div className="center">
+                <Avatar src={d ? d.headImg : logo}/>
+                <p className="ml-s">{d ? (d.shortName ? d.shortName : d.name) : ""}</p>
+            </div>
+        </Option>);
         const userOptions = this.state.userdata.map(d => <Option style={{height: 50}} key={d.userNo} value={d.userNo}>
             <div className="center">
                 <Avatar src={d ? d.avatar : defultAvatar}/>
                 <p className="ml-s">{d ? d.name : ""}</p>
             </div>
         </Option>);
-
+        const leagueSelect = <div>
+            <div className="center w-full">
+                <span style={{fontSize: 16, fontWeight: 'bold'}}>关联联赛</span>
+            </div>
+            <Select
+                showSearch
+                style={{minWidth: this.props.isToolbox ? null : 300}}
+                placeholder="按名称搜索并选择"
+                defaultActiveFirstOption={false}
+                showArrow={false}
+                filterOption={false}
+                onChange={this.handleLeagueChange}
+                onPopupScroll={this.handleLeagueShowMore}
+                notFoundContent={null}
+                onFocus={this.handleLeagueFocus}
+                onBlur={this.handleLeagueBlur}
+                open={this.state.leagueSearchOpen}
+                defaultOpen={false}
+                // mode="tags"
+                // loading={this.state.loading}
+                getInputElement={() => (
+                    <input onInput={this.handleLeagueSearch}
+                           onCompositionStart={this.onLeagueInputCompositionStart}
+                           onCompositionEnd={this.onLeagueInputCompositionEnd}/>)}
+            >
+                {leagueOptions}
+            </Select>
+            <div className="center w-full">
+                <Icon className="ml-s" style={{fontSize: 16}} type="loading"
+                      hidden={!this.state.loading}/>
+            </div>
+            {currentLeague.name ? <div className="center w-full">
+                <div className="center">
+                    <Avatar
+                        src={currentLeague ? currentLeague.headImg : logo}/>
+                    <p className="ml-s">{currentLeague ? currentLeague.name : ""}</p>
+                </div>
+            </div> : null}
+            {currentLeague == null ? <div className="center w-full"><span>暂未关联联赛</span></div> : null}
+        </div>
         const userSelect = <div>
             <div className="center w-full">
                 <span style={{fontSize: 16, fontWeight: 'bold'}}>关联用户</span>
             </div>
             <Select
                 showSearch
-                style={{minWidth: 300}}
+                style={{minWidth: this.props.isToolbox ? null : 300}}
                 placeholder="按名字搜索并选择"
                 defaultActiveFirstOption={false}
                 showArrow={false}
@@ -138,6 +300,10 @@ class UserLeagueMemberAddDialog extends React.Component {
                 onChange={this.handleUserChange}
                 onPopupScroll={this.handleUserShowMore}
                 notFoundContent={null}
+                onFocus={this.handleUserFocus}
+                onBlur={this.handleUserBlur}
+                open={this.state.userSearchOpen}
+                defaultOpen={false}
                 // mode="tags"
                 // loading={this.state.loading}
                 getInputElement={() => (
@@ -172,14 +338,22 @@ class UserLeagueMemberAddDialog extends React.Component {
                         )}
                     </FormItem>
                     {userSelect}
-                    <FormItem {...formItemLayout} className="bs-form-item">
-                        {getFieldDecorator('leagueId', {
-                            rules: [{required: true, message: '请输入id!'}],
-                            initialValue: this.props.leagueId,
-                        })(
-                            <Input hidden placeholder='请输入id!'/>
-                        )}
-                    </FormItem>
+                    {this.props.isToolbox ? leagueSelect : null}
+                    {this.props.isToolbox ? <FormItem {...formItemLayout} className="bs-form-item">
+                            {getFieldDecorator('leagueId', {
+                                rules: [{required: true, message: '请输入id!'}],
+                            })(
+                                <Input hidden placeholder='请输入id!'/>
+                            )}
+                        </FormItem>
+                        : <FormItem {...formItemLayout} className="bs-form-item">
+                            {getFieldDecorator('leagueId', {
+                                rules: [{required: true, message: '请输入id!'}],
+                                initialValue: this.props.leagueId,
+                            })(
+                                <Input hidden placeholder='请输入id!'/>
+                            )}
+                        </FormItem>}
                 </Form>
                 :
                 null
