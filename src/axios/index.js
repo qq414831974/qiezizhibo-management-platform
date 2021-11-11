@@ -2001,6 +2001,33 @@ export const deleteUserLeagueMember = (param) => del({url: `${config.football_se
     }).catch(function (error) {
         console.log(error)
     });
+export const getLeagueGiftRule = (param) => get({url: `${config.football_service}/football/gift/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueGiftRule = (param) => post({url: `${config.football_service}/football/gift/league`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueGiftRule = (param) => put({
+    url: `${config.football_service}/football/gift/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteLeagueGiftRule = (param) => del({url: `${config.football_service}/football/gift/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 //暂时无用
 export const getProducts = (params) => get({url: `${config.pay_service}/product?${unpack(params)}`})
     .then(function (response) {

@@ -10,9 +10,14 @@ import {
     addLeagueHeatRule,
     updateLeagueHeatRule,
     deleteLeagueHeatRule,
+    getLeagueGiftRule,
+    addLeagueGiftRule,
+    updateLeagueGiftRule,
+    deleteLeagueGiftRule,
     leagueHeatAllMatch, updateMatchById, getLeagueMatchById
 } from "../../../../axios";
 import LeagueHeatForm from "../League/LeagueHeatForm";
+import LeagueGiftForm from "../League/LeagueGiftForm";
 import LeagueFansManagement from "../League/LeagueFansManagement";
 import LeagueHeatTable from "../League/LeagueHeatTable";
 import LeagueCashSettlementTable from "../League/LeagueCashSettlementTable";
@@ -55,6 +60,15 @@ class FootBallLeagueHeatManagement extends React.Component {
                 message.error('获取联赛热度规则失败：' + (data ? data.result + "-" + data.message : data), 3);
             }
         });
+        getLeagueGiftRule(params).then((data) => {
+            if (data && data.code == 200) {
+                this.setState({
+                    giftData: data.data ? data.data : {},
+                });
+            } else {
+                message.error('获取联赛礼物规则失败：' + (data ? data.result + "-" + data.message : data), 3);
+            }
+        });
         getLeagueMatchById(params.leagueId).then(data => {
             if (data && data.code == 200) {
                 this.setState({
@@ -67,6 +81,9 @@ class FootBallLeagueHeatManagement extends React.Component {
     }
     saveHeatSettingRef = (form) => {
         this.form = form;
+    }
+    saveGiftSettingRef = (form) => {
+        this.form_gift = form;
     }
     heatAll = () => {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
@@ -138,10 +155,57 @@ class FootBallLeagueHeatManagement extends React.Component {
             }
         });
     }
+    handleGiftSettingSubmit = (e) => {
+        const currentLeague = getQueryString(this.props.location.search, "leagueId");
+        e.preventDefault();
+
+        const form = this.form_gift;
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            values.leagueId = currentLeague;
+            if (values.giftList == null) {
+                return;
+            }
+            values.giftList = values.giftList.filter(item => typeof item == 'number')
+            this.setState({modifyLoading: true})
+            if (this.state.giftData && this.state.giftData.id) {
+                updateLeagueGiftRule(values).then(data => {
+                    this.setState({modifyLoading: false})
+                    if (data && data.code == 200) {
+                        if (data.data) {
+                            message.success('修改成功', 1);
+                            this.refresh();
+                        } else {
+                            message.warn(data.message, 1);
+                        }
+                    } else {
+                        message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
+                    }
+                })
+            } else {
+                addLeagueGiftRule(values).then(data => {
+                    this.setState({modifyLoading: false})
+                    if (data && data.code == 200) {
+                        if (data.data) {
+                            message.success('修改成功', 1);
+                            this.refresh();
+                        } else {
+                            message.warn(data.message, 1);
+                        }
+                    } else {
+                        message.error('添加失败：' + (data ? data.result + "-" + data.message : data), 3);
+                    }
+                })
+            }
+        });
+    }
 
     render() {
         const currentLeague = getQueryString(this.props.location.search, "leagueId");
         const HeatSetting = Form.create()(LeagueHeatForm);
+        const GiftSetting = Form.create()(LeagueGiftForm);
 
         return (
             <div className="gutter-example">
@@ -173,8 +237,15 @@ class FootBallLeagueHeatManagement extends React.Component {
                                             modifyLoading={this.state.modifyLoading}
                                             ref={this.saveHeatSettingRef}/>
                                     </TabPane>
+                                    <TabPane tab="礼物设置" key="2">
+                                        <GiftSetting
+                                            record={this.state.giftData}
+                                            handleSubmit={this.handleGiftSettingSubmit}
+                                            modifyLoading={this.state.modifyLoading}
+                                            ref={this.saveGiftSettingRef}/>
+                                    </TabPane>
                                     {this.state.data && this.state.data.id && (this.state.data.type == 2 || this.state.data.type == 3) ?
-                                        <TabPane tab="联赛热度比拼详情" key="2">
+                                        <TabPane tab="联赛热度比拼详情" key="3">
                                             <LeagueHeatTable
                                                 leagueId={currentLeague}
                                                 heatRule={this.state.data}/>
@@ -193,17 +264,17 @@ class FootBallLeagueHeatManagement extends React.Component {
                                                     />
                                                 </div> : null}
                                         </TabPane> : null}
-                                    <TabPane tab="送礼物详情" key="3">
+                                    <TabPane tab="送礼物详情" key="4">
                                         <LeagueGiftOrderTable leagueId={currentLeague}/>
                                     </TabPane>
                                     {this.state.data && this.state.data.cashAvailable ?
-                                        <TabPane tab="联赛提现管理" key="4">
+                                        <TabPane tab="联赛提现管理" key="5">
                                             <LeagueCashOrderTable
                                                 leagueId={currentLeague}
                                                 heatRule={this.state.data}/>
                                         </TabPane>
                                         : null}
-                                    <TabPane tab="粉丝团" key="5">
+                                    <TabPane tab="粉丝团" key="6">
                                         <LeagueFansManagement
                                             visible={true}
                                             leagueId={currentLeague}/>
