@@ -79,7 +79,7 @@ class UserLeagueMemberTable extends React.Component {
         const {searchText} = this.state;
         pager.filters = pager.filters || {};
         if (searchText != null && searchText != '') {
-            pager.filters["userNo"] = searchText;
+            pager.filters["userName"] = searchText;
         }
         if (filters) {
             for (let param in filters) {
@@ -203,7 +203,7 @@ class UserLeagueMemberTable extends React.Component {
                 <div className="custom-filter-dropdown">
                     <Input
                         ref={ele => this.searchInput = ele}
-                        placeholder="按用户id搜索"
+                        placeholder="按用户名搜索"
                         value={this.state.searchText}
                         onChange={this.onInputChange}
                         onPressEnter={this.onSearch}
@@ -272,6 +272,25 @@ class UserLeagueMemberTable extends React.Component {
                 key: 'id',
                 align: 'center',
                 width: '50%',
+                filterDropdown: (
+                    <div className="custom-filter-dropdown">
+                        <Input
+                            ref={ele => this.searchInput = ele}
+                            placeholder="按用户名搜索"
+                            value={this.state.searchText}
+                            onChange={this.onInputChange}
+                            onPressEnter={this.onSearch}
+                        />
+                        <Button type="primary" icon="search" onClick={this.onSearch}>查找</Button>
+                    </div>
+                ),
+                filterIcon: <Icon type="search" style={{color: this.state.filtered ? '#108ee9' : '#aaa'}}/>,
+                filterDropdownVisible: this.state.filterDropdownVisible,
+                onFilterDropdownVisibleChange: (visible) => {
+                    this.setState({
+                        filterDropdownVisible: visible,
+                    }, () => this.searchInput && this.searchInput.focus());
+                },
                 render: function (text, record, index) {
                     if (record.user) {
                         const user = record.user;
