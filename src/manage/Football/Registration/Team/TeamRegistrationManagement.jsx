@@ -6,7 +6,7 @@ import {bindActionCreators} from "redux";
 import {receiveData} from "../../../../action";
 import {connect} from "react-redux";
 import {getQueryString} from "../../../../utils";
-import {getLeagueMatchById, getLeagueRegistrationRule} from "../../../../axios";
+import {getLeagueMatchById} from "../../../../axios";
 import defultAvatar from "../../../../static/avatar.jpg";
 
 

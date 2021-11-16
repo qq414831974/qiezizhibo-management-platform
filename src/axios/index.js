@@ -2028,6 +2028,54 @@ export const deleteLeagueGiftRule = (param) => del({url: `${config.football_serv
     }).catch(function (error) {
         console.log(error)
     });
+export const getLeagueMatchManagementRule = (param) => get({url: `${config.football_service}/football/unit/matchManagement?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueMatchManagementRule = (param) => post({
+    url: `${config.football_service}/football/unit/matchManagement`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueMatchManagementRule = (param) => put({
+    url: `${config.football_service}/football/unit/matchManagement`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getLeagueUnitSettingRule = (param) => get({url: `${config.football_service}/football/unit/setting?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueUnitSettingRule = (param) => post({
+    url: `${config.football_service}/football/unit/setting`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueUnitSettingRule = (param) => put({
+    url: `${config.football_service}/football/unit/setting`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 //暂时无用
 export const getProducts = (params) => get({url: `${config.pay_service}/product?${unpack(params)}`})
     .then(function (response) {

@@ -488,6 +488,12 @@ class FootBallMatchAddDialog extends React.Component {
             place: item
         })
     }
+    getMatchType = () => {
+        if(this.state.currentLeague && this.state.currentLeague.matchType){
+            return this.state.currentLeague.matchType;
+        }
+        return this.state.statisticsRule && this.state.statisticsRule.available ? [1, 2, 3] : [2, 3];
+    }
 
     render() {
         const {visible, form, record} = this.props;
@@ -591,7 +597,7 @@ class FootBallMatchAddDialog extends React.Component {
                                     // rules: [{required: true, message: '请选择联赛!'}],
                                 })(
                                     <Select showSearch
-                                            placeholder="按名称搜索并选择"
+                                            placeholder="按名称搜索并选择联赛"
                                             defaultActiveFirstOption={false}
                                             showArrow={false}
                                             filterOption={false}
@@ -676,7 +682,8 @@ class FootBallMatchAddDialog extends React.Component {
                                 {getFieldDecorator('startTime', {
                                     rules: [{required: true, message: '请选择开始时间!'}],
                                 })(
-                                    <DatePicker showTime
+                                    <DatePicker placeholder="选择时间"
+                                                showTime
                                                 format={'YYYY-MM-DD HH:mm'}/>
                                 )}
                             </FormItem>
@@ -863,7 +870,7 @@ class FootBallMatchAddDialog extends React.Component {
                         <div className="center w-full">
                             <FormItem {...formItemLayout} className="bs-form-item">
                                 {getFieldDecorator('type', {
-                                    initialValue: [1, 2, 3, 4, 5],
+                                    initialValue: this.getMatchType(),
                                 })(
                                     <TreeSelect treeData={typeData}
                                                 style={{minWidth: 300, maxWidth: 300, textAlign: "center"}}

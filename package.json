@@ -80,7 +80,7 @@
     "terser-webpack-plugin": "1.4.1",
     "ts-pnp": "1.1.4",
     "url-loader": "2.1.0",
-    "video.js": "7.6.6",
+    "video.js": "7.17.0",
     "videojs-contrib-hls": "5.15.0",
     "videojs-flash": "2.2.1",
     "webpack": "4.40.2",

@@ -69,23 +69,23 @@ class LeagueRegistrationForm extends React.Component {
         return (
             visible ?
                 <Form onSubmit={this.props.handleSubmit}>
-                    <FormItem {...formItemLayout} label="开启报名" className="bs-form-item">
-                        {getFieldDecorator('available', {
-                            initialValue: record.available,
-                            valuePropName: 'checked',
-                            rules: [{required: true, message: '请选择是否开启!'}],
-                        })(
-                            <Switch/>
-                        )}
-                    </FormItem>
-                    <FormItem {...formItemLayout} label="主办方密码" className="bs-form-item">
-                        {getFieldDecorator('unitPassword', {
-                            initialValue: record.unitPassword,
-                            rules: [{required: true, message: '请输入密码!'}],
-                        })(
-                            <Input/>
-                        )}
-                    </FormItem>
+                    {/*<FormItem {...formItemLayout} label="开启报名" className="bs-form-item">*/}
+                    {/*    {getFieldDecorator('available', {*/}
+                    {/*        initialValue: record.available,*/}
+                    {/*        valuePropName: 'checked',*/}
+                    {/*        rules: [{required: true, message: '请选择是否开启!'}],*/}
+                    {/*    })(*/}
+                    {/*        <Switch/>*/}
+                    {/*    )}*/}
+                    {/*</FormItem>*/}
+                    {/*<FormItem {...formItemLayout} label="主办方密码" className="bs-form-item">*/}
+                    {/*    {getFieldDecorator('unitPassword', {*/}
+                    {/*        initialValue: record.unitPassword,*/}
+                    {/*        rules: [{required: true, message: '请输入密码!'}],*/}
+                    {/*    })(*/}
+                    {/*        <Input/>*/}
+                    {/*    )}*/}
+                    {/*</FormItem>*/}
                     <FormItem {...formItemLayout} label="结束时间" className="bs-form-item">
                         {getFieldDecorator('dateEnd', {
                             initialValue: record.dateEnd ? moment(record.dateEnd) : null,
@@ -99,8 +99,9 @@ class LeagueRegistrationForm extends React.Component {
                         <span className="mb-n mt-m" style={{fontSize: 20}}>免责声明图片</span>
                     </div>
                     <div className="center w-full">
-                        <FormItem {...formItemLayout} className="bs-form-item form-match-poster">
+                        <FormItem {...formItemLayout} className="bs-form-item form-page">
                             {getFieldDecorator('contractPic', {
+                                initialValue: "https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/202106/registrationContractPic.jpg",
                                 // initialValue: this.state.currentLeague?this.state.currentLeague.poster:null,
                                 getValueFromEvent(e) {
                                     return form.getFieldValue('contractPic')
@@ -129,7 +130,7 @@ class LeagueRegistrationForm extends React.Component {
                                             src={form.getFieldValue('contractPic') ? form.getFieldValue('contractPic') :
                                                 (record.contractPic ? record.contractPic : imgcover)}
                                             alt="poster"
-                                            className="form-match-poster-img"/>
+                                            className="form-page-img"/>
                                     }
 
                                 </Upload>

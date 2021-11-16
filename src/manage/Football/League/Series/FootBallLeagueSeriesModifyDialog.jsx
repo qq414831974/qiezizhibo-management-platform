@@ -10,7 +10,7 @@ import {
     Progress,
     Checkbox,
     Avatar,
-    Tooltip, InputNumber, message
+    Tooltip, InputNumber, message, TreeSelect
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
@@ -41,6 +41,24 @@ const formItemLayout = {
         sm: {span: 16},
     },
 };
+const typeData = [
+    {
+        title: '时间轴',
+        value: 1,
+    }, {
+        title: '技术统计',
+        value: 2,
+    }, {
+        title: '球员名单',
+        value: 3,
+    }, {
+        title: '聊天室',
+        value: 4,
+    }, {
+        title: '集锦',
+        value: 5,
+    }
+];
 
 class FootBallLeagueSeriesModifyDialog extends React.Component {
     state = {}
@@ -177,7 +195,6 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
         const {getFieldDecorator} = form;
         const isMobile = this.props.responsive.data.isMobile;
         const handlePosterChange = this.handlePosterChange;
-        const isSeries = this.state.isSeries != null ? this.state.isSeries : (record && record.isParent);
         const isLiveCharge = this.state.isLiveCharge != null ? this.state.isLiveCharge : (record && record.isLiveCharge);
         const isRecordCharge = this.state.isRecordCharge != null ? this.state.isRecordCharge : (record && record.isRecordCharge);
         const isMonopolyCharge = this.state.isMonopolyCharge != null ? this.state.isMonopolyCharge : (record && record.isMonopolyCharge);
@@ -228,6 +245,16 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 </Upload>
                             )}
                         </FormItem>
+                        <FormItem {...formItemLayout} label="微信类型" className="bs-form-item">
+                            {getFieldDecorator('wechatType', {
+                                rules: [{required: true, message: '请选择类型'}],
+                                initialValue: record.wechatType
+                            })(
+                                <RadioGroup>
+                                    <Radio value={0}>茄子TV</Radio>
+                                </RadioGroup>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                             {getFieldDecorator('type', {
                                 rules: [{required: true, message: '请选择类型'}],
@@ -261,7 +288,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 <Input placeholder='请输入英文名'/>
                             )}
                         </FormItem>
-                        {isSeries ? null : <FormItem {...formItemLayout} label="组别" className="bs-form-item">
+                         <FormItem {...formItemLayout} label="组别" className="bs-form-item">
                             {getFieldDecorator('subgroup.groups', {
                                 rules: [{required: true, message: '请选择组别'}],
                                 initialValue: record.subgroup ? record.subgroup.groups : [],
@@ -280,9 +307,9 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                     <Option key={`default`} value={`default`}>无分组</Option>
                                 </Select>
                             )}
-                        </FormItem>}
-                        {isSeries ? null : this.getRoundDom(record)}
-                        {isSeries ? null : <FormItem {...formItemLayout} label='场地'
+                        </FormItem>
+                        {this.getRoundDom(record)}
+                        <FormItem {...formItemLayout} label='场地'
                                                      className="bs-form-item">
                             {getFieldDecorator('place', {
                                 initialValue: record.place ? record.place : [],
@@ -295,7 +322,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 >
                                 </Select>
                             )}
-                        </FormItem>}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="几人制" className="bs-form-item">
                             {getFieldDecorator('regulations.population', {
                                 initialValue: record.regulations ? record.regulations.population : null,
@@ -326,6 +353,22 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 },
                             })(
                                 <InputNumber placeholder='请输入'/>
+                            )}
+                        </FormItem>
+                        <FormItem {...formItemLayout} label="比赛菜单" className="bs-form-item">
+                            {getFieldDecorator('matchType', {
+                                initialValue: record.matchType ? record.matchType : [],
+                            })(
+                                <TreeSelect treeData={typeData}
+                                            style={{minWidth: 300, maxWidth: 300, textAlign: "center"}}
+                                            placeholder="请选择"
+                                            dropdownStyle={{maxHeight: 300, overflow: 'auto'}}
+                                            onChange={this.onTypeSelectChange}
+                                            allowClear
+                                            multiple
+                                            filterTreeNode={(inputValue, treeNode) => {
+                                                return treeNode.props.title.indexOf(inputValue) != -1 || treeNode.props.value == inputValue;
+                                            }}/>
                             )}
                         </FormItem>
                         <FormItem {...formItemLayout} label="主办方" className="bs-form-item">
@@ -377,7 +420,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                 </FormItem>
                             </Col>
                         </FormItem>
-                        {isSeries ? null : <FormItem {...formItemLayout} label="时间" className="bs-form-item">
+                        <FormItem {...formItemLayout} label="时间" className="bs-form-item">
                             <div className="inline">
                                 <div className="inline-block">
                                     {isMobile ? <span>开始：</span> : null}
@@ -405,7 +448,7 @@ class FootBallLeagueSeriesModifyDialog extends React.Component {
                                     </FormItem>
                                 </div>
                             </div>
-                        </FormItem>}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="联系电话" className="bs-form-item">
                             {getFieldDecorator('phoneNumber', {
                                 initialValue: record.phoneNumber,
