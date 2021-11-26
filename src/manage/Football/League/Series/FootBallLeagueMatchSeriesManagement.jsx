@@ -86,6 +86,41 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
     };
     handleLeagueMatchAddCreate = () => {
         const form = this.formAdd;
+        if (form == null) {
+            return;
+        }
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            const leagueType = form.getFieldValue('type');
+            const round = form.getFieldValue('round.rounds');
+            if (leagueType == null || round == null) {
+                message.warn('请选择联赛类型和轮次', 1);
+                return;
+            }
+            //杯赛
+            if (leagueType == 1) {
+                const groupRound = round.filter(item => {
+                    if (item != null && typeof item == 'string') {
+                        const splitItem = item.split('-');
+                        if (splitItem.length == 2 && splitItem[0] == "x") {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+                if (groupRound.length < 1) {
+                    this.showConfirmDialog("联赛为杯赛，未选择小组赛，可能会导致积分榜记分问题，是否确认？", this.addLeagueConfirm);
+                    return;
+                }
+            }
+            this.addLeagueConfirm();
+        })
+    };
+    addLeagueConfirm = () => {
+        this.setState({confirmVisible: false});
+        const form = this.formAdd;
         form.validateFields((err, values) => {
             if (err) {
                 return;
@@ -107,8 +142,39 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             form.resetFields();
             this.setState({dialogAddVisible: false});
         });
-    };
+    }
     handleLeagueMatchModifyCreate = () => {
+        const form = this.formModify;
+        if (form == null) {
+            return;
+        }
+        form.validateFields((err, values) => {
+            if (err) {
+                return;
+            }
+            const leagueType = form.getFieldValue('type');
+            const round = form.getFieldValue('round.rounds');
+            //杯赛
+            if (leagueType == 1) {
+                const groupRound = round.filter(item => {
+                    if (item != null && typeof item == 'string') {
+                        const splitItem = item.split('-');
+                        if (splitItem.length == 2 && splitItem[0] == "x") {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+                if (groupRound.length < 1) {
+                    this.showConfirmDialog("联赛为杯赛，未选择小组赛，可能会导致积分榜记分问题，是否确认？", this.updateLeagueConfirm);
+                    return;
+                }
+            }
+            this.updateLeagueConfirm();
+        })
+    };
+    updateLeagueConfirm = ()=>{
+        this.setState({confirmVisible: false});
         const form = this.formModify;
         form.validateFields((err, values) => {
             if (err) {
@@ -131,7 +197,7 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             form.resetFields();
             this.setState({dialogModifyVisible: false});
         });
-    };
+    }
     handleAddLeagueOK = () => {
         const form = this.formAddLeague;
         form.validateFields((err, values) => {
@@ -252,13 +318,33 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
             this.download("热度PK网页导出.txt", content);
         }
     }
+    handleConfirmCancel = () => {
+        this.setState({confirmVisible: false})
+    }
+    showConfirmDialog = (text, confirmFunc) => {
+        this.setState({confirmVisible: true, confirmText: text, handleConfirmOK: confirmFunc})
+    }
+    getAddDialogForm = () => {
+        if (this.addDialogForm) {
+            return this.addDialogForm;
+        }
+        this.addDialogForm = Form.create()(FootBallLeagueMatchAddDialog);
+        return this.addDialogForm;
+    }
+    getModifyDialogForm = () => {
+        if (this.modifyDialogForm) {
+            return this.modifyDialogForm;
+        }
+        this.modifyDialogForm = Form.create()(FootBallLeagueMatchModifyDialog);
+        return this.modifyDialogForm;
+    }
 
     render() {
         const isMobile = this.props.responsive.data.isMobile;
         const onNameClick = this.onNameClick;
         const genWxaCode = this.genWxaCode;
-        const AddDialog = Form.create()(FootBallLeagueMatchAddDialog);
-        const ModifyDialog = Form.create()(FootBallLeagueMatchModifyDialog);
+        const AddDialog = this.getAddDialogForm();
+        const ModifyDialog = this.getModifyDialogForm();
         const AddLeagueDialog = Form.create()(FootBallLeagueSeriesAddLeagueDialog);
         const {selectedRowKeys} = this.state;
 
@@ -539,6 +625,17 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                         visible={this.state.dialogAddSeriesVisible}
                         record={this.state.leagueData}
                         ref={this.saveAddLeagueDialogRef}/>
+                </Modal>
+                <Modal
+                    key="dialog-confirm"
+                    className={isMobile ? "top-n" : ""}
+                    title="注意！"
+                    visible={this.state.confirmVisible}
+                    onOk={this.state.handleConfirmOK}
+                    onCancel={this.handleConfirmCancel}
+                    zIndex={1001}
+                >
+                    <p style={{fontSize: 14}}>{this.state.confirmText}</p>
                 </Modal>
             </div>
         );

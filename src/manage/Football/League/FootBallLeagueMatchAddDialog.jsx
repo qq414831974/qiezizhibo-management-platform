@@ -144,8 +144,14 @@ class FootBallLeagueMatchAddDialog extends React.Component {
             </Option>);
         }
         selectChildren.push(<OptGroup label="开、闭幕">{openclose}</OptGroup>);
-        selectChildren.push(<OptGroup label="正常轮">{normalRound}</OptGroup>);
-        selectChildren.push(<OptGroup label="小组赛">{groupRound}</OptGroup>);
+        selectChildren.push(<OptGroup
+            label={<div><span>正常轮</span><span className="danger">（适用于联赛）</span></div>}>
+            {normalRound}
+        </OptGroup>);
+        selectChildren.push(<OptGroup
+            label={<div><span>小组赛</span><span className="danger">（适用于杯赛）杯赛积分榜只统计小组赛积分</span></div>}>
+            {groupRound}
+        </OptGroup>);
         selectChildren.push(<OptGroup label="淘汰赛">{knockRound}</OptGroup>);
         selectChildren.push(<OptGroup label="决赛">{finalRound}</OptGroup>);
 
@@ -462,11 +468,12 @@ class FootBallLeagueMatchAddDialog extends React.Component {
                                 <Input.TextArea placeholder='描述'/>
                             )}
                         </FormItem>
-                        {this.state.isSeries ? <FormItem {...formItemLayout} label="赛季（cufa专用）" className="bs-form-item">
-                            {getFieldDecorator('seriesSeason', {})(
-                                <Input placeholder='赛季'/>
-                            )}
-                        </FormItem> : null}
+                        {this.state.isSeries ?
+                            <FormItem {...formItemLayout} label="赛季（cufa专用）" className="bs-form-item">
+                                {getFieldDecorator('seriesSeason', {})(
+                                    <Input placeholder='赛季'/>
+                                )}
+                            </FormItem> : null}
                         <div className="center w-full">
                             <span className="mb-n mt-m" style={{fontSize: 20}}>预览封面</span>
                         </div>
