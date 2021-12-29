@@ -17,6 +17,7 @@ const TabPane = Tabs.TabPane;
 class FootballLeagueMatchBillAnalysis extends React.Component {
     state = {
         data: {},
+        chargeBillShow: true, giftBillShow: true
     }
 
     componentDidMount() {
@@ -25,9 +26,9 @@ class FootballLeagueMatchBillAnalysis extends React.Component {
 
     refresh = () => {
         let currentLeague;
-        if(this.props.location){
+        if (this.props.location) {
             currentLeague = getQueryString(this.props.location.search, "leagueId");
-        }else{
+        } else {
             currentLeague = this.props.leagueId;
         }
         this.fetch({leagueId: currentLeague})
@@ -57,16 +58,25 @@ class FootballLeagueMatchBillAnalysis extends React.Component {
         return (
             <div className="gutter-example">
                 <Card>
-                    {this.state.giftBill ? <div>
+                    {this.state.chargeBill && this.state.chargeBillShow ? <div className="mt-l mb-l">
+                        <h3>视频收益</h3>
+                        <div>{`线上支付：${this.state.chargeBill ? this.state.chargeBill.online / 100 : 0}`}</div>
+                        <div>{`余额支付：${this.state.chargeBill ? this.state.chargeBill.deposit / 100 : 0}`}</div>
+                    </div> : null}
+
+                    {this.state.giftBill && this.state.giftBillShow ? <div className="mt-l mb-l">
                         <h3>礼物收益：</h3>
                         <div>{`线上支付：${this.state.giftBill ? this.state.giftBill.online / 100 : 0}`}</div>
                         <div>{`余额支付：${this.state.giftBill ? this.state.giftBill.deposit / 100 : 0}`}</div>
                     </div> : null}
-                    {this.state.chargeBill ? <div>
-                        <h3>视频收益：</h3>
-                        <div>{`线上支付：${this.state.chargeBill ? this.state.chargeBill.online / 100 : 0}`}</div>
-                        <div>{`余额支付：${this.state.chargeBill ? this.state.chargeBill.deposit / 100 : 0}`}</div>
-                    </div> : null}
+                    <div className="mt-l">
+                        <Button onClick={() => {
+                            this.setState({chargeBillShow: !this.state.chargeBillShow})
+                        }}>显示/隐藏视频收益</Button>
+                        <Button onClick={() => {
+                            this.setState({giftBillShow: !this.state.giftBillShow})
+                        }}>显示/隐藏礼物收益</Button>
+                    </div>
                 </Card>
             </div>
         );

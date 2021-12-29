@@ -198,7 +198,7 @@ class UserLeagueMemberTable extends React.Component {
             dataIndex: 'id',
             key: 'id',
             align: 'center',
-            width: '50%',
+            width: '30%',
             filterDropdown: (
                 <div className="custom-filter-dropdown">
                     <Input
@@ -232,7 +232,7 @@ class UserLeagueMemberTable extends React.Component {
             title: '订单号',
             key: 'orderId',
             dataIndex: 'orderId',
-            width: '40%',
+            width: '25%',
             align: 'center',
             render: function (text, record, index) {
                 if (record.sourceType == 0) {
@@ -246,7 +246,7 @@ class UserLeagueMemberTable extends React.Component {
             title: '来源',
             key: 'sourceType',
             dataIndex: 'sourceType',
-            width: '10%',
+            width: '15%',
             align: 'center',
             render: function (text, record, index) {
                 let source = "未知";
@@ -263,7 +263,13 @@ class UserLeagueMemberTable extends React.Component {
                 }
                 return <span>{source}</span>;
             },
-        },
+        }, {
+            title: '过期时间',
+            dataIndex: 'expireTime',
+            key: 'expireTime',
+            align: 'center',
+            width: '30%',
+        }
         ];
         if (isToolbox) {
             columns = [{
@@ -271,7 +277,7 @@ class UserLeagueMemberTable extends React.Component {
                 dataIndex: 'id',
                 key: 'id',
                 align: 'center',
-                width: '50%',
+                width: '35%',
                 filterDropdown: (
                     <div className="custom-filter-dropdown">
                         <Input
@@ -306,7 +312,7 @@ class UserLeagueMemberTable extends React.Component {
                 dataIndex: 'leagueId',
                 key: 'leagueId',
                 align: 'center',
-                width: '50%',
+                width: '35%',
                 render: function (text, record, index) {
                     if (record.league) {
                         const league = record.league;
@@ -317,6 +323,12 @@ class UserLeagueMemberTable extends React.Component {
                     }
                     return <span>未知</span>;
                 }
+            }, {
+                title: '过期时间',
+                dataIndex: 'expireTime',
+                key: 'expireTime',
+                align: 'center',
+                width: '30%',
             }]
         }
 
