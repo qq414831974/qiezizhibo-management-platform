@@ -1737,6 +1737,30 @@ export const updateLeagueAdRule = (param) => put({
     }).catch(function (error) {
         console.log(error)
     });
+export const getLeagueShopRule = (param) => get({url: `${config.football_service}/football/shop/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueShopRule = (param) => post({
+    url: `${config.football_service}/football/shop/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueShopRule = (param) => put({
+    url: `${config.football_service}/football/shop/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 export const getWXShareMomentPicture = (param) => get({url: `${config.system_service}/sys/wx/ma/picture/moment?${unpack(param)}`})
     .then(function (response) {
         return response.data;

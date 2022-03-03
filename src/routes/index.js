@@ -47,6 +47,7 @@ import UserBetManagement from "../manage/Football/Bet/UserBetManagement";
 import FootBallLeagueClipManagement from "../manage/Football/Clip/League/FootBallLeagueClipManagement";
 import FootBallMatchClipManagement from "../manage/Football/Clip/Match/FootBallMatchClipManagement";
 import FootBallLeagueAdManagement from "../manage/Football/Ad/League/FootBallLeagueAdManagement";
+import FootBallLeagueShopManagement from "../manage/Football/Shop/League/FootBallLeagueShopManagement";
 import FootBallLeagueEncryptionManagement from "../manage/Football/Encryption/League/FootBallLeagueEncryptionManagement";
 import FootBallLeagueRegistrationManagement from "../manage/Football/Registration/FootBallLeagueRegistrationManagement";
 import FootBallLeagueUnitSettingManagement from "../manage/Football/UnitSetting/FootBallLeagueUnitSettingManagement";
@@ -128,6 +129,7 @@ export default class CRouter extends Component {
                 <Route exact path="/football/league/encryption" component={this.requireAuth("/football/league/encryption",FootBallLeagueEncryptionManagement)}/>
                 <Route exact path="/football/match/encryption" component={this.requireAuth("/football/match/encryption",FootBallMatchEncrypitonManagement)}/>
                 <Route exact path="/football/league/ad" component={this.requireAuth("/football/league/ad",FootBallLeagueAdManagement)}/>
+                <Route exact path="/football/league/shop" component={this.requireAuth("/football/league/shop",FootBallLeagueShopManagement)}/>
                 {/*<Route exact path="/football/league/registration" component={this.requireAuth("/football/league/registration",FootBallLeagueRegistrationManagement)}/>*/}
                 <Route exact path="/football/league/unit" component={this.requireAuth("/football/league/unit",FootBallLeagueUnitSettingManagement)}/>
                 <Route exact path="/football/league/registration/team" component={this.requireAuth("/football/league/registration/team",TeamRegistrationManagement)}/>
