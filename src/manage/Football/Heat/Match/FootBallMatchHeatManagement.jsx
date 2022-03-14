@@ -66,57 +66,58 @@ class FootBallMatchHeatManagement extends React.Component {
         this.form = form;
     }
     handleHeatSettingSubmit = (e) => {
-        const currentMatch = getQueryString(this.props.location.search, "matchId");
-        e.preventDefault();
-        const form = this.form;
-        form.validateFields((err, values) => {
-            if (err) {
-                return;
-            }
-            values.matchId = currentMatch;
-            this.setState({modifyLoading: true})
-            if (values.type != 2) {
-                values.cashAvailable = false;
-            }
-            if (values.cashPercentMap) {
-                let cashPercentMap = {};
-                for (let key of Object.keys(values.cashPercentMap)) {
-                    if (key != null && values.cashPercentMap[key] != null) {
-                        cashPercentMap[key] = values.cashPercentMap[key];
-                    }
-                }
-                values.cashPercentMap = cashPercentMap;
-            }
-            if (this.state.data && this.state.data.id) {
-                updateMatchHeatRule(values).then(data => {
-                    this.setState({modifyLoading: false})
-                    if (data && data.code == 200) {
-                        if (data.data) {
-                            message.success('修改成功', 1);
-                            this.refresh();
-                        } else {
-                            message.warn(data.message, 1);
-                        }
-                    } else {
-                        message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
-                    }
-                })
-            } else {
-                addMatchHeatRule(values).then(data => {
-                    this.setState({modifyLoading: false})
-                    if (data && data.code == 200) {
-                        if (data.data) {
-                            message.success('修改成功', 1);
-                            this.refresh();
-                        } else {
-                            message.warn(data.message, 1);
-                        }
-                    } else {
-                        message.error('添加失败：' + (data ? data.result + "-" + data.message : data), 3);
-                    }
-                })
-            }
-        });
+        message.error('请到联赛中设置后再应用', 3);
+        // const currentMatch = getQueryString(this.props.location.search, "matchId");
+        // e.preventDefault();
+        // const form = this.form;
+        // form.validateFields((err, values) => {
+        //     if (err) {
+        //         return;
+        //     }
+        //     values.matchId = currentMatch;
+        //     this.setState({modifyLoading: true})
+        //     if (values.type != 2) {
+        //         values.cashAvailable = false;
+        //     }
+        //     if (values.cashPercentMap) {
+        //         let cashPercentMap = {};
+        //         for (let key of Object.keys(values.cashPercentMap)) {
+        //             if (key != null && values.cashPercentMap[key] != null) {
+        //                 cashPercentMap[key] = values.cashPercentMap[key];
+        //             }
+        //         }
+        //         values.cashPercentMap = cashPercentMap;
+        //     }
+        //     if (this.state.data && this.state.data.id) {
+        //         updateMatchHeatRule(values).then(data => {
+        //             this.setState({modifyLoading: false})
+        //             if (data && data.code == 200) {
+        //                 if (data.data) {
+        //                     message.success('修改成功', 1);
+        //                     this.refresh();
+        //                 } else {
+        //                     message.warn(data.message, 1);
+        //                 }
+        //             } else {
+        //                 message.error('修改失败：' + (data ? data.result + "-" + data.message : data), 3);
+        //             }
+        //         })
+        //     } else {
+        //         addMatchHeatRule(values).then(data => {
+        //             this.setState({modifyLoading: false})
+        //             if (data && data.code == 200) {
+        //                 if (data.data) {
+        //                     message.success('修改成功', 1);
+        //                     this.refresh();
+        //                 } else {
+        //                     message.warn(data.message, 1);
+        //                 }
+        //             } else {
+        //                 message.error('添加失败：' + (data ? data.result + "-" + data.message : data), 3);
+        //             }
+        //         })
+        //     }
+        // });
     }
 
     render() {

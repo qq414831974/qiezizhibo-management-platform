@@ -10,19 +10,19 @@ import {
     Button,
     Row,
     Col,
-    Collapse, Progress, Switch, message, Modal
+    Collapse, Progress, Switch, message, Modal, Card, Tabs
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
 import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {upload} from "../../../../axios";
-import imgcover from "../../../../static/imgcover.jpg";
+import LeagueHeatRoundInfo from "./LeagueHeatRoundInfo";
 
 
 const Option = Select.Option;
 const {Panel} = Collapse;
+const TabPane = Tabs.TabPane;
 
 moment.locale('zh-cn');
 
@@ -50,7 +50,10 @@ class LeagueHeatForm extends React.Component {
 
     componentDidMount() {
         if (this.props.record) {
-            this.setState({type: this.props.record.type})
+            this.setState({
+                type: this.props.record.type ? this.props.record.type : 2,
+                round: this.props.record.round ? this.props.record.round : 1,
+            });
             if (this.props.record.cashPercentMap) {
                 this.setState({
                     percentMapValue: this.props.record.cashPercentMap,
@@ -73,21 +76,6 @@ class LeagueHeatForm extends React.Component {
             }
         }
         this.setState({cashPercentMapValue: mapString})
-    }
-    handleAvatarChange = (info) => {
-        if (info.file.status === 'uploading') {
-            this.setState({uploading: true, isupload: true});
-            return;
-        }
-        if (info.file.status === 'done') {
-            this.setState({isupload: false});
-            message.success("上传成功", 3);
-        }
-    }
-    onPosterChange = (form, e) => {
-        form.setFieldsValue({
-            awardPic: e.target.value
-        })
     }
     onCashPercentMapInputClick = () => {
         this.setState({mapModalVisible: true})
@@ -150,250 +138,186 @@ class LeagueHeatForm extends React.Component {
         percentMapValue[index] = value;
         this.setState({percentMapValue})
     }
-    getPosterSelector = () => {
-        const {form} = this.props;
-        if (!form.getFieldValue('cashAvailable')) {
-            return null;
+    getRoundOptions = () => {
+        let dom = [];
+        for (let i = 1; i <= 5; i++) {
+            dom.push(<Option key={i} value={i}>共{i}轮</Option>);
         }
-        return <Select style={{width: 140}} placeholder="选择默认规则图片">
-            <Option key={`opt-all`}
-                    value="https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/cash_rule/all.jpg"
-                    onClick={() => {
-                        form.setFieldsValue({
-                            awardPic: "https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/cash_rule/all.jpg"
-                        })
-                    }}>
-                全提现版本
-            </Option>
-            <Option key={`opt-ten`}
-                    value="https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/cash_rule/ten.jpg"
-                    onClick={() => {
-                        form.setFieldsValue({
-                            awardPic: "https://qiezizhibo-1300664818.cos.ap-shanghai.myqcloud.com/images/cash_rule/ten.jpg"
-                        })
-                    }}>
-                前十名提现版本
-            </Option>
-        </Select>
+        return dom;
+    }
+    onRoundChange = (e) => {
+        console.log(e)
+        this.setState({round: e})
+    }
+    getRoundInfos = () => {
+        const {form, record} = this.props;
+        let tabs = [];
+        for (let i = 1; i <= this.state.round; i++) {
+            tabs.push(<TabPane tab={`第${i}轮`} key={`${i}`} forceRender>
+                <LeagueHeatRoundInfo record={record} form={form} round={i}/>
+            </TabPane>)
+        }
+        return <Tabs>
+            {tabs}
+        </Tabs>
     }
 
     render() {
         const {visible, form, record} = this.props;
         const {getFieldDecorator} = form;
-        const handleAvatarChange = this.handleAvatarChange
 
         return (
             <div>
                 {visible ?
                     <Form onSubmit={this.props.handleSubmit}>
-                        <FormItem {...formItemLayout} label="类型" className="bs-form-item">
-                            {getFieldDecorator('type', {
-                                initialValue: record.type ? record.type : 2,
-                                rules: [{required: true, message: '请选择类型!'}],
-                                onChange: (e) => {
-                                    this.setState({type: e})
-                                }
-                            })(
-                                <Select placeholder="请选择类型!">
-                                    {/*<Option value={0}>球队热度比拼</Option>*/}
-                                    {/*<Option value={1}>球员热度比拼</Option>*/}
-                                    <Option value={2}>联赛球员热度比拼</Option>
-                                    <Option value={3}>联赛球队热度比拼</Option>
-                                </Select>
-                            )}
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="开启" className="bs-form-item">
-                            {getFieldDecorator('available', {
-                                initialValue: record.available != null ? record.available : false,
-                                valuePropName: 'checked',
-                                rules: [{required: true, message: '请选择是否开始!'}],
-                            })(
-                                <Switch/>
-                            )}
-                        </FormItem>
-                        <Tooltip placement="topLeft" trigger="click" title="以比赛开始时间为基准，负数为提前？分钟，正数为延后？分钟">
-                            <FormItem {...formItemLayout} label="开始时间/分钟" className="bs-form-item">
-                                {getFieldDecorator('startInterval', {
-                                    initialValue: record.startInterval ? record.startInterval : null,
-                                    rules: [{required: true, message: '请输入时间!'}],
-                                })(
-                                    <InputNumber placeholder='请输入时间!'/>
-                                )}
-                            </FormItem>
-                        </Tooltip>
-                        <Tooltip placement="topLeft" trigger="click" title="以比赛结束时间为基准，负数为提前？分钟，正数为延后？分钟">
-                            <FormItem {...formItemLayout} label="结束时间/分钟" className="bs-form-item">
-                                {getFieldDecorator('endInterval', {
-                                    initialValue: record.endInterval ? record.endInterval : null,
-                                    rules: [{required: true, message: '请输入时间!'}],
-                                })(
-                                    <InputNumber placeholder='请输入时间!'/>
-                                )}
-                            </FormItem>
-                        </Tooltip>
-                        <FormItem {...formItemLayout} label="热度初始值" className="bs-form-item">
-                            <Row gutter={10}>
-                                <Col span={12}>
-                                    <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
-                                        {getFieldDecorator('expand.baseMin', {
-                                            initialValue: record.expand != null ? record.expand.baseMin : 0,
-                                            rules: [{required: true, message: '请输入数值!'}],
-                                        })(
-                                            <InputNumber className="w-full" placeholder='请输入数值!'/>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                                <Col span={12}>
-                                    <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
-                                        {getFieldDecorator('expand.baseMax', {
-                                            initialValue: record.expand != null ? record.expand.baseMax : 0,
-                                            rules: [{required: true, message: '请输入数值!'}],
-                                        })(
-                                            <InputNumber className="w-full" placeholder='请输入数值!'/>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                        </FormItem>
-                        <FormItem {...formItemLayout} label="热度放大值" className="bs-form-item">
-                            <Row gutter={10}>
-                                <Col span={12}>
-                                    <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
-                                        {getFieldDecorator('expand.expandMin', {
-                                            initialValue: record.expand != null ? record.expand.expandMin : 1,
-                                            rules: [{required: true, message: '请输入数值!'}],
-                                        })(
-                                            <InputNumber className="w-full" placeholder='请输入数值!'/>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                                <Col span={12}>
-                                    <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
-                                        {getFieldDecorator('expand.expandMax', {
-                                            initialValue: record.expand != null ? record.expand.expandMax : 1,
-                                            rules: [{required: true, message: '请输入数值!'}],
-                                        })(
-                                            <InputNumber className="w-full" placeholder='请输入数值!'/>
-                                        )}
-                                    </FormItem>
-                                </Col>
-                            </Row>
-                        </FormItem>
-                        {this.state.type == 2 ?
-                            <div>
-                                <FormItem {...formItemLayout} label="开启提现模式" className="bs-form-item">
-                                    {getFieldDecorator('cashAvailable', {
-                                        initialValue: record.cashAvailable != null ? record.cashAvailable : false,
-                                        valuePropName: 'checked',
-                                    })(
-                                        <Switch/>
-                                    )}
-                                </FormItem>
-                                <FormItem {...formItemLayout} label="开启全员预提现" className="bs-form-item">
-                                    {getFieldDecorator('preCashAvailable', {
-                                        initialValue: record.preCashAvailable != null ? record.preCashAvailable : false,
-                                        valuePropName: 'checked',
-                                    })(
-                                        <Switch/>
-                                    )}
-                                </FormItem>
-                                <FormItem {...formItemLayout} label="全员预提现百分比" className="bs-form-item">
-                                    {getFieldDecorator('preCashPercent', {
-                                        initialValue: record.preCashPercent != null ? record.preCashPercent : null,
-                                    })(
-                                        <InputNumber formatter={value => `${value}%`}
-                                                     parser={value => value.replace('%', '')}
-                                                     placeholder='请输入百分比!'/>
-                                    )}
-                                </FormItem>
-                                <Row onClick={this.onCashPercentMapInputClick}>
-                                    <Col xs={24} sm={4} style={{textAlign: "end", color: "rgba(0, 0, 0, 0.85)"}}>
-                                        <span>点击修改提现规则：</span>
-                                    </Col>
-                                    <Col xs={24} sm={16}>
-                                        <Input.TextArea
-                                            autoSize={{minRows: 3, maxRows: 11}}
-                                            className="cursor-hand"
-                                            value={this.state.cashPercentMapValue}
-                                            disabled/>
-                                    </Col>
-                                </Row>
-                                <FormItem {...formItemLayout} label="提现规则" hidden className="bs-form-item">
-                                    {getFieldDecorator('cashPercentMap', {
-                                        initialValue: record.cashPercentMap != null ? record.cashPercentMap : null,
-                                    })(
-                                        <Input hidden disabled/>
-                                    )}
-                                </FormItem>
-                                <Tooltip placement="topLeft" trigger="click" title="热度pk结束时间为基准？天后不验证则提现失效">
-                                    <FormItem {...formItemLayout} label="提现验证过期时间/天" className="bs-form-item">
-                                        {getFieldDecorator('cashVerifyExpireDays', {
-                                            initialValue: record.cashVerifyExpireDays ? record.cashVerifyExpireDays : null,
-                                        })(
-                                            <InputNumber formatter={value => `${value}天`}
-                                                         parser={value => value.replace('天', '')}
-                                                         placeholder='请输入时间!'/>
-                                        )}
-                                    </FormItem>
-                                </Tooltip>
-                            </div> : null}
-                        <FormItem {...formItemLayout} label="奖品/规则" className="bs-form-item">
-                            {getFieldDecorator('award', {
-                                initialValue: record.award ? record.award : null,
-                                // rules: [{required: true, message: '请输入奖品!'}],
-                            })(
-                                <Input placeholder='请输入奖品!'/>
-                            )}
-                        </FormItem>
-                        <div className="center w-full">
-                            <span className="mb-n mt-m" style={{fontSize: 20}}>奖品/规则图片</span>
-                        </div>
-                        <div className="center w-full">
-                            <FormItem {...formItemLayout} className="bs-form-item form-page">
-                                {getFieldDecorator('awardPic', {
-                                    // initialValue: this.state.currentLeague?this.state.currentLeague.poster:null,
-                                    getValueFromEvent(e) {
-                                        return form.getFieldValue('awardPic')
-                                    },
-                                    onChange(e) {
-                                        const file = e.file;
-                                        if (file.response) {
-                                            form.setFieldsValue({
-                                                awardPic: file.response.data
-                                            })
-                                        }
-                                        handleAvatarChange(e);
+                        <Card title="基础设置">
+                            <FormItem {...formItemLayout} label="类型" className="bs-form-item">
+                                {getFieldDecorator('type', {
+                                    initialValue: record.type ? record.type : 2,
+                                    rules: [{required: true, message: '请选择类型!'}],
+                                    onChange: (e) => {
+                                        this.setState({type: e})
                                     }
                                 })(
-                                    <Upload
-                                        accept="image/*"
-                                        action={upload}
-                                        listType="picture-card"
-                                        withCredentials={true}
-                                        showUploadList={false}
-                                        disabled={this.state.uploading}
-                                        onChange={this.handleAvatarChange}
-                                    >
-                                        {
-                                            <img
-                                                src={form.getFieldValue('awardPic') ? form.getFieldValue('awardPic') :
-                                                    (record.awardPic ? record.awardPic : imgcover)}
-                                                alt="poster"
-                                                className="form-page-img"/>
-                                        }
-
-                                    </Upload>
+                                    <Select placeholder="请选择类型!">
+                                        {/*<Option value={0}>球队热度比拼</Option>*/}
+                                        {/*<Option value={1}>球员热度比拼</Option>*/}
+                                        <Option value={2}>联赛球员热度比拼</Option>
+                                        <Option value={3}>联赛球队热度比拼</Option>
+                                    </Select>
                                 )}
                             </FormItem>
-                        </div>
-                        <div className="center mt-m">
-                            <Input
-                                addonBefore={this.getPosterSelector()}
-                                style={{minWidth: 300, textAlign: "center"}}
-                                placeholder='图片地址'
-                                onChange={this.onPosterChange.bind(this, form)}
-                                value={form.getFieldValue('awardPic') ? form.getFieldValue('awardPic') : record.awardPic}/>
-                        </div>
+                            <FormItem {...formItemLayout} label="开启" className="bs-form-item">
+                                {getFieldDecorator('available', {
+                                    initialValue: record.available != null ? record.available : false,
+                                    valuePropName: 'checked',
+                                    rules: [{required: true, message: '请选择是否开始!'}],
+                                })(
+                                    <Switch/>
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="热度初始值" className="bs-form-item">
+                                <Row gutter={10}>
+                                    <Col span={12}>
+                                        <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
+                                            {getFieldDecorator('expand.baseMin', {
+                                                initialValue: record.expand != null ? record.expand.baseMin : 0,
+                                                rules: [{required: true, message: '请输入数值!'}],
+                                            })(
+                                                <InputNumber className="w-full" placeholder='请输入数值!'/>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={12}>
+                                        <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
+                                            {getFieldDecorator('expand.baseMax', {
+                                                initialValue: record.expand != null ? record.expand.baseMax : 0,
+                                                rules: [{required: true, message: '请输入数值!'}],
+                                            })(
+                                                <InputNumber className="w-full" placeholder='请输入数值!'/>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="热度放大值" className="bs-form-item">
+                                <Row gutter={10}>
+                                    <Col span={12}>
+                                        <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
+                                            {getFieldDecorator('expand.expandMin', {
+                                                initialValue: record.expand != null ? record.expand.expandMin : 1,
+                                                rules: [{required: true, message: '请输入数值!'}],
+                                            })(
+                                                <InputNumber className="w-full" placeholder='请输入数值!'/>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                    <Col span={12}>
+                                        <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
+                                            {getFieldDecorator('expand.expandMax', {
+                                                initialValue: record.expand != null ? record.expand.expandMax : 1,
+                                                rules: [{required: true, message: '请输入数值!'}],
+                                            })(
+                                                <InputNumber className="w-full" placeholder='请输入数值!'/>
+                                            )}
+                                        </FormItem>
+                                    </Col>
+                                </Row>
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="轮次" className="bs-form-item">
+                                {getFieldDecorator('round', {
+                                    initialValue: record.round ? record.round : 1,
+                                    rules: [{required: true, message: '请选择轮次!'}],
+                                })(
+                                    <Select placeholder="请选择类型!" onChange={this.onRoundChange}>
+                                        {this.getRoundOptions()}
+                                    </Select>
+                                )}
+                            </FormItem>
+                        </Card>
+                        <Card title="轮次信息设置">
+                            {this.getRoundInfos()}
+                        </Card>
+                        <Card title="提现模式设置">
+                            {this.state.type == 2 ?
+                                <div>
+                                    <FormItem {...formItemLayout} label="开启提现模式" className="bs-form-item">
+                                        {getFieldDecorator('cashAvailable', {
+                                            initialValue: record.cashAvailable != null ? record.cashAvailable : false,
+                                            valuePropName: 'checked',
+                                        })(
+                                            <Switch/>
+                                        )}
+                                    </FormItem>
+                                    <FormItem {...formItemLayout} label="开启全员预提现" className="bs-form-item">
+                                        {getFieldDecorator('preCashAvailable', {
+                                            initialValue: record.preCashAvailable != null ? record.preCashAvailable : false,
+                                            valuePropName: 'checked',
+                                        })(
+                                            <Switch/>
+                                        )}
+                                    </FormItem>
+                                    <FormItem {...formItemLayout} label="全员预提现百分比" className="bs-form-item">
+                                        {getFieldDecorator('preCashPercent', {
+                                            initialValue: record.preCashPercent != null ? record.preCashPercent : null,
+                                        })(
+                                            <InputNumber formatter={value => `${value}%`}
+                                                         parser={value => value.replace('%', '')}
+                                                         placeholder='请输入百分比!'/>
+                                        )}
+                                    </FormItem>
+                                    <Row onClick={this.onCashPercentMapInputClick}>
+                                        <Col xs={24} sm={4} style={{textAlign: "end", color: "rgba(0, 0, 0, 0.85)"}}>
+                                            <span>点击修改提现规则：</span>
+                                        </Col>
+                                        <Col xs={24} sm={16}>
+                                            <Input.TextArea
+                                                autoSize={{minRows: 3, maxRows: 11}}
+                                                className="cursor-hand"
+                                                value={this.state.cashPercentMapValue}
+                                                disabled/>
+                                        </Col>
+                                    </Row>
+                                    <FormItem {...formItemLayout} label="提现规则" hidden className="bs-form-item">
+                                        {getFieldDecorator('cashPercentMap', {
+                                            initialValue: record.cashPercentMap != null ? record.cashPercentMap : null,
+                                        })(
+                                            <Input hidden disabled/>
+                                        )}
+                                    </FormItem>
+                                    <Tooltip placement="topLeft" trigger="click" title="热度pk结束时间为基准？天后不验证则提现失效">
+                                        <FormItem {...formItemLayout} label="提现验证过期时间/天" className="bs-form-item">
+                                            {getFieldDecorator('cashVerifyExpireDays', {
+                                                initialValue: record.cashVerifyExpireDays ? record.cashVerifyExpireDays : null,
+                                            })(
+                                                <InputNumber formatter={value => `${value}天`}
+                                                             parser={value => value.replace('天', '')}
+                                                             placeholder='请输入时间!'/>
+                                            )}
+                                        </FormItem>
+                                    </Tooltip>
+                                </div> : null}
+                        </Card>
                         {record.id ? <FormItem {...formItemLayout} hidden className="bs-form-item">
                             {getFieldDecorator('id', {
                                 initialValue: record.id,

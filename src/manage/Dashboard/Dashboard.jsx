@@ -111,6 +111,8 @@ class Dashboard extends React.Component {
                         <div className="gutter-box">
                             <Card title="新增功能" bordered={false}
                                   style={{height: 214, width: "100%", overflow: "scroll"}}>
+                                <div className="w-full">2022-03-14：热度PK新增轮次功能</div>
+                                <div className="w-full">2022-02-27：新增链接商城功能</div>
                                 <div className="w-full">2021-11-15：联赛组委会功能更新</div>
                                 <div className="w-full">2021-11-15：创建系列赛填写轮次，场地，组别等信息，在创建系列赛中的联赛时会提供默认值</div>
                                 <div className="w-full">2021-11-01：联赛会员更新</div>

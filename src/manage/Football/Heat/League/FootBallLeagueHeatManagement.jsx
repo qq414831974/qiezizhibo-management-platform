@@ -111,6 +111,26 @@ class FootBallLeagueHeatManagement extends React.Component {
                 return;
             }
             values.leagueId = currentLeague;
+            if (values.roundInfos) {
+                const keys = Object.keys(values.roundInfos);
+                if (keys.length < values.round) {
+                    message.error('轮次信息不能小于设置的轮次数量', 5);
+                    return;
+                }
+                let roundInfos = {};
+                for (let key of keys) {
+                    if (key != null && values.roundInfos[key] != null) {
+                        values.roundInfos[key].startTime = values.roundInfos[key].startTime ? values.roundInfos[key].startTime.format('YYYY/MM/DD HH:mm:ss') : null;
+                        values.roundInfos[key].endTime = values.roundInfos[key].endTime ? values.roundInfos[key].endTime.format('YYYY/MM/DD HH:mm:ss') : null;
+                        if (values.roundInfos[key].startTime == null || values.roundInfos[key].endTime == null) {
+                            message.error('轮次信息时间设置错误', 5);
+                            return;
+                        }
+                        roundInfos[key] = values.roundInfos[key];
+                    }
+                }
+                values.roundInfos = roundInfos;
+            }
             this.setState({modifyLoading: true})
             if (values.type != 2) {
                 values.cashAvailable = false;

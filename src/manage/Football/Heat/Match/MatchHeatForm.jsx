@@ -10,19 +10,19 @@ import {
     Button,
     Row,
     Col,
-    Collapse, Progress, Switch, message, Modal
+    Collapse, Progress, Switch, message, Modal, Card, Tabs
 } from 'antd';
 import moment from 'moment'
 import 'moment/locale/zh-cn';
 import {receiveData} from "../../../../action";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {upload} from "../../../../axios";
-import imgcover from "../../../../static/imgcover.jpg";
+import MatchHeatRoundInfo from "./MatchHeatRoundInfo";
 
 
 const Option = Select.Option;
 const {Panel} = Collapse;
+const TabPane = Tabs.TabPane;
 
 moment.locale('zh-cn');
 
@@ -50,7 +50,10 @@ class MatchHeatForm extends React.Component {
 
     componentDidMount() {
         if (this.props.record) {
-            this.setState({type: this.props.record.type})
+            this.setState({
+                type: this.props.record.type ? this.props.record.type : 2,
+                round: this.props.record.round ? this.props.record.round : 1,
+            });
             if (this.props.record.cashPercentMap) {
                 this.setState({
                     percentMapValue: this.props.record.cashPercentMap,
@@ -73,21 +76,6 @@ class MatchHeatForm extends React.Component {
             }
         }
         this.setState({cashPercentMapValue: mapString})
-    }
-    handleAvatarChange = (info) => {
-        if (info.file.status === 'uploading') {
-            this.setState({uploading: true, isupload: true});
-            return;
-        }
-        if (info.file.status === 'done') {
-            this.setState({isupload: false});
-            message.success("上传成功", 3);
-        }
-    }
-    onPosterChange = (form, e) => {
-        form.setFieldsValue({
-            awardPic: e.target.value
-        })
     }
     onCashPercentMapInputClick = () => {
         this.setState({mapModalVisible: true})
@@ -150,16 +138,39 @@ class MatchHeatForm extends React.Component {
         percentMapValue[index] = value;
         this.setState({percentMapValue})
     }
+    getRoundOptions = () => {
+        let dom = [];
+        for (let i = 1; i <= 5; i++) {
+            dom.push(<Option key={i} value={i}>共{i}轮</Option>);
+        }
+        return dom;
+    }
+    onRoundChange = (e) => {
+        console.log(e)
+        this.setState({round: e})
+    }
+    getRoundInfos = () => {
+        const {form, record} = this.props;
+        let tabs = [];
+        for (let i = 1; i <= this.state.round; i++) {
+            tabs.push(<TabPane tab={`第${i}轮`} key={`${i}`} forceRender>
+                <MatchHeatRoundInfo record={record} form={form} round={i}/>
+            </TabPane>)
+        }
+        return <Tabs>
+            {tabs}
+        </Tabs>
+    }
 
     render() {
         const {visible, form, record} = this.props;
         const {getFieldDecorator} = form;
-        const handleAvatarChange = this.handleAvatarChange
 
         return (
             <div>
                 {visible ?
                 <Form onSubmit={this.props.handleSubmit}>
+                        <Card title="基础设置">
                     <FormItem {...formItemLayout} label="类型" className="bs-form-item">
                         {getFieldDecorator('type', {
                             initialValue: record.type ? record.type : 2,
@@ -185,32 +196,12 @@ class MatchHeatForm extends React.Component {
                             <Switch/>
                         )}
                     </FormItem>
-                    <Tooltip placement="topLeft" trigger="click" title="以比赛开始时间为基准，负数为提前？分钟，正数为延后？分钟">
-                        <FormItem {...formItemLayout} label="开始时间/分钟" className="bs-form-item">
-                            {getFieldDecorator('startInterval', {
-                                initialValue: record.startInterval ? record.startInterval : null,
-                                rules: [{required: true, message: '请输入时间!'}],
-                            })(
-                                    <InputNumber placeholder='请输入时间!'/>
-                            )}
-                        </FormItem>
-                    </Tooltip>
-                    <Tooltip placement="topLeft" trigger="click" title="以比赛结束时间为基准，负数为提前？分钟，正数为延后？分钟">
-                        <FormItem {...formItemLayout} label="结束时间/分钟" className="bs-form-item">
-                            {getFieldDecorator('endInterval', {
-                                initialValue: record.endInterval ? record.endInterval : null,
-                                rules: [{required: true, message: '请输入时间!'}],
-                            })(
-                                    <InputNumber placeholder='请输入时间!'/>
-                            )}
-                        </FormItem>
-                    </Tooltip>
                     <FormItem {...formItemLayout} label="热度初始值" className="bs-form-item">
                         <Row gutter={10}>
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
                                     {getFieldDecorator('expand.baseMin', {
-                                        initialValue: record.expand != null ? record.expand.baseMin : null,
+                                                initialValue: record.expand != null ? record.expand.baseMin : 0,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                             <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -220,7 +211,7 @@ class MatchHeatForm extends React.Component {
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
                                     {getFieldDecorator('expand.baseMax', {
-                                        initialValue: record.expand != null ? record.expand.baseMax : null,
+                                                initialValue: record.expand != null ? record.expand.baseMax : 0,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -234,7 +225,7 @@ class MatchHeatForm extends React.Component {
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最小值" className="bs-form-item">
                                     {getFieldDecorator('expand.expandMin', {
-                                        initialValue: record.expand != null ? record.expand.expandMin : null,
+                                                initialValue: record.expand != null ? record.expand.expandMin : 1,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                             <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -244,7 +235,7 @@ class MatchHeatForm extends React.Component {
                             <Col span={12}>
                                 <FormItem  {...formItemLayout} label="最大值" className="bs-form-item">
                                     {getFieldDecorator('expand.expandMax', {
-                                        initialValue: record.expand != null ? record.expand.expandMax : null,
+                                                initialValue: record.expand != null ? record.expand.expandMax : 1,
                                         rules: [{required: true, message: '请输入数值!'}],
                                     })(
                                         <InputNumber className="w-full" placeholder='请输入数值!'/>
@@ -253,6 +244,21 @@ class MatchHeatForm extends React.Component {
                             </Col>
                         </Row>
                     </FormItem>
+                            <FormItem {...formItemLayout} label="轮次" className="bs-form-item">
+                                {getFieldDecorator('round', {
+                                    initialValue: record.round ? record.round : 1,
+                                    rules: [{required: true, message: '请选择轮次!'}],
+                                })(
+                                    <Select placeholder="请选择类型!" onChange={this.onRoundChange}>
+                                        {this.getRoundOptions()}
+                                    </Select>
+                                )}
+                            </FormItem>
+                        </Card>
+                        <Card title="轮次信息设置">
+                            {this.getRoundInfos()}
+                        </Card>
+                        <Card title="提现模式设置">
                         {this.state.type == 2 ?
                             <div>
                                 <FormItem {...formItemLayout} label="开启提现模式" className="bs-form-item">
@@ -311,60 +317,7 @@ class MatchHeatForm extends React.Component {
                                     </FormItem>
                                 </Tooltip>
                             </div> : null}
-                        <FormItem {...formItemLayout} label="奖品/规则" className="bs-form-item">
-                        {getFieldDecorator('award', {
-                            initialValue: record.award ? record.award : null,
-                            // rules: [{required: true, message: '请输入奖品!'}],
-                        })(
-                            <Input placeholder='请输入奖品!'/>
-                        )}
-                    </FormItem>
-                    <div className="center w-full">
-                            <span className="mb-n mt-m" style={{fontSize: 20}}>奖品/规则图片</span>
-                    </div>
-                    <div className="center w-full">
-                        <FormItem {...formItemLayout} className="bs-form-item form-match-poster">
-                            {getFieldDecorator('awardPic', {
-                                // initialValue: this.state.currentLeague?this.state.currentLeague.poster:null,
-                                getValueFromEvent(e) {
-                                    return form.getFieldValue('awardPic')
-                                },
-                                onChange(e) {
-                                    const file = e.file;
-                                    if (file.response) {
-                                        form.setFieldsValue({
-                                            awardPic: file.response.data
-                                        })
-                                    }
-                                    handleAvatarChange(e);
-                                }
-                            })(
-                                <Upload
-                                    accept="image/*"
-                                    action={upload}
-                                    listType="picture-card"
-                                    withCredentials={true}
-                                    showUploadList={false}
-                                    disabled={this.state.uploading}
-                                    onChange={this.handleAvatarChange}
-                                >
-                                    {
-                                        <img
-                                            src={form.getFieldValue('awardPic') ? form.getFieldValue('awardPic') :
-                                                (record.awardPic ? record.awardPic : imgcover)}
-                                            alt="poster"
-                                            className="form-match-poster-img"/>
-                                    }
-
-                                </Upload>
-                            )}
-                        </FormItem>
-                    </div>
-                    <div className="center mt-m">
-                        <Input style={{minWidth: 300, textAlign: "center"}} placeholder='图片地址'
-                               onChange={this.onPosterChange.bind(this, form)}
-                               value={form.getFieldValue('awardPic') ? form.getFieldValue('awardPic') : record.awardPic}/>
-                    </div>
+                        </Card>
                     {record.id ? <FormItem {...formItemLayout} hidden className="bs-form-item">
                         {getFieldDecorator('id', {
                             initialValue: record.id,

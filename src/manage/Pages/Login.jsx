@@ -147,7 +147,7 @@ class Login extends React.Component {
                         textAlign: "center",
                         background: "#fff"
                     }}>
-                        <div>©2021 茄子直播</div>
+                        <div>©2022 茄子直播</div>
                         <a href="https://beian.miit.gov.cn/" target="_blank">
                             <span className="ml-l" style={{textDecoration: "underline"}}>闽ICP备17018408号-1</span>
                         </a>

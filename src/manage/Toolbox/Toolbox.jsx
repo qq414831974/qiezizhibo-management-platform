@@ -53,7 +53,7 @@ class Toolbox extends React.Component {
                         <Routes permissions={permission.data}/>
                     </Content>
                     <Footer style={{textAlign: 'center'}}>
-                        <div>©2021 茄子直播</div>
+                        <div>©2022 茄子直播</div>
                     </Footer>
                 </Layout>
             </DocumentTitle>
