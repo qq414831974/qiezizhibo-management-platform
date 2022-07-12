@@ -867,6 +867,18 @@ class FootBallMatchModifyDialog extends React.Component {
                             </FormItem>
                         </div>
                         <div className="center w-full">
+                            <p className="mt-m" style={{fontSize: 22}}>隐藏比赛</p>
+                            <span>是否隐藏比赛：</span>
+                            <FormItem className="bs-form-item">
+                                {getFieldDecorator('hidden', {
+                                    initialValue: record.hidden != null ? record.hidden : false,
+                                    valuePropName: "checked"
+                                })(
+                                    <Checkbox/>
+                                )}
+                            </FormItem>
+                        </div>
+                        <div className="center w-full">
                             <p className="mt-m" style={{fontSize: 22}}>直播间</p>
                             <span>是否关闭：</span>
                             <FormItem className="bs-form-item">
