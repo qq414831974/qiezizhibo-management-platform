@@ -139,6 +139,12 @@ class FootBallLeagueMatchModifyTeamDialog extends React.Component {
         })
         return dom;
     }
+    getQuitOption = () => {
+        let dom = [];
+        dom.push(<Option key={`quit-option-${0}`} value={0}>正常</Option>)
+        dom.push(<Option key={`quit-option-${1}`} value={1}>退出</Option>)
+        return dom;
+    }
 
     render() {
         const {visible, form} = this.props;
@@ -148,6 +154,16 @@ class FootBallLeagueMatchModifyTeamDialog extends React.Component {
             visible ?
                 <div>
                     <Form>
+                        <FormItem {...formItemLayout} label="退出状态" className="bs-form-item">
+                            {getFieldDecorator('quitStatus', {
+                                rules: [{required: true, message: '请选择退出状态'}],
+                                initialValue: this.props.record.quitStatus ? this.props.record.quitStatus : null,
+                            })(
+                                <Select style={{width: '100%'}}>
+                                    {this.getQuitOption()}
+                                </Select>
+                            )}
+                        </FormItem>
                         <FormItem {...formItemLayout} label="组别" className="bs-form-item">
                             {getFieldDecorator('subgroup', {
                                 rules: [{required: true, message: '请选择组别'}],
