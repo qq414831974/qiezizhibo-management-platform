@@ -64,6 +64,13 @@ export const menus_admin = [
             // { key: '/setting/wechat', title: '小程序', icon: 'wechat', },
         ],
     },
+    {
+        key: '/bbs', title: 'bbs设置', icon: 'slack',
+        public: 1,
+        sub: [
+            {key: '/bbs/board', title: '板块设置', icon: 'table',},
+        ],
+    },
     {key: '/sys/feedback', title: '投诉反馈', icon: 'customer-service',},
     {key: '/sys/log', title: '操作日志', icon: 'alert',},
 ];

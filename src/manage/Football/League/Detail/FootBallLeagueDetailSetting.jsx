@@ -195,6 +195,10 @@ class FootBallLeagueDetailSetting extends React.Component {
                                         `/football/league/shop?leagueId=${leagueId}`
                                     }>商城</Link>
                                     </Button>
+                                    <Button key="shop" type="primary"><Link to={
+                                        `/football/league/bbs?leagueId=${leagueId}`
+                                    }>bbs</Link>
+                                    </Button>
                                 </div>
                                 <div className="w-full center mt-l">
                                     <Button key="all" type="primary" onClick={this.onApplyConfirmClick}>

@@ -362,6 +362,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                                                   onClick={this.onTeamClick.bind(this, item)}>
                             <Avatar size="large" src={item.team.headImg ? item.team.headImg : logo}/>
                             <span className="ml-s">{item.team.name}</span>
+                            {item.quitStatus == 1 ? <div className="pull-right pa-s">---------已退出---------</div>:
                             <div className="pull-right pa-s">
                                 <span
                                     className="pl-s pr-s">{item.matchTotal ? item.matchTotal : 0}</span>
@@ -371,6 +372,7 @@ class FootballLeagueMatchDetailManagement extends React.Component {
                                     className="pl-s pr-s">{`${item.totalGoal ? item.totalGoal : 0}/${item.totalGoalLost ? item.totalGoalLost : 0}`}</span>
                                 <span className="pl-s pr-s">{item.ranks ? item.ranks : 0}</span>
                             </div>
+                            }
                         </div>)}
                     />)
             })

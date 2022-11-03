@@ -664,6 +664,11 @@ class FootBallMatchTable extends React.Component {
                 dom.push(<span className="w-full center">
                             {record.status == null ? "未开" : (record.status == -1 ? "未开" : status[record.status].text)}
                         </span>)
+                if (record.hidden) {
+                    dom.push(<span className="w-full center purple">
+                            已隐藏
+                        </span>)
+                }
                 if (!record.available) {
                     dom.push(<span className="w-full center danger">
                             直播间关闭

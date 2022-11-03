@@ -16,6 +16,7 @@ export const media_service = `${gateway_client_service}`
 export const chat_service = `${gateway_client_service}`
 export const live_service = `${gateway_client_service}`
 export const pay_service = `${gateway_client_service}`
+export const bbs_service = `${gateway_client_service}`
 export const websocket_service = `${gateway_client_service}`
 
 

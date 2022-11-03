@@ -48,6 +48,7 @@ import FootBallLeagueClipManagement from "../manage/Football/Clip/League/FootBal
 import FootBallMatchClipManagement from "../manage/Football/Clip/Match/FootBallMatchClipManagement";
 import FootBallLeagueAdManagement from "../manage/Football/Ad/League/FootBallLeagueAdManagement";
 import FootBallLeagueShopManagement from "../manage/Football/Shop/League/FootBallLeagueShopManagement";
+import FootBallLeagueBbsManagement from "../manage/Football/Bbs/League/FootBallLeagueBbsManagement";
 import FootBallLeagueEncryptionManagement from "../manage/Football/Encryption/League/FootBallLeagueEncryptionManagement";
 import FootBallLeagueRegistrationManagement from "../manage/Football/Registration/FootBallLeagueRegistrationManagement";
 import FootBallLeagueUnitSettingManagement from "../manage/Football/UnitSetting/FootBallLeagueUnitSettingManagement";
@@ -60,6 +61,8 @@ import PaymentConfigManagement from "../manage/Setting/Payment/PaymentConfigMana
 import Unauthorized from '../manage/Pages/Unauthorized';
 import LogManagement from '../manage/Log/LogManagement';
 import FeedbackManagement from '../manage/Setting/Feedback/FeedbackManagement';
+import BbsBoardManagement from '../manage/Bbs/BbsBoardManagement';
+import BbsClassManagement from '../manage/Bbs/BbsClass/BbsClassManagement';
 
 var UrlPattern = require('url-pattern');
 
@@ -130,6 +133,7 @@ export default class CRouter extends Component {
                 <Route exact path="/football/match/encryption" component={this.requireAuth("/football/match/encryption",FootBallMatchEncrypitonManagement)}/>
                 <Route exact path="/football/league/ad" component={this.requireAuth("/football/league/ad",FootBallLeagueAdManagement)}/>
                 <Route exact path="/football/league/shop" component={this.requireAuth("/football/league/shop",FootBallLeagueShopManagement)}/>
+                <Route exact path="/football/league/bbs" component={this.requireAuth("/bbs",FootBallLeagueBbsManagement)}/>
                 {/*<Route exact path="/football/league/registration" component={this.requireAuth("/football/league/registration",FootBallLeagueRegistrationManagement)}/>*/}
                 <Route exact path="/football/league/unit" component={this.requireAuth("/football/league/unit",FootBallLeagueUnitSettingManagement)}/>
                 <Route exact path="/football/league/registration/team" component={this.requireAuth("/football/league/registration/team",TeamRegistrationManagement)}/>
@@ -148,6 +152,8 @@ export default class CRouter extends Component {
                 <Route path="/analysis/bill" component={this.requireAuth("/analysis/bill",FootballLeagueMatchBillAnalysis)}/>
                 <Route path="/sys/log" component={this.requireAuth("/sys/log",LogManagement)}/>
                 <Route path="/sys/feedback" component={this.requireAuth("/sys/feedback",FeedbackManagement)}/>
+                <Route path="/bbs/board" component={this.requireAuth("/bbs",BbsBoardManagement)}/>
+                <Route path="/bbs/class" component={this.requireAuth("/bbs",BbsClassManagement)}/>
                 <Route render={() => <Redirect to="/index"/>}/>
             </Switch>
         )

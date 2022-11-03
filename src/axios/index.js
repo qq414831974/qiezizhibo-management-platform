@@ -2100,6 +2100,78 @@ export const updateLeagueUnitSettingRule = (param) => put({
     }).catch(function (error) {
         console.log(error)
     });
+export const getLeagueBbsRule = (param) => get({url: `${config.football_service}/football/bbs/league?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addLeagueBbsRule = (param) => post({
+    url: `${config.football_service}/football/bbs/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateLeagueBbsRule = (param) => put({
+    url: `${config.football_service}/football/bbs/league`,
+    data: param
+})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getBbsBoard = (param) => get({url: `${config.bbs_service}/bbs/board?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addBbsBoard = (param) => post({url: `${config.bbs_service}/bbs/board`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateBbsBoard = (param) => put({url: `${config.bbs_service}/bbs/board`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteBbsBoard = (param) => del({url: `${config.bbs_service}/bbs/board?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const getBbsClass = (param) => get({url: `${config.bbs_service}/bbs/class?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const addBbsClass = (param) => post({url: `${config.bbs_service}/bbs/class`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const updateBbsClass = (param) => put({url: `${config.bbs_service}/bbs/class`, data: param})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
+export const deleteBbsClass = (param) => del({url: `${config.bbs_service}/bbs/class?${unpack(param)}`})
+    .then(function (response) {
+        return response.data;
+    }).catch(function (error) {
+        console.log(error)
+    });
 //暂时无用
 export const getProducts = (params) => get({url: `${config.pay_service}/product?${unpack(params)}`})
     .then(function (response) {

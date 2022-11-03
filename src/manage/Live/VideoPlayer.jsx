@@ -10,7 +10,7 @@ import 'video.js/dist/video-js.css';
 class VideoPlayer extends React.Component {
     componentDidMount() {
         // instantiate Video.js
-        this.player = videojs(this.videoNode, this.props, function onPlayerReady() {
+        this.player = videojs(this.videoNode, {overrideNative: false, ...this.props}, function onPlayerReady() {
 
         });
     }
