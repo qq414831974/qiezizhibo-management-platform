@@ -523,12 +523,12 @@ class FootBallLeagueMatchSeriesManagement extends React.Component {
                                                        onClick={this.showLeagueMatchAddDialog}/>
                                                <Button type="primary" shape="circle" icon="zoom-in"
                                                        onClick={this.showLeagueSeriesAddDialog}/>
-                                               <Tooltip title="导出热度pk网页链接">
-                                                   <Button type="primary" shape="circle" icon="export"
-                                                           hidden={this.state.selectedRowKeys.length > 0 ? false : true}
-                                                           onClick={this.handleExportHeatWebPage}>{selectedRowKeys.length}
-                                                   </Button>
-                                               </Tooltip>
+                                               {/*<Tooltip title="导出热度pk网页链接">*/}
+                                               {/*    <Button type="primary" shape="circle" icon="export"*/}
+                                               {/*            hidden={this.state.selectedRowKeys.length > 0 ? false : true}*/}
+                                               {/*            onClick={this.handleExportHeatWebPage}>{selectedRowKeys.length}*/}
+                                               {/*    </Button>*/}
+                                               {/*</Tooltip>*/}
                                                <Button type="primary" shape="circle" icon="reload"
                                                        className="pull-right"
                                                        loading={this.state.loading}

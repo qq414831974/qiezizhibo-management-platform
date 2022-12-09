@@ -47,8 +47,8 @@ class Login extends React.Component {
         }
     }
 
-    getUserInfo = (password, remember) => {
-        getCurrentAdminUserInfo().then(userAuth => {
+    getUserInfo = (password, remember, userName) => {
+        getCurrentAdminUserInfo({username:userName}).then(userAuth => {
             if (userAuth && userAuth.code == 200 && userAuth.data) {
                 setUser({rememberMe: remember, ...userAuth.data, password: password})
                 setRole(userAuth.data.roles)
@@ -67,7 +67,7 @@ class Login extends React.Component {
                     this.setState({loginLoading: true})
                     if (logindata && logindata.code == 200) {
                         setToken(logindata.data);
-                        this.getUserInfo(values.password, values.rememberMe);
+                        this.getUserInfo(values.password, values.rememberMe, values.userName);
                     } else {
                         message.error('登陆失败：' + (logindata ? logindata.code + ":" + logindata.message : logindata), 3);
                     }
